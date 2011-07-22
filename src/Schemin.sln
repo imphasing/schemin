@@ -1,0 +1,19 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schemin", "Schemin\Schemin.csproj", "{FEA08E52-2E71-4F05-8B98-F58FC8E5E64D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AnyCPU = Debug|AnyCPU
+		Release|AnyCPU = Release|AnyCPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FEA08E52-2E71-4F05-8B98-F58FC8E5E64D}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{FEA08E52-2E71-4F05-8B98-F58FC8E5E64D}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{FEA08E52-2E71-4F05-8B98-F58FC8E5E64D}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
