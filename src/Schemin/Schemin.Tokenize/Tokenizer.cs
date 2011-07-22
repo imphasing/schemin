@@ -43,7 +43,7 @@ namespace Schemin.Tokenize
 			stringTokens = stringTokens.Where(filter).ToList();
 
 			var matchTokenTypes = new Dictionary<Regex, TokenType>();
-			matchTokenTypes.Add(new Regex("[-+]?[0-9]+"), TokenType.IntegerLiteral);
+			matchTokenTypes.Add(new Regex("^[-+]?[0-9]+"), TokenType.IntegerLiteral);
 			matchTokenTypes.Add(new Regex("[^\"\',()]+"), TokenType.Symbol);
 			matchTokenTypes.Add(new Regex("[(]"), TokenType.OpenParen);
 			matchTokenTypes.Add(new Regex("[)]"), TokenType.CloseParen);
