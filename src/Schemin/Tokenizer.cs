@@ -32,12 +32,15 @@ namespace Schemin
 
 		public List<Token> Tokenize(string input, Environment env)
 		{
+			var tokens = new List<Token>();
+
 			string addedWhitespace = input.Replace("(", " ( ");
 			addedWhitespace = addedWhitespace.Replace(")", " ) ");
+			string removedNewlines = addedWhitespace.Replace(System.Environment.NewLine, " ");
 
-			List<string> stringTokens = addedWhitespace.Split(' ').ToList();
-			stringTokens = stringTokens.Where(token => token != String.Empty).ToList();
-			var tokens = new List<Token>();
+			List<string> stringTokens = removedNewlines.Split(' ').ToList();
+			Func<string, bool> filter = token => (token != String.Empty && token != "");
+			stringTokens = stringTokens.Where(filter).ToList();
 
 			var matchTokenTypes = new Dictionary<Regex, TokenType>();
 			matchTokenTypes.Add(new Regex("[-+]?[0-9]+"), TokenType.IntegerLiteral);

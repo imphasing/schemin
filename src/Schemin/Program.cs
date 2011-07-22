@@ -13,7 +13,14 @@ namespace Schemin
 			Tokenizer t = new Tokenizer();
 			Environment env = new Environment();
 
-			string test = "(display \"this is a test\" \"and another test\" \"and another\")";
+			string test = @"
+(define test (lambda () (
+begin 
+(print ""test"")
+(print 1)
+)))
+(test)";
+
 			string noLiterals = t.ExtractLiterals(test, env);
 
 			List<Token> tokens = t.Tokenize(noLiterals, env);
