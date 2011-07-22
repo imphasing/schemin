@@ -30,22 +30,51 @@ namespace Schemin
 			return transformed;
 		}
 
-		public List<string> Tokenize(string input, Environment env)
+		public List<Token> Tokenize(string input, Environment env)
 		{
 			string addedWhitespace = input.Replace("(", " ( ");
 			addedWhitespace = addedWhitespace.Replace(")", " ) ");
 
-			List<string> tokens = addedWhitespace.Split(' ').ToList();
-			return tokens.Select(token => {
+			List<string> stringTokens = addedWhitespace.Split(' ').ToList();
+			stringTokens = stringTokens.Where(token => token != String.Empty).ToList();
+			var tokens = new List<Token>();
+
+			var matchTokenTypes = new Dictionary<Regex, TokenType>();
+			matchTokenTypes.Add(new Regex("[-+]?[0-9]+"), TokenType.IntegerLiteral);
+			matchTokenTypes.Add(new Regex("[^\"\',()]+"), TokenType.Symbol);
+			matchTokenTypes.Add(new Regex("[(]"), TokenType.OpenParen);
+			matchTokenTypes.Add(new Regex("[)]"), TokenType.CloseParen);
+
+			foreach (string token in stringTokens)
+			{
+				bool goodToken = false;
+
 				if (token.Contains("STRING_LITERAL_"))
 				{
-					return env.stringLiterals[token];
+					tokens.Add(new Token(TokenType.StringLiteral, env.stringLiterals[token]));
+					goodToken = true;
 				}
 				else
 				{
-					return token;
+					foreach (KeyValuePair<Regex, TokenType> kvp in matchTokenTypes)
+					{
+						Match m = kvp.Key.Match(token);
+						if (m.Success)
+						{
+							tokens.Add(new Token(kvp.Value, token));
+							goodToken = true;
+							break;
+						}
+					}
 				}
-			}).ToList();
+
+				if (!goodToken)
+				{
+					Console.WriteLine(string.Format("Error: Bad Token \"{0}\"", token));
+				}
+			}
+
+			return tokens;
 		}
 
 	}

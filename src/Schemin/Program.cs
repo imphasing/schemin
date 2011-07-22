@@ -16,17 +16,11 @@ namespace Schemin
 			string test = "(display \"this is a test\" \"and another test\" \"and another\")";
 			string noLiterals = t.ExtractLiterals(test, env);
 
-			foreach (KeyValuePair<string, string> literal in env.stringLiterals)
+			List<Token> tokens = t.Tokenize(noLiterals, env);
+
+			foreach (Token token in tokens)
 			{
-				Console.WriteLine(string.Format("Literal: {0} has value: {1}", literal.Key, literal.Value));
-			}
-
-
-			List<string> tokens = t.Tokenize(noLiterals, env);
-
-			foreach (string token in tokens)
-			{
-				Console.WriteLine(token);
+				Console.WriteLine(string.Format("Token: {0}, Type: {1}", token.Value, token.Type));
 			}
 		}
 	}
