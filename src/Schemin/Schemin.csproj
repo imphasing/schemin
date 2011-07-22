@@ -42,11 +42,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Tokenizer.cs" />
     <Compile Include="Environment.cs" />
-    <Compile Include="TokenType.cs" />
-    <Compile Include="Token.cs" />
     <Compile Include="Assembly\AssemblyInfo.cs" />
+    <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
+    <Compile Include="Schemin.Tokenize\TokenType.cs" />
+    <Compile Include="Schemin.Tokenize\Token.cs" />
+
+    <Compile Include="Schemin.Parse\ISchemeType.cs" />
+    <Compile Include="Schemin.Parse\Parser.cs" />
+    <Compile Include="Schemin.Parse\SchemeAtom.cs" />
+    <Compile Include="Schemin.Parse\SchemeInteger.cs" />
+    <Compile Include="Schemin.Parse\SchemeList.cs" />
+    <Compile Include="Schemin.Parse\SchemeString.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
