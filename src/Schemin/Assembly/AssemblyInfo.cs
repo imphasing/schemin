@@ -31,7 +31,7 @@ using System.Security.Permissions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle ("Schemin.dll")]
+[assembly: AssemblyTitle ("Schemin.exe")]
 [assembly: AssemblyVersion("0.0.1")]
 
 
