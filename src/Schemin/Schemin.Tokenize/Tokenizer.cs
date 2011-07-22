@@ -1,5 +1,5 @@
 
-namespace Schemin
+namespace Schemin.Tokenize
 {
 	using System;
 	using System.Collections.Generic;
@@ -8,7 +8,7 @@ namespace Schemin
 
 	public class Tokenizer
 	{
-		public string ExtractLiterals(string input, Environment env)
+		public string ExtractLiterals(string input, Schemin.Environment env)
 		{
 			int currentId = 0;
 			string literalMatch = "\"([^\"\\\\]|\\.)*\"";
@@ -30,7 +30,7 @@ namespace Schemin
 			return transformed;
 		}
 
-		public List<Token> Tokenize(string input, Environment env)
+		public List<Token> Tokenize(string input, Schemin.Environment env)
 		{
 			var tokens = new List<Token>();
 
@@ -79,6 +79,5 @@ namespace Schemin
 
 			return tokens;
 		}
-
 	}
 }

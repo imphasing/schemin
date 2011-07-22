@@ -1,5 +1,5 @@
 
-namespace Schemin
+namespace Schemin.Tokenize
 {
 	using System;
 
