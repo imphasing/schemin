@@ -1,7 +1,9 @@
 
-namespace Schemin.Parse
+namespace Schemin.AST
 {
-	public class ScheminLambda : ISchemeType
+	using System;
+
+	public class ScheminLambda : IScheminType
 	{
 		public ScheminList Definition;
 

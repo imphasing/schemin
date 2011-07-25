@@ -4,18 +4,25 @@ namespace Schemin.Parse
 	using System;
 	using System.Collections.Generic;
 	using Schemin.Tokenize;
+	using Schemin.AST;
 
 	public class Parser
 	{
-		public KeyValuePair<SchemeList, int> Parse(List<Token> tokens, int startIndex)
+		public ScheminList Parse(List<Token> tokens)
 		{
-			var parsed = new SchemeList(new LinkedList<ISchemeType>());
+			KeyValuePair<ScheminList, int> parsed = ParseInternal(tokens, 0);
+			return parsed.Key;
+		}
+
+		private KeyValuePair<ScheminList, int> ParseInternal(List<Token> tokens, int startIndex)
+		{
+			var parsed = new ScheminList(new LinkedList<IScheminType>());
 
 			while (startIndex < tokens.Count)
 			{
 				if (tokens[startIndex].Type == TokenType.OpenParen)
 				{
-					KeyValuePair<SchemeList, int> descended = Parse(tokens, startIndex + 1);
+					KeyValuePair<ScheminList, int> descended = ParseInternal(tokens, startIndex + 1);
 					parsed.List.AddLast(descended.Key);
 					startIndex = descended.Value;
 				}
@@ -25,26 +32,26 @@ namespace Schemin.Parse
 				}
 				else
 				{
-					ISchemeType converted = ConvertToken(tokens[startIndex]);
+					IScheminType converted = ConvertToken(tokens[startIndex]);
 					parsed.List.AddLast(converted);
 				}
 
 				startIndex++;
 			}
 
-			return new KeyValuePair<SchemeList, int>(parsed, startIndex);
+			return new KeyValuePair<ScheminList, int>(parsed, startIndex);
 		}
 				
-		public ISchemeType ConvertToken(Token token)
+		private IScheminType ConvertToken(Token token)
 		{
 			switch (token.Type)
 			{
 				case TokenType.Symbol:
-					return new SchemeAtom(token.Value);
+					return new ScheminAtom(token.Value);
 				case TokenType.IntegerLiteral:
-					return new SchemeInteger(int.Parse(token.Value));
+					return new ScheminInteger(int.Parse(token.Value));
 				case TokenType.StringLiteral:
-					return new SchemeString(token.Value);
+					return new ScheminString(token.Value);
 				default:
 					throw new Exception(string.Format("Unable to convert token of type: {0}", token.Type));
 			}

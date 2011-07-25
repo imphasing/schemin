@@ -1,7 +1,7 @@
 
-namespace Schemin.Parse
+namespace Schemin.AST
 {
-	public class ScheminString : ISchemeType
+	public class ScheminString : IScheminType
 	{
 		public string Value;
 

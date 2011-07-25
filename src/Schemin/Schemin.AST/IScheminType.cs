@@ -1,5 +1,5 @@
 
-namespace Schemin.Parse
+namespace Schemin.AST
 {
 	public interface IScheminType
 	{

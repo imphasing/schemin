@@ -1,13 +1,13 @@
 
-namespace Schemin.Parse
+namespace Schemin.AST
 {
 	using System.Collections.Generic;
 
-	public class ScheminList : ISchemeType
+	public class ScheminList : IScheminType
 	{
-		public LinkedList<ISchemeType> List;
+		public LinkedList<IScheminType> List;
 
-		public ScheminList(LinkedList<ISchemeType> list)
+		public ScheminList(LinkedList<IScheminType> list)
 		{
 			this.List = list;
 		}

@@ -1,7 +1,7 @@
 
-namespace Schemin.Parse
+namespace Schemin.AST
 {
-	public class ScheminInteger : ISchemeType
+	public class ScheminInteger : IScheminType
 	{
 		public int Value;
 

@@ -15,7 +15,7 @@ namespace Schemin.Tokenize
 			literals = new Dictionary<string, string>();
 		}
 
-		public string ExtractLiterals(string input)
+		private string ExtractLiterals(string input)
 		{
 			int currentId = 0;
 			string literalMatch = "\"([^\"\\\\]|\\.)*\"";
@@ -40,6 +40,9 @@ namespace Schemin.Tokenize
 		public List<Token> Tokenize(string input)
 		{
 			var tokens = new List<Token>();
+
+			// Remove string literals so our type recognition doesn't screw up
+			input = ExtractLiterals(input);
 
 			string addedWhitespace = input.Replace("(", " ( ");
 			addedWhitespace = addedWhitespace.Replace(")", " ) ");

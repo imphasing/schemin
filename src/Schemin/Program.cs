@@ -7,6 +7,7 @@ namespace Schemin
 	using System.Text;
 	using Schemin.Tokenize;
 	using Schemin.Parse;
+	using Schemin.AST;
 
 	class Program
 	{
@@ -16,9 +17,7 @@ namespace Schemin
 			Environment env = new Environment();
 
 			string test = @"(define (add1 x) (+ x 1))";
-			string noLiterals = t.ExtractLiterals(test, env);
-
-			List<Token> tokens = t.Tokenize(noLiterals, env);
+			List<Token> tokens = t.Tokenize(test);
 
 			foreach (Token token in tokens)
 			{
@@ -26,20 +25,20 @@ namespace Schemin
 			}
 
 			Parser p = new Parser();
-			KeyValuePair<SchemeList, int> parsed = p.Parse(tokens, 0);
+			ScheminList parsed = p.Parse(tokens);
 			
-			DisplayList(parsed.Key, 0);
+			DisplayList(parsed, 0);
 		}
 
 
-		static void DisplayList(SchemeList list, int level)
+		static void DisplayList(ScheminList list, int level)
 		{
 			foreach (var type in list.List)
 			{
-				if (type.GetType() == typeof(SchemeList))
+				if (type.GetType() == typeof(ScheminList))
 				{
 					Console.WriteLine("Descending into a list...");
-					DisplayList((SchemeList) type, level + 1);
+					DisplayList((ScheminList) type, level + 1);
 				}
 				else
 				{
@@ -51,22 +50,21 @@ namespace Schemin
 						levelPadding += "        ";
 					}
 
-					if (type.GetType() == typeof(SchemeAtom))
+					if (type.GetType() == typeof(ScheminAtom))
 					{
-						SchemeAtom atom = (SchemeAtom) type;	
+						ScheminAtom atom = (ScheminAtom) type;	
 						value = atom.Name;
 					}
-					else if (type.GetType() == typeof(SchemeString))
+					else if (type.GetType() == typeof(ScheminString))
 					{
-						SchemeString str = (SchemeString) type;
+						ScheminString str = (ScheminString) type;
 						value = str.Value;
 					}
-					else if (type.GetType() == typeof(SchemeInteger))
+					else if (type.GetType() == typeof(ScheminInteger))
 					{
-						SchemeInteger num = (SchemeInteger) type;
+						ScheminInteger num = (ScheminInteger) type;
 						value = num.Value.ToString();
 					}
-
 
 					Console.WriteLine(string.Format("{0}Type: {1} Value: {2}", levelPadding, type.GetType().ToString(), value));
 				}
