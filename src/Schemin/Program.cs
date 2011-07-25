@@ -8,67 +8,31 @@ namespace Schemin
 	using Schemin.Tokenize;
 	using Schemin.Parse;
 	using Schemin.AST;
+	using Schemin.Evaluate;
+	using Environment = Schemin.Evaluate.Environment;
 
 	class Program
 	{
 		static void Main(string[] args)
 		{
 			Tokenizer t = new Tokenizer();
-			Environment env = new Environment();
 
-			string test = @"(define (add1 x) (+ x 1))";
+			string test = @"(+ 1 1 (* 2 2))";
 			List<Token> tokens = t.Tokenize(test);
-
-			foreach (Token token in tokens)
-			{
-				Console.WriteLine("Token: " + token.Value + " Type: " + token.Type);
-			}
 
 			Parser p = new Parser();
 			ScheminList parsed = p.Parse(tokens);
-			
-			DisplayList(parsed, 0);
-		}
-
-
-		static void DisplayList(ScheminList list, int level)
-		{
-			foreach (var type in list.List)
+			foreach (Token token in tokens)
 			{
-				if (type.GetType() == typeof(ScheminList))
-				{
-					Console.WriteLine("Descending into a list...");
-					DisplayList((ScheminList) type, level + 1);
-				}
-				else
-				{
-					string value = String.Empty;
-					string levelPadding = String.Empty;
-
-					for (int i = 0; i < level; i++)
-					{
-						levelPadding += "        ";
-					}
-
-					if (type.GetType() == typeof(ScheminAtom))
-					{
-						ScheminAtom atom = (ScheminAtom) type;	
-						value = atom.Name;
-					}
-					else if (type.GetType() == typeof(ScheminString))
-					{
-						ScheminString str = (ScheminString) type;
-						value = str.Value;
-					}
-					else if (type.GetType() == typeof(ScheminInteger))
-					{
-						ScheminInteger num = (ScheminInteger) type;
-						value = num.Value.ToString();
-					}
-
-					Console.WriteLine(string.Format("{0}Type: {1} Value: {2}", levelPadding, type.GetType().ToString(), value));
-				}
+				Console.WriteLine(token.Value.ToString());
 			}
+			Console.WriteLine(parsed.ToString());
+			
+			Evaluator eval = new Evaluator();
+			Environment env = new Environment();
+
+			IScheminType returnType = eval.Evaluate(parsed, env);
+			Console.WriteLine(returnType.ToString());
 		}
 	}
 }

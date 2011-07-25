@@ -9,5 +9,10 @@ namespace Schemin.AST
 		{
 			this.Value = value;
 		}
+
+		public override string ToString()
+		{
+			return Value.ToString();
+		}
 	}
 }

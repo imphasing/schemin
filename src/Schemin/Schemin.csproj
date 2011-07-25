@@ -42,9 +42,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Environment.cs" />
-
     <Compile Include="Assembly\AssemblyInfo.cs" />
+
+
+    <Compile Include="Cadenza\CachedSequence.cs" />
+    <Compile Include="Cadenza\Either.g.cs" />
+
+    <Compile Include="Schemin.Evaluate\Environment.cs" />
+    <Compile Include="Schemin.Evaluate\Evaluator.cs" />
+
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />
