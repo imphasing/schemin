@@ -8,17 +8,24 @@ namespace Schemin.Tokenize
 
 	public class Tokenizer
 	{
-		public string ExtractLiterals(string input, Schemin.Environment env)
+		private Dictionary<string, string> literals;	
+
+		public Tokenizer()
+		{
+			literals = new Dictionary<string, string>();
+		}
+
+		public string ExtractLiterals(string input)
 		{
 			int currentId = 0;
 			string literalMatch = "\"([^\"\\\\]|\\.)*\"";
 			Regex literal = new Regex(literalMatch);
 
-			var literals = new Dictionary<string, string>();
+			var extractedLiterals = new Dictionary<string, string>();
 
 			Func<Match, string> replacer = m => {
-				string placeholder = string.Format("STRING_LITERAL_{0}", currentId++);
-				literals.Add(placeholder, m.ToString());
+				string placeholder = string.Format("###STRING_LITERAL_{0}###", currentId++);
+				extractedLiterals.Add(placeholder, m.ToString());
 				return placeholder;
 			};
 
@@ -26,11 +33,11 @@ namespace Schemin.Tokenize
 
 			string transformed = literal.Replace(input, evaluator);
 
-			env.stringLiterals = literals;
+			this.literals = extractedLiterals;
 			return transformed;
 		}
 
-		public List<Token> Tokenize(string input, Schemin.Environment env)
+		public List<Token> Tokenize(string input)
 		{
 			var tokens = new List<Token>();
 
@@ -52,9 +59,9 @@ namespace Schemin.Tokenize
 			{
 				bool goodToken = false;
 
-				if (token.Contains("STRING_LITERAL_"))
+				if (token.Contains("###STRING_LITERAL_"))
 				{
-					tokens.Add(new Token(TokenType.StringLiteral, env.stringLiterals[token]));
+					tokens.Add(new Token(TokenType.StringLiteral, this.literals[token]));
 					goodToken = true;
 				}
 				else
