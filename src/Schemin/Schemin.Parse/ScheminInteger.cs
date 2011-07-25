@@ -1,11 +1,11 @@
 
 namespace Schemin.Parse
 {
-	public class SchemeInteger : ISchemeType
+	public class ScheminInteger : ISchemeType
 	{
 		public int Value;
 
-		public SchemeInteger(int value)
+		public ScheminInteger(int value)
 		{
 			this.Value = value;
 		}

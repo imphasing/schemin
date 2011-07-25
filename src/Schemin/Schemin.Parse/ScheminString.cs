@@ -1,11 +1,11 @@
 
 namespace Schemin.Parse
 {
-	public class SchemeString : ISchemeType
+	public class ScheminString : ISchemeType
 	{
 		public string Value;
 
-		public SchemeString(string value)
+		public ScheminString(string value)
 		{
 			this.Value = value;
 		}

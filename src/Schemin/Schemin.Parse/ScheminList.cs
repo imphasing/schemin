@@ -3,11 +3,11 @@ namespace Schemin.Parse
 {
 	using System.Collections.Generic;
 
-	public class SchemeList : ISchemeType
+	public class ScheminList : ISchemeType
 	{
 		public LinkedList<ISchemeType> List;
 
-		public SchemeList(LinkedList<ISchemeType> list)
+		public ScheminList(LinkedList<ISchemeType> list)
 		{
 			this.List = list;
 		}

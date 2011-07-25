@@ -1,11 +1,11 @@
 
 namespace Schemin.Parse
 {
-	public class SchemeAtom : ISchemeType
+	public class ScheminAtom : ISchemeType
 	{
 		public string Name;
 
-		public SchemeAtom(string name)
+		public ScheminAtom(string name)
 		{
 			this.Name = name;
 		}

@@ -15,17 +15,15 @@ namespace Schemin
 			Tokenizer t = new Tokenizer();
 			Environment env = new Environment();
 
-			string test = @"
-(define test (lambda () (
-   begin 
-   (print ""test"")
-   (print 1)
- )))
- 
- (test)";
+			string test = @"(define (add1 x) (+ x 1))";
 			string noLiterals = t.ExtractLiterals(test, env);
 
 			List<Token> tokens = t.Tokenize(noLiterals, env);
+
+			foreach (Token token in tokens)
+			{
+				Console.WriteLine("Token: " + token.Value + " Type: " + token.Type);
+			}
 
 			Parser p = new Parser();
 			KeyValuePair<SchemeList, int> parsed = p.Parse(tokens, 0);

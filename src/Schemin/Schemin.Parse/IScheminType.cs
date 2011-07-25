@@ -1,7 +1,7 @@
 
 namespace Schemin.Parse
 {
-	public interface ISchemeType
+	public interface IScheminType
 	{
 	}
 }
