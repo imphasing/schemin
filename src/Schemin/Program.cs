@@ -16,23 +16,18 @@ namespace Schemin
 		static void Main(string[] args)
 		{
 			Tokenizer t = new Tokenizer();
-
-			string test = @"(+ 1 1 (* 2 2))";
-			List<Token> tokens = t.Tokenize(test);
-
 			Parser p = new Parser();
-			ScheminList parsed = p.Parse(tokens);
-			foreach (Token token in tokens)
-			{
-				Console.WriteLine(token.Value.ToString());
-			}
-			Console.WriteLine(parsed.ToString());
-			
 			Evaluator eval = new Evaluator();
 			Environment env = new Environment();
 
-			IScheminType returnType = eval.Evaluate(parsed, env);
-			Console.WriteLine(returnType.ToString());
+			string line = String.Empty;
+			while ((line = Console.ReadLine()) != null)
+			{
+				var tokens = t.Tokenize(line);
+				var parsed = p.Parse(tokens);
+				IScheminType returnType = eval.Evaluate(parsed, env);
+				Console.WriteLine(returnType.ToString());
+			}
 		}
 	}
 }

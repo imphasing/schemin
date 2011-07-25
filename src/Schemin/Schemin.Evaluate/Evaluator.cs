@@ -34,6 +34,7 @@ namespace Schemin.Evaluate
 					{
 						case "+":
 						case "*":
+						case "-":
 							returnType = tempAtom;
 							break;
 						default:
@@ -64,6 +65,10 @@ namespace Schemin.Evaluate
 						case "*":
 							args = (ScheminList) Evaluate(tempList.Cdr(), env);
 							returnType = MultiplyOperation(args);
+							break;
+						case "-":
+							args = (ScheminList) Evaluate(tempList.Cdr(), env);
+							returnType = SubtractOperation(args);
 							break;
 						default:
 							returnType = tempList;
@@ -101,13 +106,13 @@ namespace Schemin.Evaluate
 		{
 			int result = 0;
 
+			if (args.List.Count() < 2)
+			{
+				return new ScheminInteger(result * 1);
+			}
+
 			foreach (IScheminType type in args.List)
 			{
-				if (type.GetType() != typeof(ScheminInteger))
-				{
-					throw new Exception(string.Format("AddOperation called with some args non-integers: {0}", args.ToString()));
-				}
-
 				var temp = (ScheminInteger) type;
 				result += temp.Value;
 			}
@@ -122,16 +127,32 @@ namespace Schemin.Evaluate
 
 			foreach (IScheminType type in args.List)
 			{
-				if (type.GetType() != typeof(ScheminInteger))
-				{
-					throw new Exception(string.Format("MultiplyOperation called with some args non-integers: {0}", args.ToString()));
-				}
-
 				var temp = (ScheminInteger) type;
 				result = temp.Value * result;
 			}
 
 			return new ScheminInteger(result);
+		}
+
+		public ScheminInteger SubtractOperation(ScheminList args)
+		{
+			var first = (ScheminInteger) args.Car();
+			int result = first.Value;
+			
+			if (args.List.Count() < 2)
+			{
+				return new ScheminInteger(result * -1);
+			}
+			else
+			{
+				foreach (IScheminType type in args.Cdr().List)
+				{
+					var temp = (ScheminInteger) type;
+					result -= temp.Value;
+				}
+
+				return new ScheminInteger(result);
+			}
 		}
 	}
 }
