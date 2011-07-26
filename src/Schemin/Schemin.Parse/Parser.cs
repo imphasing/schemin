@@ -6,13 +6,19 @@ namespace Schemin.Parse
 	using Schemin.Tokenize;
 	using Schemin.AST;
 	using Cadenza.Collections;
+	using Schemin.Evaluate;
 
 	public class Parser
 	{
 		public ScheminList Parse(List<Token> tokens)
 		{
 			KeyValuePair<ScheminList, int> parsed = ParseInternal(tokens, 0);
-			return (ScheminList) parsed.Key;
+			if (parsed.Key.List.Count() < 2)
+			{
+				return parsed.Key;
+			}
+
+			return (ScheminList) parsed.Key.Cdr();
 		}
 
 		private KeyValuePair<ScheminList, int> ParseInternal(List<Token> tokens, int startIndex)
@@ -64,13 +70,11 @@ namespace Schemin.Parse
 			switch (atom.Name)
 			{
 				case "+":
-					return new ScheminPrimitive("+");
+					return new ScheminPrimitive(Primitives.Add, "+");
 				case "-":
-					return new ScheminPrimitive("-");
+					return new ScheminPrimitive(Primitives.Subtract, "-");
 				case "*":
-					return new ScheminPrimitive("*");
-				case "define":
-					return new ScheminPrimitive("define");
+					return new ScheminPrimitive(Primitives.Multiply, "*");
 				default:
 					return atom;
 			}

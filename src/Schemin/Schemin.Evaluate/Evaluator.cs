@@ -11,85 +11,82 @@ namespace Schemin.Evaluate
 
 	public class Evaluator
 	{
-		public IScheminType Evaluate(IScheminType ast, Environment env, bool ignoreSymbols)
+		private Type integer = typeof(ScheminInteger);
+		private Type atom = typeof(ScheminAtom);
+		private Type list = typeof(ScheminList);
+		private Type str = typeof(ScheminString);
+		private Type primitive = typeof(ScheminPrimitive);
+
+		public IScheminType Evaluate(IScheminType ast, Environment env)
 		{
-			if (ast.GetType() == typeof(ScheminInteger))
+			if (IsA(ast, integer))
 			{
 				return ast;
 			}
-			else if (ast.GetType() == typeof(ScheminString))
+			else if (IsA(ast, str))
 			{
 				return ast;
 			}
-			else if (ast.GetType() == typeof(ScheminAtom))
+			else if (IsA(ast, atom))
 			{
-				ScheminAtom atom = (ScheminAtom) ast;
-				Console.WriteLine("Got an atom! " + atom.Name);
-				if (ignoreSymbols)
+				ScheminAtom temp = (ScheminAtom) ast;
+				if (env.HasValue(temp))
+				{
+					return env.GetValue(temp);
+				}
+				else
+				{
+					throw new Exception(string.Format("Unbound atom: {0}", temp));
+				}
+			}
+			else if (IsA(ast, primitive))
+			{
+				return ast;
+			}
+			else if (IsA(ast, list))
+			{
+				ScheminList temp = (ScheminList) ast;
+
+				if (IsEmptyList(temp))
 				{
 					return ast;
 				}
-				else
+
+				IScheminType headResult = Evaluate(temp.Car(), env);
+				IScheminType restResult = Evaluate(temp.Cdr(), env);
+
+				if (IsA(headResult, primitive))
 				{
-					if (env.HasValue(atom))
+					ScheminPrimitive prim = (ScheminPrimitive) headResult;
+					if (IsA(restResult, list))
 					{
-						return env.GetValue(atom);
-					}
-					else
-					{
-						throw new Exception(string.Format("Unbound atom: {0}", atom));
-					}
-				}
-			}
-
-			else if (ast.GetType() == typeof(ScheminList))
-			{
-				ScheminList list = (ScheminList) ast;
-
-				if (list.Car() == null)
-				{
-					return null;
-				}
-
-				if (list.Car().GetType() == typeof(ScheminAtom))
-				{
-					switch (list.Car().ToString())
-					{
-						case "+":
-							return AddOperation((ScheminList) Evaluate(list.Cdr(), env, false));
-						case "*":
-							return MultiplyOperation((ScheminList) Evaluate(list.Cdr(), env, false));
-						case "-":
-							return SubtractOperation((ScheminList) Evaluate(list.Cdr(), env, false));
-						case "define":
-							return DefineOperation(list.Cdr(), env);
-						case "dumpenv":
-							return DumpEnv(env);
-						default:
-							return ast;
-					}
-				}
-				else
-				{
-					IScheminType headResult = Evaluate(list.Car(), env, false);
-
-					if (list.Cdr() != null)
-					{
-						IScheminType restResult = Evaluate(list.Cdr(), env, false);
-
-						if (restResult != null)
+						ScheminList tempArgList = (ScheminList) restResult;
+						if (tempArgList.Empty)
 						{
-							return new ScheminList(headResult, (ScheminList) restResult);
+							return prim;
 						}
 						else
 						{
-							return new ScheminList(headResult);
+							return prim.Evaluate((ScheminList) restResult);
 						}
-
 					}
 					else
 					{
-						return new ScheminList(headResult);
+						ScheminList tempArgList = new ScheminList(restResult);
+						return prim.Evaluate(tempArgList);
+					}
+				}
+				else
+				{
+					if (IsA(restResult, list))
+					{
+						return new ScheminList(headResult, (ScheminList) restResult);
+					}
+					else
+					{
+						ScheminList tempList = new ScheminList(headResult);
+						tempList.Append(restResult);
+						return tempList;
 					}
 				}
 			}
@@ -97,59 +94,6 @@ namespace Schemin.Evaluate
 			{
 				Console.WriteLine("CRAP");
 				return ast;
-			}
-		}
-
-		public ScheminInteger AddOperation(ScheminList args)
-		{
-			int result = 0;
-
-			if (args.List.Count() < 2)
-			{
-				return new ScheminInteger(result * 1);
-			}
-
-			foreach (IScheminType type in args.List)
-			{
-				var temp = (ScheminInteger) type;
-				result += temp.Value;
-			}
-
-			return new ScheminInteger(result);
-		}
-
-
-		public ScheminInteger MultiplyOperation(ScheminList args)
-		{
-			int result = 1;
-
-			foreach (IScheminType type in args.List)
-			{
-				var temp = (ScheminInteger) type;
-				result = temp.Value * result;
-			}
-
-			return new ScheminInteger(result);
-		}
-
-		public ScheminInteger SubtractOperation(ScheminList args)
-		{
-			var first = (ScheminInteger) args.Car();
-			int result = first.Value;
-			
-			if (args.List.Count() < 2)
-			{
-				return new ScheminInteger(result * -1);
-			}
-			else
-			{
-				foreach (IScheminType type in args.Cdr().List)
-				{
-					var temp = (ScheminInteger) type;
-					result -= temp.Value;
-				}
-
-				return new ScheminInteger(result);
 			}
 		}
 
@@ -168,7 +112,7 @@ namespace Schemin.Evaluate
 				env.AddBinding(symbol, definition);
 			}
 
-			return null;
+			return new ScheminList();
 		}
 
 		public ScheminString DumpEnv(Environment env)
@@ -181,6 +125,30 @@ namespace Schemin.Evaluate
 			}
 
 			return new ScheminString(builder.ToString());
+		}
+
+		public bool IsA(IScheminType ast, Type type)
+		{
+			if (ast.GetType() == type)
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool IsEmptyList(IScheminType type)
+		{
+			if (type.GetType() == typeof(ScheminList))
+			{
+				ScheminList temp = (ScheminList) type;
+				if (temp.Empty == true)
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 	}
 }

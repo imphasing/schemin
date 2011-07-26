@@ -5,7 +5,7 @@ namespace Schemin.AST
 
 	public class ScheminPrimitive : IScheminType
 	{
-		public Func<IScheminType, ScheminList> Definition;
+		public Func<ScheminList, IScheminType> Definition;
 		public string Name;
 
 		public ScheminPrimitive(string name)
@@ -13,7 +13,7 @@ namespace Schemin.AST
 			this.Name = name;
 		}
 
-		public ScheminPrimitive(Func<IScheminType, ScheminList> definition, string name)
+		public ScheminPrimitive(Func<ScheminList, IScheminType> definition, string name)
 		{
 			this.Definition = definition;
 			this.Name = name;
@@ -22,6 +22,18 @@ namespace Schemin.AST
 		public IScheminType Evaluate(ScheminList args)
 		{
 			return Definition(args);
+		}
+
+		public override string ToString()
+		{
+			if (Name != null)
+			{
+				return "<Primitive:" + Name + ">";
+			}
+			else
+			{
+				return "<Primitive:unbound>";
+			}
 		}
 	}
 }
