@@ -53,40 +53,57 @@ namespace Schemin.Evaluate
 				}
 
 				IScheminType headResult = Evaluate(temp.Car(), env);
-				IScheminType restResult = Evaluate(temp.Cdr(), env);
 
-				if (IsA(headResult, primitive))
+
+				if (IsEmptyList(temp.Cdr()))
 				{
-					ScheminPrimitive prim = (ScheminPrimitive) headResult;
-					if (IsA(restResult, list))
-					{
-						ScheminList tempArgList = (ScheminList) restResult;
-						if (tempArgList.Empty)
-						{
-							return prim;
-						}
-						else
-						{
-							return prim.Evaluate((ScheminList) restResult);
-						}
-					}
-					else
-					{
-						ScheminList tempArgList = new ScheminList(restResult);
-						return prim.Evaluate(tempArgList);
-					}
+					return headResult;
 				}
 				else
 				{
-					if (IsA(restResult, list))
+					IScheminType restResult = Evaluate(temp.Cdr(), env);
+
+					if (IsA(headResult, primitive))
 					{
-						return new ScheminList(headResult, (ScheminList) restResult);
+						ScheminPrimitive prim = (ScheminPrimitive) headResult;
+						if (IsA(restResult, list))
+						{
+							ScheminList tempArgList = (ScheminList) restResult;
+							if (tempArgList.Empty)
+							{
+								return prim;
+							}
+							else
+							{
+								return prim.Evaluate((ScheminList) restResult);
+							}
+						}
+						else
+						{
+							ScheminList unaryArgList = new ScheminList(restResult);
+							return prim.Evaluate(unaryArgList);
+						}
 					}
 					else
 					{
-						ScheminList tempList = new ScheminList(headResult);
-						tempList.Append(restResult);
-						return tempList;
+						if (IsA(restResult, list))
+						{
+							ScheminList tempList = (ScheminList) restResult;
+							if (tempList.Empty)
+							{
+								return headResult;
+							}
+							else
+							{
+								return new ScheminList(headResult, tempList);
+							}
+						}
+						else
+						{
+							ScheminList tempList = new ScheminList(headResult);
+							tempList.Append(restResult);
+							return tempList;
+						}
 					}
 				}
 			}
