@@ -8,9 +8,12 @@ namespace Schemin.AST
 	public class ScheminList : IScheminType
 	{
 		public CachedSequence<IScheminType> List;
+		public bool Empty;
 
 		public ScheminList()
 		{
+			this.Empty = true;
+			this.List = null;
 		}
 
 		public ScheminList(IScheminType head)
@@ -32,7 +35,7 @@ namespace Schemin.AST
 		{
 			if (this.List == null)
 			{
-				return null;
+				return new ScheminList();
 			}
 
 			return this.List.Head;
@@ -42,7 +45,7 @@ namespace Schemin.AST
 		{
 			if (this.List == null)
 			{
-				return null;
+				return new ScheminList();
 			}
 
 			return new ScheminList(this.List.Tail);
@@ -53,7 +56,7 @@ namespace Schemin.AST
 			if (this.List == null)
 			{
 				this.List = new CachedSequence<IScheminType>(type);
-				return new ScheminList(this.List);
+				return this;
 			}
 			else
 			{

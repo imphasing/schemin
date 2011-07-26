@@ -44,7 +44,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Assembly\AssemblyInfo.cs" />
 
-
     <Compile Include="Cadenza\CachedSequence.cs" />
     <Compile Include="Cadenza\Either.g.cs" />
 
@@ -62,6 +61,7 @@
     <Compile Include="Schemin.AST\ScheminInteger.cs" />
     <Compile Include="Schemin.AST\ScheminList.cs" />
     <Compile Include="Schemin.AST\ScheminLambda.cs" />
+    <Compile Include="Schemin.AST\ScheminPrimitive.cs" />
     <Compile Include="Schemin.AST\ScheminString.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

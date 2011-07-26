@@ -49,7 +49,7 @@ namespace Schemin.Parse
 			switch (token.Type)
 			{
 				case TokenType.Symbol:
-					return new ScheminAtom(token.Value);
+					return ConvertAtom(new ScheminAtom(token.Value));
 				case TokenType.IntegerLiteral:
 					return new ScheminInteger(int.Parse(token.Value));
 				case TokenType.StringLiteral:
@@ -58,5 +58,23 @@ namespace Schemin.Parse
 					throw new Exception(string.Format("Unable to convert token of type: {0}", token.Type));
 			}
 		}
+
+		private IScheminType ConvertAtom(ScheminAtom atom)
+		{
+			switch (atom.Name)
+			{
+				case "+":
+					return new ScheminPrimitive("+");
+				case "-":
+					return new ScheminPrimitive("-");
+				case "*":
+					return new ScheminPrimitive("*");
+				case "define":
+					return new ScheminPrimitive("define");
+				default:
+					return atom;
+			}
+		}
+			
 	}
 }
