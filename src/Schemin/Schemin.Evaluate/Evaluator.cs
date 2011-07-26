@@ -2,104 +2,102 @@
 namespace Schemin.Evaluate
 {
 	using System;
+	using System.Text;
 	using System.Collections;
+	using System.Collections.Generic;
 	using System.Linq;
 	using Schemin.AST;
 	using Cadenza;
 
 	public class Evaluator
 	{
-		public IScheminType Evaluate(IScheminType ast, Environment env)
+		public IScheminType Evaluate(IScheminType ast, Environment env, bool ignoreSymbols)
 		{
-			IScheminType returnType = null;
-
 			if (ast.GetType() == typeof(ScheminInteger))
 			{
-				returnType = (ScheminInteger) ast;
+				return ast;
 			}
 			else if (ast.GetType() == typeof(ScheminString))
 			{
-				returnType = (ScheminString) ast;
+				return ast;
 			}
 			else if (ast.GetType() == typeof(ScheminAtom))
 			{
-				if (env.HasValue((ScheminAtom) ast))
+				ScheminAtom atom = (ScheminAtom) ast;
+				Console.WriteLine("Got an atom! " + atom.Name);
+				if (ignoreSymbols)
 				{
-					returnType = env.GetValue((ScheminAtom) ast);
-				}
-				else
-				{
-					var tempAtom = (ScheminAtom) ast;
-					switch (tempAtom.Name)
-					{
-						case "+":
-						case "*":
-						case "-":
-							returnType = tempAtom;
-							break;
-						default:
-							throw new Exception("Referenced unbound symbol: " + ast.ToString());
-					}
-				}
-			}
-			else if (ast.GetType() == typeof(ScheminList))
-			{
-				ScheminList tempList = (ScheminList) ast;
-
-				if (tempList.Car() == null)
-				{
-					// return an empty list if we're done
 					return ast;
 				}
-
-				if (tempList.Car().GetType() == typeof(ScheminAtom))
-				{
-					ScheminList args;
-
-					switch (tempList.Car().ToString())
-					{
-						case "+":
-							args = (ScheminList) Evaluate(tempList.Cdr(), env);
-							returnType = AddOperation(args);
-							break;
-						case "*":
-							args = (ScheminList) Evaluate(tempList.Cdr(), env);
-							returnType = MultiplyOperation(args);
-							break;
-						case "-":
-							args = (ScheminList) Evaluate(tempList.Cdr(), env);
-							returnType = SubtractOperation(args);
-							break;
-						default:
-							returnType = tempList;
-							break;
-					}
-				}
 				else
 				{
-					IScheminType headResult = Evaluate(tempList.Car(), env);
-
-					if (tempList.Cdr() != null)
+					if (env.HasValue(atom))
 					{
-						IScheminType restResult = Evaluate(tempList.Cdr(), env);
-
-						if (restResult.GetType() == typeof(ScheminList))
-						{
-							returnType = new ScheminList(headResult, (ScheminList) restResult);
-						}
-						else
-						{
-							returnType = new ScheminList(headResult).Append(restResult);
-						}
+						return env.GetValue(atom);
 					}
 					else
 					{
-						returnType = new ScheminList(headResult);
+						throw new Exception(string.Format("Unbound atom: {0}", atom));
 					}
 				}
 			}
 
-			return returnType;
+			else if (ast.GetType() == typeof(ScheminList))
+			{
+				ScheminList list = (ScheminList) ast;
+
+				if (list.Car() == null)
+				{
+					return null;
+				}
+
+				if (list.Car().GetType() == typeof(ScheminAtom))
+				{
+					switch (list.Car().ToString())
+					{
+						case "+":
+							return AddOperation((ScheminList) Evaluate(list.Cdr(), env, false));
+						case "*":
+							return MultiplyOperation((ScheminList) Evaluate(list.Cdr(), env, false));
+						case "-":
+							return SubtractOperation((ScheminList) Evaluate(list.Cdr(), env, false));
+						case "define":
+							return DefineOperation(list.Cdr(), env);
+						case "dumpenv":
+							return DumpEnv(env);
+						default:
+							return ast;
+					}
+				}
+				else
+				{
+					IScheminType headResult = Evaluate(list.Car(), env, false);
+
+					if (list.Cdr() != null)
+					{
+						IScheminType restResult = Evaluate(list.Cdr(), env, false);
+
+						if (restResult != null)
+						{
+							return new ScheminList(headResult, (ScheminList) restResult);
+						}
+						else
+						{
+							return new ScheminList(headResult);
+						}
+
+					}
+					else
+					{
+						return new ScheminList(headResult);
+					}
+				}
+			}
+			else
+			{
+				Console.WriteLine("CRAP");
+				return ast;
+			}
 		}
 
 		public ScheminInteger AddOperation(ScheminList args)
@@ -153,6 +151,36 @@ namespace Schemin.Evaluate
 
 				return new ScheminInteger(result);
 			}
+		}
+
+		public IScheminType DefineOperation(ScheminList args, Environment env)
+		{
+			ScheminAtom symbol = (ScheminAtom) args.Car();
+			IScheminType definition = args.Cdr();
+
+			if (env.HasValue(symbol))
+			{
+				env.RemoveBinding(symbol);
+				env.AddBinding(symbol, definition);
+			}
+			else
+			{
+				env.AddBinding(symbol, definition);
+			}
+
+			return null;
+		}
+
+		public ScheminString DumpEnv(Environment env)
+		{
+			StringBuilder builder = new StringBuilder();
+
+			foreach (KeyValuePair<string, IScheminType> kvp in env.bindings)
+			{
+				builder.Append(string.Format("({0} => {1}), ", kvp.Key, kvp.Value));
+			}
+
+			return new ScheminString(builder.ToString());
 		}
 	}
 }

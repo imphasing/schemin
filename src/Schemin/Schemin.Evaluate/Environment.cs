@@ -7,7 +7,7 @@ namespace Schemin.Evaluate
 	
 	public class Environment
 	{
-		private Dictionary<string, IScheminType> bindings;
+		public Dictionary<string, IScheminType> bindings;
 
 		public Environment()
 		{
@@ -26,7 +26,7 @@ namespace Schemin.Evaluate
 			}
 		}
 
-		public void RemoveBinding(ScheminAtom symbol, IScheminType type)
+		public void RemoveBinding(ScheminAtom symbol)
 		{
 			if (bindings.ContainsKey(symbol.Name))
 			{

@@ -72,6 +72,11 @@ namespace Schemin.AST
 
 			foreach (var type in list.List)
 			{
+				if (type == null)
+				{
+					return String.Empty;
+				}
+
 				if (type.GetType() == typeof(ScheminList))
 				{
 					builder.Append("(");
