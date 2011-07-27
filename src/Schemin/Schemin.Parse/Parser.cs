@@ -84,6 +84,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Cdr, "cdr");
 				case "=":
 					return new ScheminPrimitive(Primitives.Equal, "=");
+				case "if":
+					return new ScheminPrimitive(Primitives.If, "if");
 				default:
 					return atom;
 			}

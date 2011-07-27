@@ -99,6 +99,11 @@ namespace Schemin.Evaluate
 						{
 							restResult = Evaluate(temp.Cdr(), env, true);
 						}
+						else if (prim.Name == "if")
+						{
+							// don't evaluate the arguments yet if it's an if call
+							restResult = temp.Cdr();
+						}
 						else
 						{
 							restResult = Evaluate(temp.Cdr(), env, false);
@@ -137,13 +142,13 @@ namespace Schemin.Evaluate
 							}
 							else
 							{
-								return prim.Evaluate((ScheminList) restResult, env);
+								return prim.Evaluate((ScheminList) restResult, env, this);
 							}
 						}
 						else
 						{
 							ScheminList unaryArgList = new ScheminList(restResult);
-							return prim.Evaluate(unaryArgList, env);
+							return prim.Evaluate(unaryArgList, env, this);
 						}
 					}
 					if (IsA(headResult, lambda))

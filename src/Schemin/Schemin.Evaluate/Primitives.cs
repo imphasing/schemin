@@ -8,20 +8,37 @@ namespace Schemin.Evaluate
 
 	public static class Primitives
 	{
-		public static Func<ScheminList, Environment, IScheminType> Add;
-		public static Func<ScheminList, Environment, IScheminType> Subtract;
-		public static Func<ScheminList, Environment, IScheminType> Multiply;
-		public static Func<ScheminList, Environment, IScheminType> Define;
-		public static Func<ScheminList, Environment, IScheminType> DumpEnv;
-		public static Func<ScheminList, Environment, IScheminType> Quote;
-		public static Func<ScheminList, Environment, IScheminType> Car;
-		public static Func<ScheminList, Environment, IScheminType> Cdr;
-		public static Func<ScheminList, Environment, IScheminType> Equal;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Add;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Subtract;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Multiply;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Define;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> DumpEnv;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Quote;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Car;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cdr;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
 
 
 		static Primitives()
 		{
-			Equal = (list, env) => {
+			If = (list, env, eval) => {
+				ScheminList condition = (ScheminList) list.Car();
+				ScheminList then = (ScheminList) list.Cdr().Car();
+				ScheminList otherwise = (ScheminList) list.Cdr().Cdr().Car();
+
+				ScheminBool conditionResults = (ScheminBool) eval.Evaluate(condition, env, false);
+				if (conditionResults.Value)
+				{
+					return eval.Evaluate(then, env, false);
+				}
+				else
+				{
+					return eval.Evaluate(otherwise, env, false);
+				}
+			};
+				
+			Equal = (list, env, eval) => {
 				ScheminInteger last = (ScheminInteger) list.Car();
 
 				bool result = false;
@@ -43,19 +60,19 @@ namespace Schemin.Evaluate
 				return new ScheminBool(result);
 			};
 
-			Car = (list, env) => {
+			Car = (list, env, eval) => {
 				return list.Car();
 			};
 
-			Cdr = (list, env) => {
+			Cdr = (list, env, eval) => {
 				return list.Cdr();
 			};
 
-			Quote = (list, env) => {
+			Quote = (list, env, eval) => {
 				return list;
 			};
 
-			DumpEnv = (args, env) => {
+			DumpEnv = (args, env, eval) => {
 				StringBuilder builder = new StringBuilder();
 
 				foreach (KeyValuePair<string, IScheminType> kvp in env.bindings)
@@ -66,7 +83,7 @@ namespace Schemin.Evaluate
 				return new ScheminString(builder.ToString());
 			};
 
-			Define = (args, env) => {
+			Define = (args, env, eval) => {
 				ScheminAtom symbol = (ScheminAtom) args.Car();
 				IScheminType definition = args.Cdr();
 
@@ -90,7 +107,7 @@ namespace Schemin.Evaluate
 				return new ScheminList();
 			};
 
-			Add = (args, env) => {
+			Add = (args, env, eval) => {
 				int result = 0;
 
 				if (args.List.Count() < 2)
@@ -111,7 +128,7 @@ namespace Schemin.Evaluate
 				return new ScheminInteger(result);
 			};
 
-			Subtract = (args, env) => {
+			Subtract = (args, env, eval) => {
 				var first = (ScheminInteger) args.Car();
 				int result = first.Value;
 
@@ -132,7 +149,7 @@ namespace Schemin.Evaluate
 				return new ScheminInteger(result);
 			};
 
-			Multiply = (args, env) => {
+			Multiply = (args, env, eval) => {
 				int result = 1;
 
 				foreach (IScheminType type in args.List)
