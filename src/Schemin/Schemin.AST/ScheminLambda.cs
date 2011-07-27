@@ -8,29 +8,25 @@ namespace Schemin.AST
 	public class ScheminLambda : IScheminType
 	{
 		public ScheminList Definition;
+		public ScheminList Arguments;
 
-		public ScheminLambda(ScheminList definition)
+		public ScheminLambda(ScheminList definition, ScheminList args)
 		{
 			this.Definition = definition;
+			this.Arguments = args;
 		}
 
-		public IScheminType Evaluate(ScheminList args, Evaluator eval, Environment env)
+		public IScheminType Evaluate(ScheminList values, Evaluator eval, Environment env)
 		{
-			ScheminList symbols = (ScheminList) args.Car();
-			ScheminList definition = (ScheminList) args.Cdr();
+			ScheminAtom first = (ScheminAtom) Arguments.Car();
+			ScheminList rest = Arguments.Cdr();
 
-			ScheminAtom first = (ScheminAtom) symbols.Car();
-			ScheminList rest = symbols.Cdr();
-
-			IScheminType firstArg = (IScheminType) args.Car();
-			ScheminList restArgs = args.Cdr();
+			IScheminType firstArg = (IScheminType) values.Car();
+			ScheminList restArgs = values.Cdr();
 
 			for (; ;)
 			{
-				first = (ScheminAtom) symbols.Car();
-				firstArg = (IScheminType) args.Car();
-				rest = symbols.Cdr();
-				restArgs = args.Cdr();
+				Console.WriteLine("Iterating. first: " + first.ToString() + " arg: " + firstArg.ToString());
 
 				if (first == null || firstArg == null)
 				{
@@ -38,6 +34,11 @@ namespace Schemin.AST
 				}
 
 				env.AddBinding(first, firstArg);
+
+				first = (ScheminAtom) rest.Car();
+				firstArg = (IScheminType) restArgs.Car();
+				rest = rest.Cdr();
+				restArgs = restArgs.Cdr();
 			}
 
 			IScheminType result = eval.Evaluate(Definition, env, false);
