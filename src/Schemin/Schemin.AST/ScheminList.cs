@@ -71,14 +71,46 @@ namespace Schemin.AST
 
 		public override string ToString()
 		{
-			if (this.Empty)
+			return ToStringInternal(this);
+		}
+
+		private string ToStringInternal(ScheminList list)
+		{
+			StringBuilder builder = new StringBuilder();
+
+			if (list.Empty)
 			{
 				return "()";
 			}
 			else
 			{
-				return "List";
+				builder.Append("(");
+				int index = 0;
+				foreach (var type in list.List)
+				{
+					if (type.GetType() == typeof(ScheminList))
+					{
+						builder.Append("(");
+						builder.Append(ToStringInternal((ScheminList) type));
+						builder.Append(")");
+					}
+					else
+					{
+						if (index == list.List.Count() - 1)
+						{
+							builder.Append(type.ToString());
+						}
+						else
+						{
+							builder.Append(type.ToString() + " ");
+						}
+					}
+					index++;
+				}
+				builder.Append(")");
 			}
+
+			return "<List: " + builder.ToString() + ">";
 		}
 	}
 }
