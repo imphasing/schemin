@@ -75,6 +75,10 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Subtract, "-");
 				case "*":
 					return new ScheminPrimitive(Primitives.Multiply, "*");
+				case "define": 
+					return new ScheminPrimitive(Primitives.Define, "define");
+				case "dumpenv":
+					return new ScheminPrimitive(Primitives.DumpEnv, "dumpenv");
 				default:
 					return atom;
 			}

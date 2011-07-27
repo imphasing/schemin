@@ -2,10 +2,12 @@
 namespace Schemin.AST
 {
 	using System;
+	using Schemin.Evaluate;
+	using Environment = Schemin.Evaluate.Environment;
 
 	public class ScheminPrimitive : IScheminType
 	{
-		public Func<ScheminList, IScheminType> Definition;
+		public Func<ScheminList, Environment, IScheminType> Definition;
 		public string Name;
 
 		public ScheminPrimitive(string name)
@@ -13,15 +15,15 @@ namespace Schemin.AST
 			this.Name = name;
 		}
 
-		public ScheminPrimitive(Func<ScheminList, IScheminType> definition, string name)
+		public ScheminPrimitive(Func<ScheminList, Environment, IScheminType> definition, string name)
 		{
 			this.Definition = definition;
 			this.Name = name;
 		}
 
-		public IScheminType Evaluate(ScheminList args)
+		public IScheminType Evaluate(ScheminList args, Environment env)
 		{
-			return Definition(args);
+			return Definition(args, env);
 		}
 
 		public override string ToString()

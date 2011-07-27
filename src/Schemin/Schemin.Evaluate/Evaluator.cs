@@ -17,7 +17,7 @@ namespace Schemin.Evaluate
 		private Type str = typeof(ScheminString);
 		private Type primitive = typeof(ScheminPrimitive);
 
-		public IScheminType Evaluate(IScheminType ast, Environment env)
+		public IScheminType Evaluate(IScheminType ast, Environment env, bool ignoreSymbols)
 		{
 			if (IsA(ast, integer))
 			{
@@ -30,13 +30,20 @@ namespace Schemin.Evaluate
 			else if (IsA(ast, atom))
 			{
 				ScheminAtom temp = (ScheminAtom) ast;
-				if (env.HasValue(temp))
+				if (ignoreSymbols)
 				{
-					return env.GetValue(temp);
+					return ast;
 				}
 				else
 				{
-					throw new Exception(string.Format("Unbound atom: {0}", temp));
+					if (env.HasValue(temp))
+					{
+						return env.GetValue(temp);
+					}
+					else
+					{
+						throw new Exception(string.Format("Error: Unbound atom: {0}", temp));
+					}
 				}
 			}
 			else if (IsA(ast, primitive))
@@ -52,8 +59,7 @@ namespace Schemin.Evaluate
 					return ast;
 				}
 
-				IScheminType headResult = Evaluate(temp.Car(), env);
-
+				IScheminType headResult = Evaluate(temp.Car(), env, ignoreSymbols);
 
 				if (IsEmptyList(temp.Cdr()))
 				{
@@ -61,7 +67,25 @@ namespace Schemin.Evaluate
 				}
 				else
 				{
-					IScheminType restResult = Evaluate(temp.Cdr(), env);
+					IScheminType restResult = null;
+					// Switch up the Cdr() parsing if the headResult is define, or another operation that needs to ignore atoms
+					if (IsA(headResult, primitive))
+					{
+						ScheminPrimitive prim = (ScheminPrimitive) headResult;
+						if (prim.Name == "define")
+						{
+							restResult = Evaluate(temp.Cdr(), env, true);
+						}
+						else
+						{
+							restResult = Evaluate(temp.Cdr(), env, false);
+						}
+					}
+					else
+					{
+						restResult = Evaluate(temp.Cdr(), env, false);
+					}	
+							
 
 					if (IsA(headResult, primitive))
 					{
@@ -75,13 +99,13 @@ namespace Schemin.Evaluate
 							}
 							else
 							{
-								return prim.Evaluate((ScheminList) restResult);
+								return prim.Evaluate((ScheminList) restResult, env);
 							}
 						}
 						else
 						{
 							ScheminList unaryArgList = new ScheminList(restResult);
-							return prim.Evaluate(unaryArgList);
+							return prim.Evaluate(unaryArgList, env);
 						}
 					}
 					else
@@ -112,36 +136,6 @@ namespace Schemin.Evaluate
 				Console.WriteLine("CRAP");
 				return ast;
 			}
-		}
-
-		public IScheminType DefineOperation(ScheminList args, Environment env)
-		{
-			ScheminAtom symbol = (ScheminAtom) args.Car();
-			IScheminType definition = args.Cdr();
-
-			if (env.HasValue(symbol))
-			{
-				env.RemoveBinding(symbol);
-				env.AddBinding(symbol, definition);
-			}
-			else
-			{
-				env.AddBinding(symbol, definition);
-			}
-
-			return new ScheminList();
-		}
-
-		public ScheminString DumpEnv(Environment env)
-		{
-			StringBuilder builder = new StringBuilder();
-
-			foreach (KeyValuePair<string, IScheminType> kvp in env.bindings)
-			{
-				builder.Append(string.Format("({0} => {1}), ", kvp.Key, kvp.Value));
-			}
-
-			return new ScheminString(builder.ToString());
 		}
 
 		public bool IsA(IScheminType ast, Type type)

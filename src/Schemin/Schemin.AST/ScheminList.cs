@@ -71,7 +71,14 @@ namespace Schemin.AST
 
 		public override string ToString()
 		{
-			return "List";
+			if (this.Empty)
+			{
+				return "()";
+			}
+			else
+			{
+				return "List";
+			}
 		}
 	}
 }

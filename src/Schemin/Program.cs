@@ -25,7 +25,7 @@ namespace Schemin
 			{
 				var tokens = t.Tokenize(line);
 				var parsed = p.Parse(tokens);
-				IScheminType returnType = eval.Evaluate(parsed, env);
+				IScheminType returnType = eval.Evaluate(parsed, env, false);
 				Console.WriteLine(returnType.ToString());
 			}
 		}
