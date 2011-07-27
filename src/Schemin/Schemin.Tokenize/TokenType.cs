@@ -6,6 +6,7 @@ namespace Schemin.Tokenize
 		Symbol,
 		IntegerLiteral,
 		StringLiteral,
+		BoolLiteral,
 		OpenParen,
 		CloseParen
 	}

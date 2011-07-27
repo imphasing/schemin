@@ -16,6 +16,21 @@ namespace Schemin.Evaluate
 		private Type list = typeof(ScheminList);
 		private Type str = typeof(ScheminString);
 		private Type primitive = typeof(ScheminPrimitive);
+		private Type lambda = typeof(ScheminLambda);
+		private Type boolean = typeof(ScheminBool);
+
+		public IScheminType Evaluate(ScheminList ast)
+		{
+			Environment global = new Environment();
+			IScheminType last = null;
+
+			foreach (IScheminType type in ast.List)
+			{
+				last = Evaluate(type, global, false);
+			}
+
+			return last;
+		}
 
 		public IScheminType Evaluate(IScheminType ast, Environment env, bool ignoreSymbols)
 		{
@@ -27,9 +42,18 @@ namespace Schemin.Evaluate
 			{
 				return ast;
 			}
+			else if (IsA(ast, boolean))
+			{
+				return ast;
+			}
 			else if (IsA(ast, atom))
 			{
 				ScheminAtom temp = (ScheminAtom) ast;
+				if (temp.Name == "lambda")
+				{
+					return ast;
+				}
+
 				if (ignoreSymbols)
 				{
 					return ast;
@@ -81,12 +105,24 @@ namespace Schemin.Evaluate
 							restResult = Evaluate(temp.Cdr(), env, false);
 						}
 					}
+					else if (IsA(headResult, atom))
+					{
+						// Need to handle lambda specially
+						ScheminAtom tempAtom = (ScheminAtom) headResult;
+						if (tempAtom.Name == "lambda")
+						{
+							ScheminLambda lam = new ScheminLambda(temp.Cdr());
+							return lam;
+						}
+						else
+						{
+							restResult = Evaluate(temp.Cdr(), env, false);
+						}
+					}
 					else
 					{
 						restResult = Evaluate(temp.Cdr(), env, false);
 					}	
-							
-
 					if (IsA(headResult, primitive))
 					{
 						ScheminPrimitive prim = (ScheminPrimitive) headResult;
@@ -106,6 +142,28 @@ namespace Schemin.Evaluate
 						{
 							ScheminList unaryArgList = new ScheminList(restResult);
 							return prim.Evaluate(unaryArgList, env);
+						}
+					}
+					if (IsA(headResult, lambda))
+					{
+						// Again handling lambda with special care
+						ScheminLambda lam = (ScheminLambda) headResult;
+						if (IsA(restResult, list))
+						{
+							ScheminList tempArgList = (ScheminList) restResult;
+							if (tempArgList.Empty)
+							{
+								return lam;
+							}
+							else
+							{
+								return lam.Evaluate((ScheminList) restResult, this, env);
+							}
+						}
+						else
+						{
+							ScheminList unaryArgList = new ScheminList(restResult);
+							return lam.Evaluate(unaryArgList, this, env);
 						}
 					}
 					else

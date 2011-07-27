@@ -10,10 +10,10 @@ namespace Schemin.AST
 		public ScheminList Definition;
 		public ScheminList Arguments;
 
-		public ScheminLambda(ScheminList definition, ScheminList args)
+		public ScheminLambda(ScheminList definition)
 		{
-			this.Definition = definition;
-			this.Arguments = args;
+			this.Arguments = (ScheminList) definition.Car();
+			this.Definition = (ScheminList) definition.Cdr().Car();
 		}
 
 		public IScheminType Evaluate(ScheminList values, Evaluator eval, Environment env)
@@ -42,6 +42,11 @@ namespace Schemin.AST
 			IScheminType result = eval.Evaluate(Definition, env, false);
 
 			return result;
+		}
+
+		public override string ToString()
+		{
+			return "<Lambda>";
 		}
 	}
 }

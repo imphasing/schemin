@@ -13,12 +13,7 @@ namespace Schemin.Parse
 		public ScheminList Parse(List<Token> tokens)
 		{
 			KeyValuePair<ScheminList, int> parsed = ParseInternal(tokens, 0);
-			if (parsed.Key.List.Count() < 2)
-			{
-				return parsed.Key;
-			}
-
-			return (ScheminList) parsed.Key.Cdr();
+			return (ScheminList) parsed.Key;
 		}
 
 		private KeyValuePair<ScheminList, int> ParseInternal(List<Token> tokens, int startIndex)
@@ -60,6 +55,8 @@ namespace Schemin.Parse
 					return new ScheminInteger(int.Parse(token.Value));
 				case TokenType.StringLiteral:
 					return new ScheminString(token.Value);
+				case TokenType.BoolLiteral:
+					return new ScheminBool(token.Value);
 				default:
 					throw new Exception(string.Format("Unable to convert token of type: {0}", token.Type));
 			}
@@ -79,6 +76,12 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Define, "define");
 				case "dumpenv":
 					return new ScheminPrimitive(Primitives.DumpEnv, "dumpenv");
+				case "quote":
+					return new ScheminPrimitive(Primitives.Quote, "quote");
+				case "car":
+					return new ScheminPrimitive(Primitives.Car, "car");
+				case "cdr":
+					return new ScheminPrimitive(Primitives.Cdr, "cdr");
 				default:
 					return atom;
 			}

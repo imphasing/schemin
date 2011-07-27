@@ -64,6 +64,7 @@
     <Compile Include="Schemin.AST\ScheminLambda.cs" />
     <Compile Include="Schemin.AST\ScheminPrimitive.cs" />
     <Compile Include="Schemin.AST\ScheminString.cs" />
+    <Compile Include="Schemin.AST\ScheminBool.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
