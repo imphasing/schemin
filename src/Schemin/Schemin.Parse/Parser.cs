@@ -82,6 +82,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Car, "car");
 				case "cdr":
 					return new ScheminPrimitive(Primitives.Cdr, "cdr");
+				case "=":
+					return new ScheminPrimitive(Primitives.Equal, "=");
 				default:
 					return atom;
 			}

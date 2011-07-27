@@ -18,14 +18,14 @@ namespace Schemin
 			Tokenizer t = new Tokenizer();
 			Parser p = new Parser();
 			Evaluator eval = new Evaluator();
-			Environment env = new Environment();
+			Environment global = new Environment();
 
 			string line = String.Empty;
 			while ((line = Console.ReadLine()) != null)
 			{
 				var tokens = t.Tokenize(line);
 				var parsed = p.Parse(tokens);
-				IScheminType returnType = eval.Evaluate(parsed);
+				IScheminType returnType = eval.Evaluate(parsed, global);
 				Console.WriteLine(returnType.ToString());
 			}
 		}

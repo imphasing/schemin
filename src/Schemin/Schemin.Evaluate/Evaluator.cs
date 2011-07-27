@@ -19,9 +19,8 @@ namespace Schemin.Evaluate
 		private Type lambda = typeof(ScheminLambda);
 		private Type boolean = typeof(ScheminBool);
 
-		public IScheminType Evaluate(ScheminList ast)
+		public IScheminType Evaluate(ScheminList ast, Environment global)
 		{
-			Environment global = new Environment();
 			IScheminType last = null;
 
 			foreach (IScheminType type in ast.List)
@@ -123,6 +122,9 @@ namespace Schemin.Evaluate
 					{
 						restResult = Evaluate(temp.Cdr(), env, false);
 					}	
+
+
+
 					if (IsA(headResult, primitive))
 					{
 						ScheminPrimitive prim = (ScheminPrimitive) headResult;

@@ -16,11 +16,33 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, IScheminType> Quote;
 		public static Func<ScheminList, Environment, IScheminType> Car;
 		public static Func<ScheminList, Environment, IScheminType> Cdr;
-		public static Func<ScheminList, Environment, IScheminType> If;
+		public static Func<ScheminList, Environment, IScheminType> Equal;
 
 
 		static Primitives()
 		{
+			Equal = (list, env) => {
+				ScheminInteger last = (ScheminInteger) list.Car();
+
+				bool result = false;
+				
+				foreach (IScheminType type in list.Cdr().List)
+				{
+					var temp = (ScheminInteger) type;
+
+					if (last.Value == temp.Value)
+					{
+						result = true;
+					}
+					else
+					{
+						result = false;
+					}
+				}
+
+				return new ScheminBool(result);
+			};
+
 			Car = (list, env) => {
 				return list.Car();
 			};
@@ -28,7 +50,6 @@ namespace Schemin.Evaluate
 			Cdr = (list, env) => {
 				return list.Cdr();
 			};
-
 
 			Quote = (list, env) => {
 				return list;
