@@ -19,27 +19,30 @@ namespace Schemin.AST
 			ScheminList symbols = (ScheminList) args.Car();
 			ScheminList definition = (ScheminList) args.Cdr();
 
-			ScheminAtom first;
-			ScheminList rest;
+			ScheminAtom first = (ScheminAtom) symbols.Car();
+			ScheminList rest = symbols.Cdr();
 
-			ScheminAtom firstArg;
-			ScheminList restArgs;
+			IScheminType firstArg = (IScheminType) args.Car();
+			ScheminList restArgs = args.Cdr();
 
 			for (; ;)
 			{
 				first = (ScheminAtom) symbols.Car();
-				firstArg = (ScheminAtom) args.Car();
+				firstArg = (IScheminType) args.Car();
 				rest = symbols.Cdr();
 				restArgs = args.Cdr();
 
-					
+				if (first == null || firstArg == null)
+				{
+					break;
+				}
 
-				first = rest.Car();
-				firstArg = restArgs.Car();
-				rest = rest.Cdr();
-				restArgs = restArgs.Cdr();
+				env.AddBinding(first, firstArg);
 			}
-			throw new NotImplementedException();	
+
+			IScheminType result = eval.Evaluate(Definition, env, false);
+
+			return result;
 		}
 	}
 }

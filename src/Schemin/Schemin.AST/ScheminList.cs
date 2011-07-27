@@ -38,7 +38,7 @@ namespace Schemin.AST
 		{
 			if (this.List == null)
 			{
-				return new ScheminList();
+				return null;
 			}
 
 			return this.List.Head;
