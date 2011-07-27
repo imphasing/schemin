@@ -18,25 +18,23 @@ namespace Schemin.AST
 
 		public IScheminType Evaluate(ScheminList values, Evaluator eval, Environment env)
 		{
-			ScheminAtom first = (ScheminAtom) Arguments.Car();
+			IScheminType first = Arguments.Car();
 			ScheminList rest = Arguments.Cdr();
 
-			IScheminType firstArg = (IScheminType) values.Car();
+			IScheminType firstArg = values.Car();
 			ScheminList restArgs = values.Cdr();
 
 			for (; ;)
 			{
-				Console.WriteLine("Iterating. first: " + first.ToString() + " arg: " + firstArg.ToString());
-
-				if (first == null || firstArg == null)
+				if (first.GetType() == typeof(ScheminList) || firstArg.GetType() == typeof(ScheminList))
 				{
 					break;
 				}
 
-				env.AddBinding(first, firstArg);
+				env.AddBinding((ScheminAtom) first, firstArg);
 
-				first = (ScheminAtom) rest.Car();
-				firstArg = (IScheminType) restArgs.Car();
+				first = rest.Car();
+				firstArg = restArgs.Car();
 				rest = rest.Cdr();
 				restArgs = restArgs.Cdr();
 			}
