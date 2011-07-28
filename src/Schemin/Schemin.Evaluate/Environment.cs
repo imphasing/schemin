@@ -8,6 +8,7 @@ namespace Schemin.Evaluate
 	public class Environment
 	{
 		public Dictionary<string, IScheminType> bindings;
+		public Environment parent = null;
 
 		public Environment()
 		{
@@ -46,6 +47,7 @@ namespace Schemin.Evaluate
 			}
 		}
 
+				
 		public IScheminType GetValue(ScheminAtom symbol)
 		{
 			return bindings[symbol.Name];

@@ -59,14 +59,13 @@ namespace Schemin.Evaluate
 				}
 				else
 				{
-					if (env.HasValue(temp))
-					{
-						return env.GetValue(temp);
-					}
-					else
+					IScheminType bound = GetEnvValueRecursive(temp, env);
+					if (bound == null)
 					{
 						throw new Exception(string.Format("Error: Unbound atom: {0}", temp));
 					}
+
+					return bound;
 				}
 			}
 			else if (IsA(ast, primitive))
@@ -169,20 +168,27 @@ namespace Schemin.Evaluate
 								// If the first element is an atom, that means the lambda is being called with no args
 								if (temp.Car().GetType() == typeof(ScheminAtom))
 								{
-									return lam.Evaluate(tempArgList, this, env);
+									Environment closure = new Environment();
+									closure.parent = env;
+									return lam.Evaluate(tempArgList, this, closure);
 								}
 
 								return lam;
 							}
 							else
 							{
-								return lam.Evaluate(tempArgList, this, env);
+								Environment closure = new Environment();
+								closure.parent = env;
+								return lam.Evaluate(tempArgList, this, closure);
 							}
 						}
 						else
 						{
+							Environment closure = new Environment();
+							closure.parent = env;
+
 							ScheminList unaryArgList = new ScheminList(restResult);
-							return lam.Evaluate(unaryArgList, this, env);
+							return lam.Evaluate(unaryArgList, this, closure);
 						}
 					}
 					else
@@ -237,6 +243,21 @@ namespace Schemin.Evaluate
 			}
 
 			return false;
+		}
+
+		public IScheminType GetEnvValueRecursive(ScheminAtom symbol, Environment env)
+		{
+			if (env.HasValue(symbol))
+			{
+				return env.bindings[symbol.Name];
+			}
+
+			if (env.parent == null)
+			{
+				return null;
+			}
+
+			return GetEnvValueRecursive(symbol, env.parent);
 		}
 	}
 }
