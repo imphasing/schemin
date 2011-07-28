@@ -138,11 +138,17 @@ namespace Schemin.Evaluate
 							ScheminList tempArgList = (ScheminList) restResult;
 							if (tempArgList.Empty)
 							{
+								// If the car is a primitive, that means we're calling with no args
+								if (temp.Car().GetType() == typeof(ScheminPrimitive))
+								{
+									return prim.Evaluate(tempArgList, env, this);
+								}
+
 								return prim;
 							}
 							else
 							{
-								return prim.Evaluate((ScheminList) restResult, env, this);
+								return prim.Evaluate(tempArgList, env, this);
 							}
 						}
 						else
@@ -160,11 +166,17 @@ namespace Schemin.Evaluate
 							ScheminList tempArgList = (ScheminList) restResult;
 							if (tempArgList.Empty)
 							{
+								// If the first element is an atom, that means the lambda is being called with no args
+								if (temp.Car().GetType() == typeof(ScheminAtom))
+								{
+									return lam.Evaluate(tempArgList, this, env);
+								}
+
 								return lam;
 							}
 							else
 							{
-								return lam.Evaluate((ScheminList) restResult, this, env);
+								return lam.Evaluate(tempArgList, this, env);
 							}
 						}
 						else

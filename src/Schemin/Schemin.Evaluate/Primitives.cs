@@ -18,6 +18,7 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cdr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cons;
 
 
 		static Primitives()
@@ -60,11 +61,23 @@ namespace Schemin.Evaluate
 				return new ScheminBool(result);
 			};
 
+			Cons = (list, env, eval) => {
+				IScheminType head = list.Car();
+				IScheminType rest = list.Cdr().Car();
+
+				var temp = new ScheminList(head);
+				return temp.Append(rest);
+			};
+
 			Car = (list, env, eval) => {
 				return list.Car();
 			};
 
 			Cdr = (list, env, eval) => {
+				if (list.Cdr().List.Count() < 2)
+				{
+					return list.Cdr().Car();
+				}
 				return list.Cdr();
 			};
 

@@ -80,6 +80,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Quote, "quote");
 				case "car":
 					return new ScheminPrimitive(Primitives.Car, "car");
+				case "cons":
+					return new ScheminPrimitive(Primitives.Cons, "cons");
 				case "cdr":
 					return new ScheminPrimitive(Primitives.Cdr, "cdr");
 				case "=":
