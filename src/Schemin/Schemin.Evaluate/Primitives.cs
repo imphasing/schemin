@@ -4,6 +4,7 @@ namespace Schemin.Evaluate
 	using System;
 	using System.Text;
 	using System.Collections.Generic;
+	using System.Numerics;
 	using Schemin.AST;
 
 	public static class Primitives
@@ -24,9 +25,9 @@ namespace Schemin.Evaluate
 		static Primitives()
 		{
 			If = (list, env, eval) => {
-				ScheminList condition = (ScheminList) list.Car();
-				ScheminList then = (ScheminList) list.Cdr().Car();
-				ScheminList otherwise = (ScheminList) list.Cdr().Cdr().Car();
+				IScheminType condition = list.Car();
+				IScheminType then = list.Cdr().Car();
+				IScheminType otherwise = list.Cdr().Cdr().Car();
 
 				ScheminBool conditionResults = (ScheminBool) eval.Evaluate(condition, env, false);
 				if (conditionResults.Value)
@@ -121,7 +122,7 @@ namespace Schemin.Evaluate
 			};
 
 			Add = (args, env, eval) => {
-				int result = 0;
+				BigInteger result = new BigInteger(0);
 
 				if (args.List.Count() < 2)
 				{
@@ -143,7 +144,7 @@ namespace Schemin.Evaluate
 
 			Subtract = (args, env, eval) => {
 				var first = (ScheminInteger) args.Car();
-				int result = first.Value;
+				BigInteger result = first.Value;
 
 				if (args.List.Count() < 2)
 				{
@@ -163,7 +164,7 @@ namespace Schemin.Evaluate
 			};
 
 			Multiply = (args, env, eval) => {
-				int result = 1;
+				BigInteger result = new BigInteger(1);
 
 				foreach (IScheminType type in args.List)
 				{
