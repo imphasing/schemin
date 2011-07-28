@@ -88,6 +88,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Equal, "=");
 				case "if":
 					return new ScheminPrimitive(Primitives.If, "if");
+				case "map":
+					return new ScheminPrimitive(Primitives.Map, "map");
 				default:
 					return atom;
 			}

@@ -95,7 +95,7 @@ namespace Schemin.Evaluate
 					if (IsA(headResult, primitive))
 					{
 						ScheminPrimitive prim = (ScheminPrimitive) headResult;
-						if (prim.Name == "define")
+						if (prim.Name == "define" || prim.Name == "map")
 						{
 							restResult = Evaluate(temp.Cdr(), env, true);
 						}

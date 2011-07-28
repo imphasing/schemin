@@ -5,6 +5,8 @@ namespace Schemin.Evaluate
 	using System.Text;
 	using System.Collections.Generic;
 	using System.Numerics;
+	using System.Linq;
+	using Cadenza.Collections;
 	using Schemin.AST;
 
 	public static class Primitives
@@ -20,10 +22,26 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cons;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Map;
 
 
 		static Primitives()
 		{
+			Map = (list, env, eval) => {
+				ScheminAtom lamAtom = (ScheminAtom) list.Car();
+				ScheminList toMap = (ScheminList) list.Cdr();
+
+				// we suspended symbol lookup so the lambda wouldn't get called on the list, so lookup the lambda now
+				ScheminLambda lam = (ScheminLambda) eval.Evaluate(lamAtom, env, false);
+
+				var mapped = toMap.List.Select(element => {
+					var args = new ScheminList(element);
+					return lam.Evaluate(args, eval, env);
+				});
+
+				return new ScheminList(new CachedSequence<IScheminType>(mapped));
+			};
+
 			If = (list, env, eval) => {
 				IScheminType condition = list.Car();
 				IScheminType then = list.Cdr().Car();
