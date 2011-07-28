@@ -7,13 +7,14 @@ namespace Schemin.AST
 
 	public class ScheminLambda : IScheminType
 	{
-		public ScheminList Definition;
+		public IScheminType Definition;
 		public ScheminList Arguments;
 
 		public ScheminLambda(ScheminList definition)
 		{
 			this.Arguments = (ScheminList) definition.Car();
-			this.Definition = (ScheminList) definition.Cdr().Car();
+
+			this.Definition = definition.Cdr().Car();
 		}
 
 		public IScheminType Evaluate(ScheminList values, Evaluator eval, Environment env)

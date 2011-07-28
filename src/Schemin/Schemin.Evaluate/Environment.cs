@@ -47,7 +47,21 @@ namespace Schemin.Evaluate
 			}
 		}
 
-				
+		public void CloseOver(Environment env)
+		{
+			foreach (KeyValuePair<string, IScheminType> binding in env.bindings)
+			{
+				this.AddBinding(new ScheminAtom(binding.Key), binding.Value);
+			}
+
+			if (env.parent == null)
+			{
+				return;
+			}
+			
+			CloseOver(env.parent);
+		}
+
 		public IScheminType GetValue(ScheminAtom symbol)
 		{
 			return bindings[symbol.Name];

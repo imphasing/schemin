@@ -159,6 +159,8 @@ namespace Schemin.Evaluate
 					if (IsA(headResult, lambda))
 					{
 						// Again handling lambda with special care
+						// Before the lambda is executed, we create a new environment for it so arguments don't clobber the scope
+						// The parent environment needs to be copied into the new environment as well, to implement closures.
 						ScheminLambda lam = (ScheminLambda) headResult;
 						if (IsA(restResult, list))
 						{
@@ -168,7 +170,10 @@ namespace Schemin.Evaluate
 								// If the first element is an atom, that means the lambda is being called with no args
 								if (temp.Car().GetType() == typeof(ScheminAtom))
 								{
+									// CloseOver hoists free variables to the closure's env
 									Environment closure = new Environment();
+									closure.CloseOver(env);
+
 									closure.parent = env;
 									return lam.Evaluate(tempArgList, this, closure);
 								}
@@ -178,6 +183,8 @@ namespace Schemin.Evaluate
 							else
 							{
 								Environment closure = new Environment();
+								closure.CloseOver(env);
+
 								closure.parent = env;
 								return lam.Evaluate(tempArgList, this, closure);
 							}
@@ -185,6 +192,7 @@ namespace Schemin.Evaluate
 						else
 						{
 							Environment closure = new Environment();
+							closure.CloseOver(env);
 							closure.parent = env;
 
 							ScheminList unaryArgList = new ScheminList(restResult);
