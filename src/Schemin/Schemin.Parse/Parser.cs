@@ -86,6 +86,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Cdr, "cdr");
 				case "cadr":
 					return new ScheminPrimitive(Primitives.Cadr, "cadr");
+				case "cddr":
+					return new ScheminPrimitive(Primitives.Cddr, "cddr");
 				case "length":
 					return new ScheminPrimitive(Primitives.Length, "length");
 				case "=":

@@ -20,6 +20,7 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Car;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cdr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cadr;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cddr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cons;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Length;
 
@@ -127,8 +128,10 @@ namespace Schemin.Evaluate
 						ScheminAtom symbol = (ScheminAtom) binding.Car();
 						IScheminType val = binding.Cdr().Car();
 
+						IScheminType evaledVal = eval.Evaluate(val, env, false, false);
+
 						argSymbols.Append(symbol);
-						argValues.Append(val);
+						argValues.Append(evaledVal);
 					}
 
 					ScheminList lambdaArgs = new ScheminList(argSymbols);
@@ -241,6 +244,10 @@ namespace Schemin.Evaluate
 				return list.Cdr().Car();
 			};
 
+			Cddr = (list, env, eval) => {
+				return list.Cdr().Cdr();
+			};
+
 			Quote = (list, env, eval) => {
 				if (list.List.Count() > 1)
 				{
@@ -259,6 +266,8 @@ namespace Schemin.Evaluate
 				{
 					builder.Append(string.Format("({0} => {1}), ", kvp.Key, kvp.Value));
 				}
+
+				Console.WriteLine(builder.ToString());
 
 				return new ScheminString(builder.ToString());
 			};

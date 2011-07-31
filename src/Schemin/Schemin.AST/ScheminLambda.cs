@@ -92,6 +92,11 @@ namespace Schemin.AST
 				temp.Closure = env;
 			}
 
+			Console.WriteLine("Args: " + Arguments.ToString());
+			Console.WriteLine("Env: " + env.ToString());
+			Console.WriteLine("Def: " + Definition.ToString());
+
+
 			return result;
 		}
 

@@ -2,6 +2,7 @@
 namespace Schemin.Evaluate
 {
 	using System;
+	using System.Text;
 	using System.Collections.Generic;
 	using Schemin.AST;
 	
@@ -75,5 +76,18 @@ namespace Schemin.Evaluate
 		{
 			return bindings[symbol.Name];
 		}
+
+		public override string ToString()
+		{
+			StringBuilder builder = new StringBuilder();
+
+			foreach (KeyValuePair<string, IScheminType> kvp in bindings)
+			{
+				builder.Append(string.Format("({0} => {1}), ", kvp.Key, kvp.Value));
+			}
+
+			return builder.ToString();
+		}
+
 	}
 }
