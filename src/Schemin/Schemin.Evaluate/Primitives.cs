@@ -14,22 +14,27 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Add;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Subtract;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Multiply;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Define;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> DumpEnv;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Quote;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Car;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cdr;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cons;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Map;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThan;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThan;
+
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Car;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cdr;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cadr;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cons;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Length;
+
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
+
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Map;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Begin;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetBang;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Display;
 
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Define;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> DumpEnv;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Quote;
 
 		static Primitives()
 		{
@@ -155,6 +160,10 @@ namespace Schemin.Evaluate
 				return new ScheminBool(result);
 			};
 
+			Length = (list, env, eval) => {
+				return new ScheminInteger(list.List.Count());
+			};
+
 			Cons = (list, env, eval) => {
 				IScheminType head = list.Car();
 				IScheminType rest = list.Cdr().Car();
@@ -173,6 +182,10 @@ namespace Schemin.Evaluate
 					return list.Cdr().Car();
 				}
 				return list.Cdr();
+			};
+
+			Cadr = (list, env, eval) => {
+				return list.Cdr().Car();
 			};
 
 			Quote = (list, env, eval) => {
