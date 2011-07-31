@@ -92,6 +92,10 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Map, "map");
 				case ">":
 					return new ScheminPrimitive(Primitives.GreaterThan, ">");
+				case "<":
+					return new ScheminPrimitive(Primitives.LessThan, "<");
+				case "let":
+					return new ScheminPrimitive(Primitives.Let, "let");
 				default:
 					return atom;
 			}

@@ -269,7 +269,7 @@ namespace Schemin.Evaluate
 				// Need to suspend execution of primitives and lambdas for functions that can have them passed as arguments.
 				return Evaluate(top.Cdr(), env, false, true);
 			}
-			else if (prim.Name == "if")
+			else if (prim.Name == "if" || prim.Name == "let")
 			{
 				// don't evaluate the arguments yet if it's an if call
 				return top.Cdr();

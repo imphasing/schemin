@@ -24,10 +24,31 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cons;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Map;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThan;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThan;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
 
 
 		static Primitives()
 		{
+			Let = (list, env, eval) => {
+				ScheminList bindings = (ScheminList) list.Car();
+				IScheminType expression = list.Cdr().Car();
+
+				Environment temporary = new Environment();
+				temporary.parent = env;
+				
+				foreach (IScheminType type in bindings.List)
+				{
+					ScheminList binding = (ScheminList) type;
+					ScheminAtom symbol = (ScheminAtom) binding.Car();
+					IScheminType val = binding.Cdr().Car();
+
+					temporary.AddBinding(symbol, eval.Evaluate(val, env, false, false));
+				}
+
+				return eval.Evaluate(expression, temporary, false, false);
+			};
+
 			Map = (list, env, eval) => {
 				IScheminType toApply = (IScheminType) list.Car();
 				ScheminList toMap = (ScheminList) list.Cdr();
@@ -154,6 +175,18 @@ namespace Schemin.Evaluate
 				ScheminInteger second = (ScheminInteger) args.Cdr().Car();
 
 				if (first.Value > second.Value)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
+			};
+
+			LessThan = (args, env, eval) => {
+				ScheminInteger first = (ScheminInteger) args.Car();
+				ScheminInteger second = (ScheminInteger) args.Cdr().Car();
+
+				if (first.Value < second.Value)
 				{
 					return new ScheminBool(true);
 				}
