@@ -28,11 +28,22 @@ namespace Schemin.Evaluate
 		static Primitives()
 		{
 			Map = (list, env, eval) => {
-				ScheminAtom lamAtom = (ScheminAtom) list.Car();
+				IScheminType toApply = (IScheminType) list.Car();
 				ScheminList toMap = (ScheminList) list.Cdr();
 
-				// we suspended symbol lookup so the lambda wouldn't get called on the list, so lookup the lambda now
-				ScheminLambda lam = (ScheminLambda) eval.Evaluate(lamAtom, env, false);
+				ScheminLambda lam;
+
+				if (toApply.GetType() == typeof(ScheminAtom))
+				{
+					// we suspended symbol lookup and function eval so the lambda wouldn't get called on the list, so lookup the lambda now
+					lam = (ScheminLambda) eval.Evaluate(toApply, env, false, false);
+				}
+				else
+				{
+					// we were passed an explicit lambda instead of a symbol to lookup
+					lam = (ScheminLambda) toApply;
+				}
+
 
 				var mapped = toMap.List.Select(element => {
 					var args = new ScheminList(element);
@@ -47,14 +58,14 @@ namespace Schemin.Evaluate
 				IScheminType then = list.Cdr().Car();
 				IScheminType otherwise = list.Cdr().Cdr().Car();
 
-				ScheminBool conditionResults = (ScheminBool) eval.Evaluate(condition, env, false);
+				ScheminBool conditionResults = (ScheminBool) eval.Evaluate(condition, env, false, false);
 				if (conditionResults.Value)
 				{
-					return eval.Evaluate(then, env, false);
+					return eval.Evaluate(then, env, false, false);
 				}
 				else
 				{
-					return eval.Evaluate(otherwise, env, false);
+					return eval.Evaluate(otherwise, env, false, false);
 				}
 			};
 				

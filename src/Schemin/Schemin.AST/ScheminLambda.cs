@@ -9,11 +9,11 @@ namespace Schemin.AST
 	{
 		public IScheminType Definition;
 		public ScheminList Arguments;
+		public Environment Closure;
 
 		public ScheminLambda(ScheminList definition)
 		{
 			this.Arguments = (ScheminList) definition.Car();
-
 			this.Definition = definition.Cdr().Car();
 		}
 
@@ -40,7 +40,20 @@ namespace Schemin.AST
 				restArgs = restArgs.Cdr();
 			}
 
-			IScheminType result = eval.Evaluate(Definition, env, false);
+			if (this.Closure != null)
+			{
+				// Only close over the top level with locals, otherwise we clobber our env with global stuff
+				env.CloseOverTop(this.Closure);
+			}
+
+			IScheminType result = eval.Evaluate(Definition, env, false, false);
+
+			// Pass closure on to the next lambda if we return one
+			if (result.GetType() == typeof(ScheminLambda))
+			{
+				ScheminLambda temp = (ScheminLambda) result;
+				temp.Closure = env;
+			}
 
 			return result;
 		}
