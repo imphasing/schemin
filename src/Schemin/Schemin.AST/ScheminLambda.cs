@@ -14,7 +14,7 @@ namespace Schemin.AST
 		public ScheminLambda(ScheminList definition)
 		{
 			this.Arguments = (ScheminList) definition.Car();
-			this.Definition = definition.Cdr().Car();
+			this.Definition = definition.Cdr();
 		}
 
 		public IScheminType Evaluate(ScheminList values, Evaluator eval, Environment env)
@@ -42,6 +42,7 @@ namespace Schemin.AST
 			}
 
 			ScheminList restArgs = values.Cdr();
+			int argsLeft = Arguments.List.Count();
 
 			for (; ;)
 			{
@@ -64,10 +65,18 @@ namespace Schemin.AST
 				}
 
 				env.AddBinding((ScheminAtom) first, firstArg);
+				argsLeft--;
 
 				// break after the first argument
 				if (singleListArg)
 				{
+					break;
+				}
+
+				// If there's only one arg left but multiple values left, treat it as a liast argument
+				if (argsLeft == 1 && restArgs.List.Count() > 1)
+				{
+					env.AddBinding((ScheminAtom) rest.Car(), restArgs);
 					break;
 				}
 
@@ -82,22 +91,30 @@ namespace Schemin.AST
 				// Only close over the top level with locals, otherwise we clobber our env with global stuff
 				env.CloseOverTop(this.Closure);
 			}
-
-			IScheminType result = eval.Evaluate(Definition, env, false, false);
+			
+			// Need to evaluate each part of the lambda body and return the last value
+			IScheminType last = null;
+			if (Definition.GetType() == typeof(ScheminList))
+			{
+				ScheminList temp = (ScheminList) Definition;
+				foreach (IScheminType type in temp.List)
+				{
+					last = eval.Evaluate(type, env, false, false);
+				}
+			}
+			else
+			{
+				last = eval.Evaluate(Definition, env, false, false);
+			}
 
 			// Pass closure on to the next lambda if we return one
-			if (result.GetType() == typeof(ScheminLambda))
+			if (last.GetType() == typeof(ScheminLambda))
 			{
-				ScheminLambda temp = (ScheminLambda) result;
+				ScheminLambda temp = (ScheminLambda) last;
 				temp.Closure = env;
 			}
 
-			Console.WriteLine("Args: " + Arguments.ToString());
-			Console.WriteLine("Env: " + env.ToString());
-			Console.WriteLine("Def: " + Definition.ToString());
-
-
-			return result;
+			return last;
 		}
 
 		public override string ToString()

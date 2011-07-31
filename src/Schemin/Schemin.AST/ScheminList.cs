@@ -51,6 +51,11 @@ namespace Schemin.AST
 				return new ScheminList();
 			}
 
+			if (this.List.Tail == null)
+			{
+				return new ScheminList();
+			}
+
 			return new ScheminList(this.List.Tail);
 		}
 

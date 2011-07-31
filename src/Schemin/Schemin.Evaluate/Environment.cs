@@ -88,6 +88,5 @@ namespace Schemin.Evaluate
 
 			return builder.ToString();
 		}
-
 	}
 }

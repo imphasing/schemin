@@ -210,7 +210,22 @@ namespace Schemin.Evaluate
 			};
 
 			Length = (list, env, eval) => {
-				return new ScheminInteger(list.List.Count());
+				int count = 0;
+				foreach (IScheminType type in list.List)
+				{
+					if (type.GetType() == typeof(ScheminList))
+					{
+						var temp = (ScheminList) type;
+						if (temp.Empty)
+						{
+							break;
+						}
+					}
+
+					count++;
+				}
+
+				return new ScheminInteger(count);
 			};
 
 			Cons = (list, env, eval) => {
@@ -233,11 +248,8 @@ namespace Schemin.Evaluate
 			};
 
 			Cdr = (list, env, eval) => {
-				if (list.Cdr().List.Count() < 2)
-				{
-					return list.Cdr().Car();
-				}
-				return list.Cdr();
+				ScheminList ret = list.Cdr();
+				return ret;
 			};
 
 			Cadr = (list, env, eval) => {
