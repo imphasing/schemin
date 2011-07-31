@@ -98,11 +98,6 @@ namespace Schemin.Evaluate
 
 					if (IsA(headResult, primitive))
 					{
-						if (suspendFunctions)
-						{
-							return ConstructRemnantList(headResult, restResult);
-						}
-
 						return EvaluatePrimitive(temp, headResult, restResult, env);
 					}
 					if (IsA(headResult, lambda))
@@ -260,7 +255,7 @@ namespace Schemin.Evaluate
 		public IScheminType EvaluateRestPrimitive(ScheminList top, IScheminType headResult, Environment env)
 		{
 			ScheminPrimitive prim = (ScheminPrimitive) headResult;
-			if (prim.Name == "define")
+			if (prim.Name == "define" || prim.Name == "set!")
 			{
 				return Evaluate(top.Cdr(), env, true, false);
 			}
@@ -269,7 +264,7 @@ namespace Schemin.Evaluate
 				// Need to suspend execution of primitives and lambdas for functions that can have them passed as arguments.
 				return Evaluate(top.Cdr(), env, false, true);
 			}
-			else if (prim.Name == "if" || prim.Name == "let")
+			else if (prim.Name == "if" || prim.Name == "let" || prim.Name == "begin")
 			{
 				// don't evaluate the arguments yet if it's an if call
 				return top.Cdr();

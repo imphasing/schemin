@@ -26,10 +26,54 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThan;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThan;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Begin;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetBang;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Display;
 
 
 		static Primitives()
 		{
+			Display = (list, env, eval) => {
+				IScheminType toDisplay = list;
+				Console.WriteLine(eval.Evaluate(toDisplay, env, false, false).ToString());
+
+				return new ScheminList();
+			};
+
+			SetBang = (list, env, eval) => {
+				ScheminAtom symbol = (ScheminAtom) list.Car();
+				IScheminType definition = list.Cdr();
+
+				// If there's less than 2 elements in the list, treat the define as if it's binding to a non-list.
+				ScheminList temp = (ScheminList) definition;
+				if (temp.List.Count() < 2)
+				{
+					definition = temp.Car();
+				}
+				
+				if (env.HasValue(symbol))
+				{
+					env.RemoveBinding(symbol);
+					env.AddBinding(symbol, definition);
+				}
+				else
+				{
+					throw new Exception("Unbound atom referenced: " + symbol.Name);
+				}
+
+				return new ScheminList();
+			};
+
+			Begin = (list, env, eval) => {
+				IScheminType last = new ScheminList();
+				foreach (IScheminType type in list.List)
+				{
+					last = eval.Evaluate(type, env, false, false);
+				}
+
+				return last;
+			};
+
 			Let = (list, env, eval) => {
 				ScheminList bindings = (ScheminList) list.Car();
 				IScheminType expression = list.Cdr().Car();
@@ -132,7 +176,14 @@ namespace Schemin.Evaluate
 			};
 
 			Quote = (list, env, eval) => {
-				return list;
+				if (list.List.Count() > 1)
+				{
+					return list;
+				}
+				else
+				{
+					return list.Car();
+				}
 			};
 
 			DumpEnv = (args, env, eval) => {
