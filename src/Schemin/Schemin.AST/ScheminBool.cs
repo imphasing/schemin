@@ -30,5 +30,21 @@ namespace Schemin.AST
 			}
 			return "#f";
 		}
+
+		public bool Equals(IScheminType type)
+		{
+			if (this.GetType() != type.GetType())
+			{
+				return false;
+			}
+
+			ScheminBool temp = (ScheminBool) type;
+			if (this.Value == temp.Value)
+			{
+				return true;
+			}
+
+			return false;
+		}
 	}
 }

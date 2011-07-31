@@ -71,15 +71,13 @@ namespace Schemin.Evaluate
 			};
 				
 			Equal = (list, env, eval) => {
-				ScheminInteger last = (ScheminInteger) list.Car();
+				IScheminType last = list.Car();
 
 				bool result = false;
 				
 				foreach (IScheminType type in list.Cdr().List)
 				{
-					var temp = (ScheminInteger) type;
-
-					if (last.Value == temp.Value)
+					if (last.Equals(type))
 					{
 						result = true;
 					}

@@ -21,5 +21,21 @@ namespace Schemin.AST
 		{
 			return Value.ToString();
 		}
+
+		public bool Equals(IScheminType type)
+		{
+			if (this.GetType() != type.GetType())
+			{
+				return false;
+			}
+
+			ScheminInteger temp = (ScheminInteger) type;
+			if (this.Value == temp.Value)
+			{
+				return true;
+			}
+
+			return false;
+		}
 	}
 }

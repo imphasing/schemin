@@ -37,5 +37,10 @@ namespace Schemin.AST
 				return "<Primitive:unbound>";
 			}
 		}
+
+		public bool Equals(IScheminType type)
+		{
+			return false;
+		}
 	}
 }

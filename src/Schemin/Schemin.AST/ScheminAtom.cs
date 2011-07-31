@@ -14,5 +14,21 @@ namespace Schemin.AST
 		{
 			return Name;
 		}
+
+		public bool Equals(IScheminType type)
+		{
+			if (this.GetType() != type.GetType())
+			{
+				return false;
+			}
+
+			ScheminAtom temp = (ScheminAtom) type;
+			if (this.Name == temp.Name)
+			{
+				return true;
+			}
+
+			return false;
+		}
 	}
 }

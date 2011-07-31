@@ -112,5 +112,21 @@ namespace Schemin.AST
 
 			return "<List: " + builder.ToString() + ">";
 		}
+
+		public bool Equals(IScheminType type)
+		{
+			if (this.GetType() != type.GetType())
+			{
+				return false;
+			}
+
+			ScheminList temp = (ScheminList) type;
+			if (this.List == temp.List)
+			{
+				return true;
+			}
+
+			return false;
+		}
 	}
 }

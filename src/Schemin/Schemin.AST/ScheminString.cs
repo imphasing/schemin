@@ -14,5 +14,21 @@ namespace Schemin.AST
 		{
 			return Value;
 		}
+
+		public bool Equals(IScheminType type)
+		{
+			if (this.GetType() != type.GetType())
+			{
+				return false;
+			}
+
+			ScheminString temp = (ScheminString) type;
+			if (this.Value == temp.Value)
+			{
+				return true;
+			}
+
+			return false;
+		}
 	}
 }

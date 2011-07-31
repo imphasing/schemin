@@ -99,5 +99,10 @@ namespace Schemin.AST
 		{
 			return "<Lambda>";
 		}
+
+		public bool Equals(IScheminType type)
+		{
+			return false;
+		}
 	}
 }
