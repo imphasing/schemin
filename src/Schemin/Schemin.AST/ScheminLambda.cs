@@ -19,20 +19,57 @@ namespace Schemin.AST
 
 		public IScheminType Evaluate(ScheminList values, Evaluator eval, Environment env)
 		{
+			bool singleListArg = false;
 			IScheminType first = Arguments.Car();
 			ScheminList rest = Arguments.Cdr();
 
-			IScheminType firstArg = values.Car();
+			if (this.Arguments.List.Count() < 2 && Arguments.List.Count() < values.List.Count())
+			{
+				singleListArg = true;
+			}
+
+			IScheminType firstArg;
+
+			// if there's a single argument and the number of lambda arguments is less than the number of values in the list
+			// then we're working with a lambda with a single list argument passed in, to treat as the argument
+			if (singleListArg)
+			{
+				firstArg = values;
+			}
+			else
+			{
+				firstArg = values.Car();
+			}
+
 			ScheminList restArgs = values.Cdr();
 
 			for (; ;)
 			{
-				if (first.GetType() == typeof(ScheminList) || firstArg.GetType() == typeof(ScheminList))
+				if (first.GetType() == typeof(ScheminList))
 				{
-					break;
+					ScheminList tempFirst = (ScheminList) first;
+					if (tempFirst.Empty)
+					{
+						break;
+					}
+				}
+
+				if (firstArg.GetType() == typeof(ScheminList))
+				{
+					ScheminList tempArg = (ScheminList) firstArg;
+					if (tempArg.Empty)
+					{
+						break;
+					}
 				}
 
 				env.AddBinding((ScheminAtom) first, firstArg);
+
+				// break after the first argument
+				if (singleListArg)
+				{
+					break;
+				}
 
 				first = rest.Car();
 				firstArg = restArgs.Car();

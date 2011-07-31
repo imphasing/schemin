@@ -62,7 +62,7 @@ namespace Schemin.Evaluate
 					return ast;
 				}
 
-				IScheminType headResult = Evaluate(temp.Car(), env, ignoreSymbols, false);
+				IScheminType headResult = Evaluate(temp.Car(), env, ignoreSymbols, suspendFunctions);
 
 				if (IsEmptyList(temp.Cdr()))
 				{
@@ -87,12 +87,12 @@ namespace Schemin.Evaluate
 						}
 						else
 						{
-							restResult = Evaluate(temp.Cdr(), env, false, false);
+							restResult = Evaluate(temp.Cdr(), env, ignoreSymbols, suspendFunctions);
 						}
 					}
 					else
 					{
-						restResult = Evaluate(temp.Cdr(), env, false, false);
+						restResult = Evaluate(temp.Cdr(), env, ignoreSymbols, suspendFunctions);
 					}	
 
 
@@ -267,7 +267,7 @@ namespace Schemin.Evaluate
 			else if (prim.Name == "map")
 			{
 				// Need to suspend execution of primitives and lambdas for functions that can have them passed as arguments.
-				return Evaluate(top.Cdr(), env, true, true);
+				return Evaluate(top.Cdr(), env, false, true);
 			}
 			else if (prim.Name == "if")
 			{
