@@ -80,22 +80,68 @@ namespace Schemin.Evaluate
 			};
 
 			Let = (list, env, eval) => {
-				ScheminList bindings = (ScheminList) list.Car();
-				IScheminType expression = list.Cdr().Car();
-
-				Environment temporary = new Environment();
-				temporary.parent = env;
-				
-				foreach (IScheminType type in bindings.List)
+				bool isNamed = false;
+				IScheminType first = list.Car();
+				if (first.GetType() == typeof(ScheminAtom))
 				{
-					ScheminList binding = (ScheminList) type;
-					ScheminAtom symbol = (ScheminAtom) binding.Car();
-					IScheminType val = binding.Cdr().Car();
-
-					temporary.AddBinding(symbol, eval.Evaluate(val, env, false, false));
+					isNamed = true;
+				}
+					
+				ScheminList bindings;
+				IScheminType expression;
+				if (isNamed)
+				{
+					bindings = (ScheminList) list.Cdr().Car();
+					expression = list.Cdr().Cdr().Car();
+				}
+				else
+				{
+					bindings = (ScheminList) list.Car();
+					expression = list.Cdr().Car();
 				}
 
-				return eval.Evaluate(expression, temporary, false, false);
+				if (!isNamed)
+				{
+					Environment temporary = new Environment();
+					temporary.parent = env;
+
+					foreach (IScheminType type in bindings.List)
+					{
+						ScheminList binding = (ScheminList) type;
+						ScheminAtom symbol = (ScheminAtom) binding.Car();
+						IScheminType val = binding.Cdr().Car();
+
+						temporary.AddBinding(symbol, eval.Evaluate(val, env, false, false));
+					}
+
+					return eval.Evaluate(expression, temporary, false, false);
+				}
+				else
+				{
+					ScheminList argSymbols = new ScheminList();
+					ScheminList argValues = new ScheminList();
+
+					foreach (IScheminType type in bindings.List)
+					{
+						ScheminList binding = (ScheminList) type;
+						ScheminAtom symbol = (ScheminAtom) binding.Car();
+						IScheminType val = binding.Cdr().Car();
+
+						argSymbols.Append(symbol);
+						argValues.Append(val);
+					}
+
+					ScheminList lambdaArgs = new ScheminList(argSymbols);
+					lambdaArgs = lambdaArgs.Append(expression);
+
+					ScheminLambda proc = new ScheminLambda(lambdaArgs);
+					Environment temporary = new Environment();
+					temporary.parent = env;
+
+					temporary.AddBinding((ScheminAtom) first, proc);
+
+					return proc.Evaluate(argValues, eval, temporary);
+				}
 			};
 
 			Map = (list, env, eval) => {
@@ -117,9 +163,9 @@ namespace Schemin.Evaluate
 
 
 				var mapped = toMap.List.Select(element => {
-					var args = new ScheminList(element);
-					return lam.Evaluate(args, eval, env);
-				});
+						var args = new ScheminList(element);
+						return lam.Evaluate(args, eval, env);
+						});
 
 				return new ScheminList(new CachedSequence<IScheminType>(mapped));
 			};
@@ -139,12 +185,12 @@ namespace Schemin.Evaluate
 					return eval.Evaluate(otherwise, env, false, false);
 				}
 			};
-				
+
 			Equal = (list, env, eval) => {
 				IScheminType last = list.Car();
 
 				bool result = false;
-				
+
 				foreach (IScheminType type in list.Cdr().List)
 				{
 					if (last.Equals(type))
@@ -166,10 +212,17 @@ namespace Schemin.Evaluate
 
 			Cons = (list, env, eval) => {
 				IScheminType head = list.Car();
-				IScheminType rest = list.Cdr().Car();
+				IScheminType rest = list.Cdr();
 
-				var temp = new ScheminList(head);
-				return temp.Append(rest);
+				if (rest.GetType() == typeof(ScheminList))
+				{
+					ScheminList temp = (ScheminList) rest;
+					return new ScheminList(head, temp);
+				}
+
+				var append = new ScheminList(head);
+				append.Append(rest);
+				return append; 
 			};
 
 			Car = (list, env, eval) => {
@@ -220,7 +273,7 @@ namespace Schemin.Evaluate
 				{
 					definition = temp.Car();
 				}
-				
+
 				if (env.HasValue(symbol))
 				{
 					env.RemoveBinding(symbol);
