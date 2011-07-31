@@ -23,6 +23,7 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cons;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Map;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThan;
 
 
 		static Primitives()
@@ -148,6 +149,18 @@ namespace Schemin.Evaluate
 				}
 
 				return new ScheminList();
+			};
+
+			GreaterThan = (args, env, eval) => {
+				ScheminInteger first = (ScheminInteger) args.Car();
+				ScheminInteger second = (ScheminInteger) args.Cdr().Car();
+
+				if (first.Value > second.Value)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
 			};
 
 			Add = (args, env, eval) => {
