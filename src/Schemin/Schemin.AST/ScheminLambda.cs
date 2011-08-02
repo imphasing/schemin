@@ -35,15 +35,6 @@ namespace Schemin.AST
 					}
 				}
 
-				if (firstArg.GetType() == typeof(ScheminList))
-				{
-					ScheminList tempArg = (ScheminList) firstArg;
-					if (tempArg.Empty)
-					{
-						break;
-					}
-				}
-
 				env.AddBinding((ScheminAtom) first, firstArg);
 
 				first = rest.Car();

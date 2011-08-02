@@ -7,6 +7,7 @@ namespace Schemin.Evaluate
 		DefineArgs,
 		QuoteArgs,
 		LetArgs,
+		IfArgs,
 		Normal
 	}
 }

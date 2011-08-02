@@ -18,6 +18,7 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Multiply;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThan;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThan;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThanOr;
 
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Car;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cdr;
@@ -25,6 +26,8 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cddr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cons;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Length;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Null;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> List;
 
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 
@@ -48,7 +51,7 @@ namespace Schemin.Evaluate
 			};
 
 			Display = (list, env, eval) => {
-				IScheminType toDisplay = list;
+				IScheminType toDisplay = list.Car();
 				Console.WriteLine(toDisplay.ToString());
 
 				return new ScheminList();
@@ -176,6 +179,7 @@ namespace Schemin.Evaluate
 			};
 
 			If = (list, env, eval) => {
+				eval.EvalState = EvaluatorState.Normal;
 				IScheminType condition = list.Car();
 				IScheminType then = list.Cdr().Car();
 				IScheminType otherwise = list.Cdr().Cdr().Car();
@@ -257,6 +261,29 @@ namespace Schemin.Evaluate
 				return arg;
 			};
 
+			List = (list, env, eval) => {
+				ScheminList listArg = (ScheminList) list.Car();
+				ScheminList ret = new ScheminList();
+
+				foreach (IScheminType type in listArg.List)
+				{
+					ret.Append(type);
+				}
+
+				return ret;
+			};
+
+			Null = (list, env, eval) => {
+				ScheminList listArg = (ScheminList) list.Car();
+
+				if (listArg.Empty)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
+			};
+
 			DumpEnv = (args, env, eval) => {
 				StringBuilder builder = new StringBuilder();
 
@@ -271,6 +298,7 @@ namespace Schemin.Evaluate
 			};
 
 			Define = (args, env, eval) => {
+				eval.EvalState = EvaluatorState.Normal;
 				ScheminAtom symbol = (ScheminAtom) args.Car();
 				IScheminType definition = args.Cdr().Car();
 
@@ -284,7 +312,6 @@ namespace Schemin.Evaluate
 					env.AddBinding(symbol, definition);
 				}
 
-				eval.EvalState = EvaluatorState.Normal;
 				return new ScheminList();
 			};
 
@@ -305,6 +332,18 @@ namespace Schemin.Evaluate
 				ScheminInteger second = (ScheminInteger) args.Cdr().Car();
 
 				if (first.Value < second.Value)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
+			};
+
+			LessThanOr = (args, env, eval) => {
+				ScheminInteger first = (ScheminInteger) args.Car();
+				ScheminInteger second = (ScheminInteger) args.Cdr().Car();
+
+				if (first.Value <= second.Value)
 				{
 					return new ScheminBool(true);
 				}

@@ -105,6 +105,9 @@ namespace Schemin.Evaluate
 							case "let":
 								this.EvalState = EvaluatorState.LetArgs;
 								break;
+							case "if":
+								this.EvalState = EvaluatorState.IfArgs;
+								break;
 						}
 
 						complete.Append(type);
@@ -124,6 +127,9 @@ namespace Schemin.Evaluate
 								complete.Append(type);
 								continue;
 							case EvaluatorState.LetArgs:
+								complete.Append(type);
+								continue;
+							case EvaluatorState.IfArgs:
 								complete.Append(type);
 								continue;
 						}
@@ -176,6 +182,8 @@ namespace Schemin.Evaluate
 				case EvaluatorState.LambdaArgs:
 					return ast;
 				case EvaluatorState.LetArgs:
+					return ast;
+				case EvaluatorState.IfArgs:
 					return ast;
 			}
 

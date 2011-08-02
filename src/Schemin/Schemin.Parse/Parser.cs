@@ -92,6 +92,10 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Cddr, "cddr");
 				case "length":
 					return new ScheminPrimitive(Primitives.Length, "length");
+				case "list":
+					return new ScheminPrimitive(Primitives.List, "list");
+				case "null?":
+					return new ScheminPrimitive(Primitives.Null, "null?");
 				case "=":
 					return new ScheminPrimitive(Primitives.Equal, "=");
 				case "eq?":
@@ -104,6 +108,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.GreaterThan, ">");
 				case "<":
 					return new ScheminPrimitive(Primitives.LessThan, "<");
+				case "<=":
+					return new ScheminPrimitive(Primitives.LessThanOr, "<=");
 				case "let":
 					return new ScheminPrimitive(Primitives.Let, "let");
 				case "begin":
