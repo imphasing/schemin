@@ -94,6 +94,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.Length, "length");
 				case "list":
 					return new ScheminPrimitive(Primitives.List, "list");
+				case "append":
+					return new ScheminPrimitive(Primitives.Append, "append");
 				case "null?":
 					return new ScheminPrimitive(Primitives.Null, "null?");
 				case "=":

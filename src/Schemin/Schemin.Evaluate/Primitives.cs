@@ -28,6 +28,7 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Length;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Null;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> List;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Append;
 
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 
@@ -192,32 +193,37 @@ namespace Schemin.Evaluate
 
 			Filter = (list, env, eval) => {
 				IScheminType toApply = (IScheminType) list.Car();
-				ScheminList toMap = (ScheminList) list.Cdr().Car();
+				ScheminList toFilter = (ScheminList) list.Cdr().Car();
 
 				ScheminLambda lam = (ScheminLambda) toApply;
 
-				if (toMap.Empty)
+				if (toFilter.Empty)
 				{
-					return toMap;
+					return toFilter;
 				}
 
-				var mapped = toMap.List.Where(element => {
+				var filtered = toFilter.List.Where(element => {
 						var args = new ScheminList(element);
 						ScheminBool predResult = (ScheminBool) lam.Evaluate(args, eval, env);
 						return predResult.Value;
 				});
 
-				if (mapped.Count() < 1)
+				if (filtered.Count() < 1)
 				{
 					return new ScheminList();
 				}
 
-				return new ScheminList(new CachedSequence<IScheminType>(mapped));
+				return new ScheminList(new CachedSequence<IScheminType>(filtered));
 			};
 
 			Map = (list, env, eval) => {
 				IScheminType toApply = (IScheminType) list.Car();
 				ScheminList toMap = (ScheminList) list.Cdr().Car();
+
+				if (toMap.Empty)
+				{
+					return toMap;
+				}
 
 				ScheminLambda lam = (ScheminLambda) toApply;
 
@@ -225,6 +231,11 @@ namespace Schemin.Evaluate
 						var args = new ScheminList(element);
 						return lam.Evaluate(args, eval, env);
 				});
+
+				if (mapped.Count() < 1)
+				{
+					return new ScheminList();
+				}
 
 				return new ScheminList(new CachedSequence<IScheminType>(mapped));
 			};
@@ -307,8 +318,8 @@ namespace Schemin.Evaluate
 			};
 
 			Quote = (list, env, eval) => {
-				IScheminType arg = list.Car();
 				eval.EvalState = EvaluatorState.Normal;
+				IScheminType arg = list.Car();
 				return arg;
 			};
 
@@ -330,6 +341,34 @@ namespace Schemin.Evaluate
 				}
 
 				return ret;
+			};
+
+			Append = (list, env, eval) => {
+				ScheminList appended = new ScheminList();
+
+				foreach (IScheminType type in list.List)
+				{
+					if (type.GetType() == typeof(ScheminList))
+					{
+						ScheminList temp = (ScheminList) type;
+
+						if (temp.Empty)
+						{
+							continue;
+						}
+
+						foreach (IScheminType subType in temp.List)
+						{
+							appended.Append(subType);
+						}
+					}
+					else
+					{
+						throw new Exception("Non-list arguments given to append.");
+					}
+				}
+
+				return appended;
 			};
 
 			Null = (list, env, eval) => {
