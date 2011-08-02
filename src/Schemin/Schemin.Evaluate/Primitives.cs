@@ -222,7 +222,7 @@ namespace Schemin.Evaluate
 
 			Cons = (list, env, eval) => {
 				IScheminType head = list.Car();
-				IScheminType rest = list.Cdr();
+				IScheminType rest = list.Cdr().Car();
 
 				if (rest.GetType() == typeof(ScheminList))
 				{
@@ -262,12 +262,20 @@ namespace Schemin.Evaluate
 			};
 
 			List = (list, env, eval) => {
-				ScheminList listArg = (ScheminList) list.Car();
+				IScheminType args = list;
 				ScheminList ret = new ScheminList();
 
-				foreach (IScheminType type in listArg.List)
+				if (args.GetType() == typeof(ScheminList))
 				{
-					ret.Append(type);
+					ScheminList temp = (ScheminList) args;
+					foreach (IScheminType type in temp.List)
+					{
+						ret.Append(type);
+					}
+				}
+				else
+				{
+					ret.Append(args);
 				}
 
 				return ret;

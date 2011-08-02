@@ -48,20 +48,16 @@ namespace Schemin.AST
 				// Only close over the top level with locals, otherwise we clobber our env with global stuff
 				env.CloseOverTop(this.Closure);
 			}
-			
-			// Need to evaluate each part of the lambda body and return the last value
-			IScheminType last = null;
+
+
+			IScheminType last; 
 			if (Definition.GetType() == typeof(ScheminList))
 			{
-				ScheminList temp = (ScheminList) Definition;
-				foreach (IScheminType type in temp.List)
-				{
-					last = eval.EvaluateInternal(type, env);
-				}
+				last = eval.Evaluate((ScheminList) Definition, env);
 			}
 			else
 			{
-				last = eval.EvaluateInternal(Definition, env);
+				last = eval.EvaluateInternal(Definition, env); 
 			}
 
 			// Pass closure on to the next lambda if we return one
