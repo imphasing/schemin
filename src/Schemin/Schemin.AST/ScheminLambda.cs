@@ -19,30 +19,10 @@ namespace Schemin.AST
 
 		public IScheminType Evaluate(ScheminList values, Evaluator eval, Environment env)
 		{
-			bool singleListArg = false;
 			IScheminType first = Arguments.Car();
 			ScheminList rest = Arguments.Cdr();
-
-			if (this.Arguments.List.Count() < 2 && Arguments.List.Count() < values.List.Count())
-			{
-				singleListArg = true;
-			}
-
-			IScheminType firstArg;
-
-			// if there's a single argument and the number of lambda arguments is less than the number of values in the list
-			// then we're working with a lambda with a single list argument passed in, to treat as the argument
-			if (singleListArg)
-			{
-				firstArg = values;
-			}
-			else
-			{
-				firstArg = values.Car();
-			}
-
+			IScheminType firstArg = values.Car();
 			ScheminList restArgs = values.Cdr();
-			int argsLeft = Arguments.List.Count();
 
 			for (; ;)
 			{
@@ -65,20 +45,6 @@ namespace Schemin.AST
 				}
 
 				env.AddBinding((ScheminAtom) first, firstArg);
-				argsLeft--;
-
-				// break after the first argument
-				if (singleListArg)
-				{
-					break;
-				}
-
-				// If there's only one arg left but multiple values left, treat it as a liast argument
-				if (argsLeft == 1 && restArgs.List.Count() > 1)
-				{
-					env.AddBinding((ScheminAtom) rest.Car(), restArgs);
-					break;
-				}
 
 				first = rest.Car();
 				firstArg = restArgs.Car();
@@ -99,12 +65,12 @@ namespace Schemin.AST
 				ScheminList temp = (ScheminList) Definition;
 				foreach (IScheminType type in temp.List)
 				{
-					last = eval.Evaluate(type, env, false, false);
+					last = eval.EvaluateInternal(type, env);
 				}
 			}
 			else
 			{
-				last = eval.Evaluate(Definition, env, false, false);
+				last = eval.EvaluateInternal(Definition, env);
 			}
 
 			// Pass closure on to the next lambda if we return one

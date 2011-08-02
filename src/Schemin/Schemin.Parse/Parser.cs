@@ -66,6 +66,8 @@ namespace Schemin.Parse
 		{
 			switch (atom.Name)
 			{
+				case "lambda":
+					return new ScheminPrimitive(Primitives.Lambda, "lambda");
 				case "+":
 					return new ScheminPrimitive(Primitives.Add, "+");
 				case "-":

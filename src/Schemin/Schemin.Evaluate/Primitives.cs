@@ -11,6 +11,8 @@ namespace Schemin.Evaluate
 
 	public static class Primitives
 	{
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Lambda;
+
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Add;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Subtract;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Multiply;
@@ -39,24 +41,23 @@ namespace Schemin.Evaluate
 
 		static Primitives()
 		{
+			Lambda = (list, env, eval) => {
+				ScheminLambda lam = new ScheminLambda(list);
+				eval.EvalState = EvaluatorState.Normal;
+				return lam;
+			};
+
 			Display = (list, env, eval) => {
 				IScheminType toDisplay = list;
-				Console.WriteLine(eval.Evaluate(toDisplay, env, false, false).ToString());
+				Console.WriteLine(toDisplay.ToString());
 
 				return new ScheminList();
 			};
 
 			SetBang = (list, env, eval) => {
 				ScheminAtom symbol = (ScheminAtom) list.Car();
-				IScheminType definition = list.Cdr();
+				IScheminType definition = list.Cdr().Car();
 
-				// If there's less than 2 elements in the list, treat the define as if it's binding to a non-list.
-				ScheminList temp = (ScheminList) definition;
-				if (temp.List.Count() < 2)
-				{
-					definition = temp.Car();
-				}
-				
 				if (env.HasValue(symbol))
 				{
 					env.RemoveBinding(symbol);
@@ -74,13 +75,14 @@ namespace Schemin.Evaluate
 				IScheminType last = new ScheminList();
 				foreach (IScheminType type in list.List)
 				{
-					last = eval.Evaluate(type, env, false, false);
+					last = eval.EvaluateInternal(type, env);
 				}
 
 				return last;
 			};
 
 			Let = (list, env, eval) => {
+				eval.EvalState = EvaluatorState.Normal;
 				bool isNamed = false;
 				IScheminType first = list.Car();
 				if (first.GetType() == typeof(ScheminAtom))
@@ -112,10 +114,10 @@ namespace Schemin.Evaluate
 						ScheminAtom symbol = (ScheminAtom) binding.Car();
 						IScheminType val = binding.Cdr().Car();
 
-						temporary.AddBinding(symbol, eval.Evaluate(val, env, false, false));
+						temporary.AddBinding(symbol, eval.EvaluateInternal(val, env));
 					}
 
-					return eval.Evaluate(expression, temporary, false, false);
+					return eval.EvaluateInternal(expression, temporary);
 				}
 				else
 				{
@@ -128,7 +130,7 @@ namespace Schemin.Evaluate
 						ScheminAtom symbol = (ScheminAtom) binding.Car();
 						IScheminType val = binding.Cdr().Car();
 
-						IScheminType evaledVal = eval.Evaluate(val, env, false, false);
+						IScheminType evaledVal = eval.EvaluateInternal(val, env);
 
 						argSymbols.Append(symbol);
 						argValues.Append(evaledVal);
@@ -149,14 +151,14 @@ namespace Schemin.Evaluate
 
 			Map = (list, env, eval) => {
 				IScheminType toApply = (IScheminType) list.Car();
-				ScheminList toMap = (ScheminList) list.Cdr();
+				ScheminList toMap = (ScheminList) list.Cdr().Car();
 
 				ScheminLambda lam;
 
 				if (toApply.GetType() == typeof(ScheminAtom))
 				{
 					// we suspended symbol lookup and function eval so the lambda wouldn't get called on the list, so lookup the lambda now
-					lam = (ScheminLambda) eval.Evaluate(toApply, env, false, false);
+					lam = (ScheminLambda) eval.EvaluateInternal(toApply, env);
 				}
 				else
 				{
@@ -178,14 +180,14 @@ namespace Schemin.Evaluate
 				IScheminType then = list.Cdr().Car();
 				IScheminType otherwise = list.Cdr().Cdr().Car();
 
-				ScheminBool conditionResults = (ScheminBool) eval.Evaluate(condition, env, false, false);
+				ScheminBool conditionResults = (ScheminBool) eval.EvaluateInternal(condition, env);
 				if (conditionResults.Value)
 				{
-					return eval.Evaluate(then, env, false, false);
+					return eval.EvaluateInternal(then, env);
 				}
 				else
 				{
-					return eval.Evaluate(otherwise, env, false, false);
+					return eval.EvaluateInternal(otherwise, env);
 				}
 			};
 
@@ -210,22 +212,8 @@ namespace Schemin.Evaluate
 			};
 
 			Length = (list, env, eval) => {
-				int count = 0;
-				foreach (IScheminType type in list.List)
-				{
-					if (type.GetType() == typeof(ScheminList))
-					{
-						var temp = (ScheminList) type;
-						if (temp.Empty)
-						{
-							break;
-						}
-					}
-
-					count++;
-				}
-
-				return new ScheminInteger(count);
+				ScheminList listArg = (ScheminList) list.Car();
+				return new ScheminInteger(listArg.List.Count());
 			};
 
 			Cons = (list, env, eval) => {
@@ -244,31 +232,29 @@ namespace Schemin.Evaluate
 			};
 
 			Car = (list, env, eval) => {
-				return list.Car();
+				ScheminList listArg = (ScheminList) list.Car();
+				return listArg.Car();
 			};
 
 			Cdr = (list, env, eval) => {
-				ScheminList ret = list.Cdr();
-				return ret;
+				ScheminList listArg = (ScheminList) list.Car();
+				return listArg.Cdr();
 			};
 
 			Cadr = (list, env, eval) => {
-				return list.Cdr().Car();
+				ScheminList listArg = (ScheminList) list.Car();
+				return listArg.Cdr().Car();
 			};
 
 			Cddr = (list, env, eval) => {
-				return list.Cdr().Cdr();
+				ScheminList listArg = (ScheminList) list.Car();
+				return listArg.Cdr().Cdr();
 			};
 
 			Quote = (list, env, eval) => {
-				if (list.List.Count() > 1)
-				{
-					return list;
-				}
-				else
-				{
-					return list.Car();
-				}
+				IScheminType arg = list.Car();
+				eval.EvalState = EvaluatorState.Normal;
+				return arg;
 			};
 
 			DumpEnv = (args, env, eval) => {
@@ -281,19 +267,12 @@ namespace Schemin.Evaluate
 
 				Console.WriteLine(builder.ToString());
 
-				return new ScheminString(builder.ToString());
+				return new ScheminList();
 			};
 
 			Define = (args, env, eval) => {
 				ScheminAtom symbol = (ScheminAtom) args.Car();
-				IScheminType definition = args.Cdr();
-
-				// If there's less than 2 elements in the list, treat the define as if it's binding to a non-list.
-				ScheminList temp = (ScheminList) definition;
-				if (temp.List.Count() < 2)
-				{
-					definition = temp.Car();
-				}
+				IScheminType definition = args.Cdr().Car();
 
 				if (env.HasValue(symbol))
 				{
@@ -305,6 +284,7 @@ namespace Schemin.Evaluate
 					env.AddBinding(symbol, definition);
 				}
 
+				eval.EvalState = EvaluatorState.Normal;
 				return new ScheminList();
 			};
 
