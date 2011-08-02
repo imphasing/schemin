@@ -104,6 +104,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(Primitives.If, "if");
 				case "map":
 					return new ScheminPrimitive(Primitives.Map, "map");
+				case "filter":
+					return new ScheminPrimitive(Primitives.Filter, "filter");
 				case ">":
 					return new ScheminPrimitive(Primitives.GreaterThan, ">");
 				case "<":

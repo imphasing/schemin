@@ -32,11 +32,14 @@ namespace Schemin.Evaluate
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Map;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Begin;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetBang;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Display;
+
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Map;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Filter;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Foldl;
 
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Define;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> DumpEnv;
@@ -152,23 +155,37 @@ namespace Schemin.Evaluate
 				}
 			};
 
+			Foldl = (list, env, eval) => {
+				IScheminType func = (IScheminType) list.Car();
+				IScheminType init = list.Cdr().Car();
+				ScheminList toFold = (ScheminList) list.Cdr().Cdr().Car();
+
+				ScheminLambda lam = (ScheminLambda) func;
+
+				return new ScheminList();
+			};
+					
+
+			Filter = (list, env, eval) => {
+				IScheminType toApply = (IScheminType) list.Car();
+				ScheminList toMap = (ScheminList) list.Cdr().Car();
+
+				ScheminLambda lam = (ScheminLambda) toApply;
+
+				var mapped = toMap.List.Where(element => {
+						var args = new ScheminList(element);
+						ScheminBool predResult = (ScheminBool) lam.Evaluate(args, eval, env);
+						return predResult.Value;
+						});
+
+				return new ScheminList(new CachedSequence<IScheminType>(mapped));
+			};
+
 			Map = (list, env, eval) => {
 				IScheminType toApply = (IScheminType) list.Car();
 				ScheminList toMap = (ScheminList) list.Cdr().Car();
 
-				ScheminLambda lam;
-
-				if (toApply.GetType() == typeof(ScheminAtom))
-				{
-					// we suspended symbol lookup and function eval so the lambda wouldn't get called on the list, so lookup the lambda now
-					lam = (ScheminLambda) eval.EvaluateInternal(toApply, env);
-				}
-				else
-				{
-					// we were passed an explicit lambda instead of a symbol to lookup
-					lam = (ScheminLambda) toApply;
-				}
-
+				ScheminLambda lam = (ScheminLambda) toApply;
 
 				var mapped = toMap.List.Select(element => {
 						var args = new ScheminList(element);
