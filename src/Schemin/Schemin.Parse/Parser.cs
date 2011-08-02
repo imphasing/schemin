@@ -7,6 +7,7 @@ namespace Schemin.Parse
 	using Schemin.AST;
 	using Cadenza.Collections;
 	using Schemin.Evaluate;
+	using Schemin.Evaluate.Primitives;
 
 	public class Parser
 	{
@@ -67,63 +68,63 @@ namespace Schemin.Parse
 			switch (atom.Name)
 			{
 				case "lambda":
-					return new ScheminPrimitive(Primitives.Lambda, "lambda");
+					return new ScheminPrimitive(GeneralOperations.Lambda, "lambda");
 				case "+":
-					return new ScheminPrimitive(Primitives.Add, "+");
+					return new ScheminPrimitive(NumericOperations.Add, "+");
 				case "-":
-					return new ScheminPrimitive(Primitives.Subtract, "-");
+					return new ScheminPrimitive(NumericOperations.Subtract, "-");
 				case "*":
-					return new ScheminPrimitive(Primitives.Multiply, "*");
+					return new ScheminPrimitive(NumericOperations.Multiply, "*");
 				case "define": 
-					return new ScheminPrimitive(Primitives.Define, "define");
+					return new ScheminPrimitive(GeneralOperations.Define, "define");
 				case "dumpenv":
-					return new ScheminPrimitive(Primitives.DumpEnv, "dumpenv");
+					return new ScheminPrimitive(GeneralOperations.DumpEnv, "dumpenv");
 				case "quote":
-					return new ScheminPrimitive(Primitives.Quote, "quote");
+					return new ScheminPrimitive(GeneralOperations.Quote, "quote");
 				case "car":
-					return new ScheminPrimitive(Primitives.Car, "car");
+					return new ScheminPrimitive(ListOperations.Car, "car");
 				case "cons":
-					return new ScheminPrimitive(Primitives.Cons, "cons");
+					return new ScheminPrimitive(ListOperations.Cons, "cons");
 				case "cdr":
-					return new ScheminPrimitive(Primitives.Cdr, "cdr");
+					return new ScheminPrimitive(ListOperations.Cdr, "cdr");
 				case "cadr":
-					return new ScheminPrimitive(Primitives.Cadr, "cadr");
+					return new ScheminPrimitive(ListOperations.Cadr, "cadr");
 				case "cddr":
-					return new ScheminPrimitive(Primitives.Cddr, "cddr");
+					return new ScheminPrimitive(ListOperations.Cddr, "cddr");
 				case "length":
-					return new ScheminPrimitive(Primitives.Length, "length");
+					return new ScheminPrimitive(ListOperations.Length, "length");
 				case "list":
-					return new ScheminPrimitive(Primitives.List, "list");
+					return new ScheminPrimitive(ListOperations.List, "list");
 				case "append":
-					return new ScheminPrimitive(Primitives.Append, "append");
+					return new ScheminPrimitive(ListOperations.Append, "append");
 				case "null?":
-					return new ScheminPrimitive(Primitives.Null, "null?");
+					return new ScheminPrimitive(BooleanOperations.Null, "null?");
 				case "=":
-					return new ScheminPrimitive(Primitives.Equal, "=");
+					return new ScheminPrimitive(BooleanOperations.Equal, "=");
 				case "eq?":
-					return new ScheminPrimitive(Primitives.Equal, "eq?");
+					return new ScheminPrimitive(BooleanOperations.Equal, "eq?");
 				case "if":
-					return new ScheminPrimitive(Primitives.If, "if");
+					return new ScheminPrimitive(GeneralOperations.If, "if");
 				case "map":
-					return new ScheminPrimitive(Primitives.Map, "map");
+					return new ScheminPrimitive(ListOperations.Map, "map");
 				case "filter":
-					return new ScheminPrimitive(Primitives.Filter, "filter");
+					return new ScheminPrimitive(ListOperations.Filter, "filter");
 				case "foldl":
-					return new ScheminPrimitive(Primitives.Foldl, "foldl");
+					return new ScheminPrimitive(ListOperations.Foldl, "foldl");
 				case ">":
-					return new ScheminPrimitive(Primitives.GreaterThan, ">");
+					return new ScheminPrimitive(BooleanOperations.GreaterThan, ">");
 				case "<":
-					return new ScheminPrimitive(Primitives.LessThan, "<");
+					return new ScheminPrimitive(BooleanOperations.LessThan, "<");
 				case "<=":
-					return new ScheminPrimitive(Primitives.LessThanOr, "<=");
+					return new ScheminPrimitive(BooleanOperations.LessThanOr, "<=");
 				case "let":
-					return new ScheminPrimitive(Primitives.Let, "let");
+					return new ScheminPrimitive(GeneralOperations.Let, "let");
 				case "begin":
-					return new ScheminPrimitive(Primitives.Begin, "begin");
+					return new ScheminPrimitive(GeneralOperations.Begin, "begin");
 				case "set!":
-					return new ScheminPrimitive(Primitives.SetBang, "set!");
+					return new ScheminPrimitive(GeneralOperations.SetBang, "set!");
 				case "display":
-					return new ScheminPrimitive(Primitives.Display, "display");
+					return new ScheminPrimitive(GeneralOperations.Display, "display");
 				default:
 					return atom;
 			}
