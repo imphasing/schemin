@@ -160,11 +160,35 @@ namespace Schemin.Evaluate
 				IScheminType init = list.Cdr().Car();
 				ScheminList toFold = (ScheminList) list.Cdr().Cdr().Car();
 
-				ScheminLambda lam = (ScheminLambda) func;
+				
+				IScheminType result;
+				
+				if (func.GetType() == typeof(ScheminPrimitive))
+				{
 
-				return new ScheminList();
+					ScheminPrimitive proc = (ScheminPrimitive) func;
+					result = toFold.List.Aggregate(init, (total, next) => {
+							ScheminList args = new ScheminList(next);
+							args.Append(total);
+
+							return proc.Evaluate(args, env, eval);
+					});
+				}
+				else
+				{
+					ScheminLambda lam = (ScheminLambda) func;
+
+					result = toFold.List.Aggregate(init, (total, next) => {
+							ScheminList args = new ScheminList(next);
+							args.Append(total);
+
+							return lam.Evaluate(args, eval, env);
+					}); 
+				}
+
+				return result;
 			};
-					
+
 
 			Filter = (list, env, eval) => {
 				IScheminType toApply = (IScheminType) list.Car();
@@ -172,11 +196,21 @@ namespace Schemin.Evaluate
 
 				ScheminLambda lam = (ScheminLambda) toApply;
 
+				if (toMap.Empty)
+				{
+					return toMap;
+				}
+
 				var mapped = toMap.List.Where(element => {
 						var args = new ScheminList(element);
 						ScheminBool predResult = (ScheminBool) lam.Evaluate(args, eval, env);
 						return predResult.Value;
-						});
+				});
+
+				if (mapped.Count() < 1)
+				{
+					return new ScheminList();
+				}
 
 				return new ScheminList(new CachedSequence<IScheminType>(mapped));
 			};
@@ -190,7 +224,7 @@ namespace Schemin.Evaluate
 				var mapped = toMap.List.Select(element => {
 						var args = new ScheminList(element);
 						return lam.Evaluate(args, eval, env);
-						});
+				});
 
 				return new ScheminList(new CachedSequence<IScheminType>(mapped));
 			};
