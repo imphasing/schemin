@@ -9,11 +9,17 @@ namespace Schemin
 	using Schemin.AST;
 	using Schemin.Evaluate;
 	using Schemin.Tokenize;
+	using Mono.Options;
 	using Environment = Schemin.Evaluate.Environment;
 
 	class Program
 	{
 		static void Main(string[] consoleArgs) 
+		{
+			ReplPrompt();
+		}
+
+		static void ReplPrompt()
 		{
 			Tokenizer t = new Tokenizer();
 			Parser p = new Parser();
@@ -33,7 +39,7 @@ namespace Schemin
 				{
 					if (openParens != closeParens)
 					{
-						Console.Write("schemin>* ");
+						Console.Write("schemin* ");
 					}
 					else
 					{
@@ -42,6 +48,7 @@ namespace Schemin
 
 					string line = Console.ReadLine();
 					var lineTokens = t.Tokenize(line);
+
 					foreach (Token token in lineTokens)
 					{
 						partialInput.Add(token);
@@ -64,6 +71,11 @@ namespace Schemin
 
 				try
 				{
+					if (partialInput.Count < 1)
+					{
+						continue;
+					}
+
 					var parsed = p.Parse(partialInput);
 					IScheminType returnType = eval.Evaluate(parsed, global);
 					Console.WriteLine(">> " + returnType.ToString());

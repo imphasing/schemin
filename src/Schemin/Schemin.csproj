@@ -48,6 +48,8 @@
     <Compile Include="Cadenza\CachedSequence.cs" />
     <Compile Include="Cadenza\Either.g.cs" />
 
+    <Compile Include="Mono.Options\Options.cs" />
+
     <Compile Include="Schemin.Evaluate\Environment.cs" />
     <Compile Include="Schemin.Evaluate\Evaluator.cs" />
     <Compile Include="Schemin.Evaluate\EvaluatorState.cs" />
