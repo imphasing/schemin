@@ -10,13 +10,72 @@ namespace Schemin
 	using Schemin.Evaluate;
 	using Schemin.Tokenize;
 	using Mono.Options;
+	using System.IO;
 	using Environment = Schemin.Evaluate.Environment;
 
 	class Program
 	{
 		static void Main(string[] consoleArgs) 
 		{
-			ReplPrompt();
+			bool help = false;
+			string fileName = String.Empty;
+			bool file = false;
+			bool repl = false;
+
+			var p = new OptionSet () {
+				{ 
+					"file=", 
+					"Interpret a given file with Schemin.", 
+					v => { fileName = v; file = true; } 
+				},
+				{ 
+					"repl",
+					"Start up a read, eval, print loop (REPL) session.", 
+					v => {file = false; repl = v != null; } 
+				},
+				{ 
+					"h|?|help", 
+					"Display help.", 
+					v => {file = false; repl = false; help = v != null; } 
+				}
+			};
+
+			try 
+			{
+				List<string> extra = p.Parse(consoleArgs);
+			}
+			catch (OptionException e)
+			{
+				Console.WriteLine("Invalid options. Displaying help:");
+			}
+
+			if (repl)
+			{
+				ReplPrompt();
+			}
+			else if (file)
+			{
+				InterpretFile(fileName);
+			}
+			else if (help)
+			{	
+				p.WriteOptionDescriptions(Console.Out);
+			}
+		}
+
+		static void InterpretFile(string filename)
+		{
+			Tokenizer t = new Tokenizer();
+			Parser p = new Parser();
+			Evaluator eval = new Evaluator();
+			Environment global = new Environment();
+			eval.DefinePrimitives(global);
+
+			string contents = File.ReadAllText(filename);
+			var tokens = t.Tokenize(contents);
+			var parsed = p.Parse(tokens);
+			IScheminType returnType = eval.Evaluate(parsed, global);
+			Console.WriteLine(returnType.ToString());
 		}
 
 		static void ReplPrompt()
