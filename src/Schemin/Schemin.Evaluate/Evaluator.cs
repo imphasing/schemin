@@ -135,12 +135,9 @@ namespace Schemin.Evaluate
 				else if (IsA(functionPosition, lambda))
 				{
 					ScheminLambda lam = (ScheminLambda) functionPosition;
-					Environment closure = new Environment();
-					closure.CloseOver(env);
-					closure.parent = env;
 
 					Environment child = new Environment();
-					child.parent = closure;
+					child.parent = env;
 					return lam.Evaluate(functionArgs, this, child);
 				}
 				else
@@ -161,6 +158,7 @@ namespace Schemin.Evaluate
 			switch (this.EvalState)
 			{
 				case EvaluatorState.DefineArgs:
+					this.EvalState = EvaluatorState.Normal;
 					return ast;
 				case EvaluatorState.LambdaArgs:
 					return ast;

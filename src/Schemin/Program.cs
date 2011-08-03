@@ -107,6 +107,13 @@ namespace Schemin
 					}
 
 					string line = Console.ReadLine();
+
+					// bust out right here if the user wants to exit
+					if (line == ",exit")
+					{
+						return;
+					}
+
 					var lineTokens = t.Tokenize(line);
 
 					foreach (Token token in lineTokens)
