@@ -5,10 +5,10 @@ namespace Schemin
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
-	using Schemin.Tokenize;
 	using Schemin.Parse;
 	using Schemin.AST;
 	using Schemin.Evaluate;
+	using Schemin.Tokenize;
 	using Environment = Schemin.Evaluate.Environment;
 
 	class Program
@@ -21,21 +21,52 @@ namespace Schemin
 			Environment global = new Environment();
 			eval.DefinePrimitives(global);
 
-			string line = String.Empty;
 			for (; ;)
 			{
-				Console.Write("schemin> ");
-				line = Console.ReadLine();
+				bool completeInput = false;
+				int openParens = 0;
+				int closeParens = 0;
+
+				List<Token> partialInput = new List<Token>();
+
+				while (completeInput != true)
+				{
+					if (openParens != closeParens)
+					{
+						Console.Write("schemin>* ");
+					}
+					else
+					{
+						Console.Write("schemin> ");
+					}
+
+					string line = Console.ReadLine();
+					var lineTokens = t.Tokenize(line);
+					foreach (Token token in lineTokens)
+					{
+						partialInput.Add(token);
+						if (token.Type == TokenType.OpenParen)
+						{
+							openParens++;
+						}
+						else if (token.Type == TokenType.CloseParen)
+						{
+							closeParens++;
+						}
+					}
+
+					if (openParens == closeParens)
+					{
+						completeInput = true;
+						break;
+					}
+				}
 
 				try
 				{
-					if (line != String.Empty)
-					{
-						var tokens = t.Tokenize(line);
-						var parsed = p.Parse(tokens);
-						IScheminType returnType = eval.Evaluate(parsed, global);
-						Console.WriteLine(">> " + returnType.ToString());
-					}
+					var parsed = p.Parse(partialInput);
+					IScheminType returnType = eval.Evaluate(parsed, global);
+					Console.WriteLine(">> " + returnType.ToString());
 				}
 				catch (UnboundAtomException unbound)
 				{
