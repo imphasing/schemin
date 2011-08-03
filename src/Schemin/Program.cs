@@ -19,6 +19,7 @@ namespace Schemin
 			Parser p = new Parser();
 			Evaluator eval = new Evaluator();
 			Environment global = new Environment();
+			eval.DefinePrimitives(global);
 
 			string line = String.Empty;
 			while ((line = Console.ReadLine()) != null)

@@ -8,6 +8,7 @@ namespace Schemin.Evaluate
 	using System.Linq;
 	using Schemin.AST;
 	using Cadenza;
+	using Schemin.Evaluate.Primitives;
 
 	public class Evaluator
 	{
@@ -91,25 +92,7 @@ namespace Schemin.Evaluate
 					else if (IsA(type, primitive))
 					{
 						ScheminPrimitive prim = (ScheminPrimitive) type;
-						switch (prim.Name)
-						{
-							case "define":
-								this.EvalState = EvaluatorState.DefineArgs;
-								break;
-							case "lambda":
-								this.EvalState = EvaluatorState.LambdaArgs;
-								break;
-							case "quote":
-								this.EvalState = EvaluatorState.QuoteArgs;
-								break;
-							case "let":
-								this.EvalState = EvaluatorState.LetArgs;
-								break;
-							case "if":
-								this.EvalState = EvaluatorState.IfArgs;
-								break;
-						}
-
+						SetStatePrimitive(prim);
 						complete.Append(type);
 					}
 					else if (IsA(type, lambda))
@@ -195,6 +178,7 @@ namespace Schemin.Evaluate
 				throw new Exception(string.Format("Error: Unbound atom: {0}", temp));
 			}
 
+			
 			return bound;
 		}
 
@@ -237,17 +221,36 @@ namespace Schemin.Evaluate
 			return GetEnvValueRecursive(symbol, env.parent);
 		}
 
+		public void SetStatePrimitive(ScheminPrimitive prim)
+		{
+			switch (prim.Name)
+			{
+				case "define":
+					this.EvalState = EvaluatorState.DefineArgs;
+					break;
+				case "lambda":
+					this.EvalState = EvaluatorState.LambdaArgs;
+					break;
+				case "quote":
+					this.EvalState = EvaluatorState.QuoteArgs;
+					break;
+				case "let":
+					this.EvalState = EvaluatorState.LetArgs;
+					break;
+				case "if":
+					this.EvalState = EvaluatorState.IfArgs;
+					break;
+			}
+		}
+
 		public void DefinePrimitives(Environment env)
 		{
-			var prebound = new List<string, Func<ScheminList, Environment, Evaluator, IScheminType>();
+			var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
 
-			prebound.Add("lambda", GeneralOperations.Lambda);
 			prebound.Add("+", NumericOperations.Add);
 			prebound.Add("-", NumericOperations.Subtract);
 			prebound.Add( "*", NumericOperations.Multiply);
-			prebound.Add("define", GeneralOperations.Define);
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
-			prebound.Add("quote", GeneralOperations.Quote);
 			prebound.Add( "car", ListOperations.Car);
 			prebound.Add("cons", ListOperations.Cons);
 			prebound.Add( "cdr", ListOperations.Cdr);
@@ -259,20 +262,25 @@ namespace Schemin.Evaluate
 			prebound.Add( "null?", BooleanOperations.Null);
 			prebound.Add("=", BooleanOperations.Equal);
 			prebound.Add( "eq?", BooleanOperations.Equal);
-			prebound.Add("if", GeneralOperations.If);
 			prebound.Add("map", ListOperations.Map);
 			prebound.Add("filter", ListOperations.Filter);
 			prebound.Add("foldl", ListOperations.Foldl);
 			prebound.Add(">", BooleanOperations.GreaterThan);
 			prebound.Add("<", BooleanOperations.LessThan);
 			prebound.Add("<=", BooleanOperations.LessThanOr);
-			prebound.Add("let", GeneralOperations.Let);
 			prebound.Add("begin", GeneralOperations.Begin);
 			prebound.Add("set!", GeneralOperations.SetBang);
 			prebound.Add("display", GeneralOperations.Display);
 
-			foreach (string primitive in prebound)
+			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{
+				var func = kvp.Value;
+				string symbolValue = kvp.Key;
+
+				ScheminAtom symbol = new ScheminAtom(symbolValue);
+				ScheminPrimitive prim = new ScheminPrimitive(func, symbolValue);
+
+				env.AddBinding(symbol, prim);
 			}
 		}
 	}
