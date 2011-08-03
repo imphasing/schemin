@@ -51,7 +51,7 @@ namespace Schemin.Parse
 			switch (token.Type)
 			{
 				case TokenType.Symbol:
-					return ConvertAtom(new ScheminAtom(token.Value));
+					return new ScheminAtom(token.Value); //ConvertAtom(new ScheminAtom(token.Value));
 				case TokenType.IntegerLiteral:
 					return new ScheminInteger(int.Parse(token.Value));
 				case TokenType.StringLiteral:

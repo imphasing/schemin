@@ -236,5 +236,44 @@ namespace Schemin.Evaluate
 
 			return GetEnvValueRecursive(symbol, env.parent);
 		}
+
+		public void DefinePrimitives(Environment env)
+		{
+			var prebound = new List<string, Func<ScheminList, Environment, Evaluator, IScheminType>();
+
+			prebound.Add("lambda", GeneralOperations.Lambda);
+			prebound.Add("+", NumericOperations.Add);
+			prebound.Add("-", NumericOperations.Subtract);
+			prebound.Add( "*", NumericOperations.Multiply);
+			prebound.Add("define", GeneralOperations.Define);
+			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
+			prebound.Add("quote", GeneralOperations.Quote);
+			prebound.Add( "car", ListOperations.Car);
+			prebound.Add("cons", ListOperations.Cons);
+			prebound.Add( "cdr", ListOperations.Cdr);
+			prebound.Add("cadr", ListOperations.Cadr);
+			prebound.Add(	"cddr", ListOperations.Cddr);
+			prebound.Add("length", ListOperations.Length);
+			prebound.Add( "list", ListOperations.List);
+			prebound.Add( "append", ListOperations.Append);
+			prebound.Add( "null?", BooleanOperations.Null);
+			prebound.Add("=", BooleanOperations.Equal);
+			prebound.Add( "eq?", BooleanOperations.Equal);
+			prebound.Add("if", GeneralOperations.If);
+			prebound.Add("map", ListOperations.Map);
+			prebound.Add("filter", ListOperations.Filter);
+			prebound.Add("foldl", ListOperations.Foldl);
+			prebound.Add(">", BooleanOperations.GreaterThan);
+			prebound.Add("<", BooleanOperations.LessThan);
+			prebound.Add("<=", BooleanOperations.LessThanOr);
+			prebound.Add("let", GeneralOperations.Let);
+			prebound.Add("begin", GeneralOperations.Begin);
+			prebound.Add("set!", GeneralOperations.SetBang);
+			prebound.Add("display", GeneralOperations.Display);
+
+			foreach (string primitive in prebound)
+			{
+			}
+		}
 	}
 }
