@@ -22,12 +22,29 @@ namespace Schemin
 			eval.DefinePrimitives(global);
 
 			string line = String.Empty;
-			while ((line = Console.ReadLine()) != null)
+			for (; ;)
 			{
-				var tokens = t.Tokenize(line);
-				var parsed = p.Parse(tokens);
-				IScheminType returnType = eval.Evaluate(parsed, global);
-				Console.WriteLine(returnType.ToString());
+				Console.Write("schemin> ");
+				line = Console.ReadLine();
+
+				try
+				{
+					if (line != String.Empty)
+					{
+						var tokens = t.Tokenize(line);
+						var parsed = p.Parse(tokens);
+						IScheminType returnType = eval.Evaluate(parsed, global);
+						Console.WriteLine(">> " + returnType.ToString());
+					}
+				}
+				catch (UnboundAtomException unbound)
+				{
+					Console.WriteLine("Error: " + unbound.Message.ToString());
+				}
+				catch (InvalidOperationException invalid)
+				{
+					Console.WriteLine("Error: " + invalid.Message.ToString());
+				}
 			}
 		}
 	}

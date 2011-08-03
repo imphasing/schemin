@@ -145,7 +145,7 @@ namespace Schemin.Evaluate
 				}
 				else
 				{
-					throw new Exception("non-function in function position: " + functionPosition.ToString());
+					throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
 				}
 			}
 			else
@@ -175,10 +175,10 @@ namespace Schemin.Evaluate
 			IScheminType bound = GetEnvValueRecursive(temp, env);
 			if (bound == null)
 			{
-				throw new Exception(string.Format("Error: Unbound atom: {0}", temp));
+				throw new UnboundAtomException(string.Format("Unbound atom: {0}", temp));
 			}
 
-			
+
 			return bound;
 		}
 
