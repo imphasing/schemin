@@ -12,7 +12,7 @@ namespace Schemin.AST
 
 		public override string ToString()
 		{
-			return Value;
+			return "\"" + Value + "\"";
 		}
 
 		public bool Equals(IScheminType type)

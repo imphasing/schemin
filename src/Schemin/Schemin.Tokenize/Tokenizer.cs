@@ -25,7 +25,7 @@ namespace Schemin.Tokenize
 
 			Func<Match, string> replacer = m => {
 				string placeholder = string.Format("###STRING_LITERAL_{0}###", currentId++);
-				extractedLiterals.Add(placeholder, m.ToString());
+				extractedLiterals.Add(placeholder, TrimQuotes(m.ToString()));
 				return placeholder;
 			};
 
@@ -35,6 +35,12 @@ namespace Schemin.Tokenize
 
 			this.literals = extractedLiterals;
 			return transformed;
+		}
+
+		private string TrimQuotes(string input)
+		{
+			string leading = input.Remove(0, 1);
+			return leading.Remove(leading.Length - 1, 1);
 		}
 
 		public List<Token> Tokenize(string input)

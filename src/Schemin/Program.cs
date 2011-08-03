@@ -47,6 +47,7 @@ namespace Schemin
 			catch (OptionException e)
 			{
 				Console.WriteLine("Invalid options. Displaying help:");
+				p.WriteOptionDescriptions(Console.Out);
 			}
 
 			if (repl)
@@ -137,7 +138,7 @@ namespace Schemin
 
 					var parsed = p.Parse(partialInput);
 					IScheminType returnType = eval.Evaluate(parsed, global);
-					Console.WriteLine(">> " + returnType.ToString());
+					Console.WriteLine(returnType.ToString());
 				}
 				catch (UnboundAtomException unbound)
 				{

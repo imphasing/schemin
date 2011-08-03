@@ -250,27 +250,32 @@ namespace Schemin.Evaluate
 			prebound.Add("+", NumericOperations.Add);
 			prebound.Add("-", NumericOperations.Subtract);
 			prebound.Add( "*", NumericOperations.Multiply);
-			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
-			prebound.Add( "car", ListOperations.Car);
+
+			prebound.Add("car", ListOperations.Car);
 			prebound.Add("cons", ListOperations.Cons);
-			prebound.Add( "cdr", ListOperations.Cdr);
+			prebound.Add("cdr", ListOperations.Cdr);
 			prebound.Add("cadr", ListOperations.Cadr);
-			prebound.Add(	"cddr", ListOperations.Cddr);
+			prebound.Add("cddr", ListOperations.Cddr);
 			prebound.Add("length", ListOperations.Length);
-			prebound.Add( "list", ListOperations.List);
-			prebound.Add( "append", ListOperations.Append);
-			prebound.Add( "null?", BooleanOperations.Null);
-			prebound.Add("=", BooleanOperations.Equal);
-			prebound.Add( "eq?", BooleanOperations.Equal);
+			prebound.Add("list", ListOperations.List);
+			prebound.Add("append", ListOperations.Append);
 			prebound.Add("map", ListOperations.Map);
 			prebound.Add("filter", ListOperations.Filter);
 			prebound.Add("foldl", ListOperations.Foldl);
+
+			prebound.Add("null?", BooleanOperations.Null);
+			prebound.Add("=", BooleanOperations.Equal);
+			prebound.Add("eq?", BooleanOperations.Equal);
 			prebound.Add(">", BooleanOperations.GreaterThan);
 			prebound.Add("<", BooleanOperations.LessThan);
 			prebound.Add("<=", BooleanOperations.LessThanOr);
+			prebound.Add("not", BooleanOperations.Not);
+
+			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
 			prebound.Add("begin", GeneralOperations.Begin);
 			prebound.Add("set!", GeneralOperations.SetBang);
 			prebound.Add("display", GeneralOperations.Display);
+			prebound.Add("newline", GeneralOperations.Newline);
 
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{

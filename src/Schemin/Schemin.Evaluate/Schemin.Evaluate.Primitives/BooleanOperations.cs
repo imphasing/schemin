@@ -17,6 +17,7 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThanOr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Null;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Not;
 
 		static BooleanOperations()
 		{
@@ -39,6 +40,18 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return new ScheminBool(result);
+			};
+
+			Not = (args, env, eval) => {
+				IScheminType first = args.Car();
+				
+				if (first.GetType() == typeof(ScheminBool))
+				{
+					ScheminBool temp = (ScheminBool) first;
+					return new ScheminBool(!temp.Value);
+				}
+
+				return new ScheminBool(false);
 			};
 
 			GreaterThan = (args, env, eval) => {

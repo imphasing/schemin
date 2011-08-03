@@ -19,6 +19,7 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Begin;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetBang;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Display;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Newline;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Define;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> DumpEnv;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Quote;
@@ -31,9 +32,23 @@ namespace Schemin.Evaluate.Primitives
 				return lam;
 			};
 
+			Newline = (list, env, eval) => {
+				Console.WriteLine();
+				return new ScheminList();
+			};
+
 			Display = (list, env, eval) => {
 				IScheminType toDisplay = list.Car();
-				Console.WriteLine(toDisplay.ToString());
+
+				if (toDisplay.GetType() == typeof(ScheminString))
+				{
+					ScheminString temp = (ScheminString) toDisplay;
+					Console.Write(temp.Value);
+				}
+				else
+				{
+					Console.Write(toDisplay.ToString());
+				}
 
 				return new ScheminList();
 			};
