@@ -35,31 +35,31 @@ namespace Schemin.Evaluate
 
 		public IScheminType EvaluateInternal(IScheminType ast, Environment env)
 		{
-			if (IsA(ast, integer))
+			if ((ast as ScheminInteger) != null)
 			{
 				return ast;
 			}
-			else if (IsA(ast, str))
+			else if ((ast as ScheminString) != null)
 			{
 				return ast;
 			}
-			else if (IsA(ast, boolean))
+			else if ((ast as ScheminBool) != null)
 			{
 				return ast;
 			}
-			else if (IsA(ast, atom))
+			else if ((ast as ScheminAtom) != null)
 			{
 				return EvalAtom(ast, env);
 			}
-			else if (IsA(ast, primitive))
+			else if ((ast as ScheminPrimitive) != null)
 			{
 				return ast;
 			}
-			else if (IsA(ast, lambda))
+			else if ((ast as ScheminLambda) != null)
 			{
 				return ast;
 			}
-			else if (IsA(ast, list))
+			else if ((ast as ScheminList) != null)
 			{
 				ScheminList evalList = (ScheminList) ast;
 				ScheminList complete = new ScheminList();
@@ -71,34 +71,34 @@ namespace Schemin.Evaluate
 
 				foreach (IScheminType type in evalList)
 				{
-					if (IsA(type, integer))
+					if ((type as ScheminInteger) != null)
 					{
 						complete.Append(type);
 					}
-					else if (IsA(type, str))
+					else if ((type as ScheminString) != null)
 					{
 						complete.Append(type);
 					}
-					else if (IsA(type, boolean))
+					else if ((type as ScheminBool) != null)
 					{
 						complete.Append(type);
 					}
-					else if (IsA(type, atom))
+					else if ((type as ScheminAtom) != null)
 					{
 						IScheminType atomResult = EvalAtom(type, env);
 						complete.Append(atomResult);
 					}
-					else if (IsA(type, primitive))
+					else if ((type as ScheminPrimitive) != null)
 					{
 						ScheminPrimitive prim = (ScheminPrimitive) type;
 						SetStatePrimitive(prim);
 						complete.Append(type);
 					}
-					else if (IsA(type, lambda))
+					else if ((type as ScheminLambda) != null)
 					{
 						complete.Append(type);
 					}
-					else if (IsA(type, list))
+					else if ((type as ScheminList) != null)
 					{
 						switch (this.EvalState)
 						{
@@ -125,13 +125,12 @@ namespace Schemin.Evaluate
 				ScheminList functionArgs = complete.Cdr();
 
 
-				if (IsA(functionPosition, primitive))
+				if ((functionPosition as ScheminPrimitive) != null)
 				{
 					ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
 					return prim.Evaluate(functionArgs, env, this);
 				}
-				// don't forget to make lambda a real primitive type from the parser, none of this symbol mangling shit
-				else if (IsA(functionPosition, lambda))
+				else if ((functionPosition as ScheminLambda) != null)
 				{
 					ScheminLambda lam = (ScheminLambda) functionPosition;
 
@@ -157,6 +156,7 @@ namespace Schemin.Evaluate
 			switch (this.EvalState)
 			{
 				case EvaluatorState.DefineArgs:
+					// only ignore the FIRST symbol after a define
 					this.EvalState = EvaluatorState.Normal;
 					return ast;
 				case EvaluatorState.LambdaArgs:
@@ -165,11 +165,15 @@ namespace Schemin.Evaluate
 					return ast;
 				case EvaluatorState.IfArgs:
 					return ast;
+				case EvaluatorState.SetBangArgs:
+					// only ignore the first argument to set!
+					this.EvalState = EvaluatorState.Normal;
+					return ast;
 			}
 
 			ScheminAtom temp = (ScheminAtom) ast;
 
-			IScheminType bound = GetEnvValueRecursive(temp, env);
+			IScheminType bound = GetEnvValue(temp, env);
 			if (bound == null)
 			{
 				throw new UnboundAtomException(string.Format("Unbound atom: {0}", temp));
@@ -177,16 +181,6 @@ namespace Schemin.Evaluate
 
 
 			return bound;
-		}
-
-		public bool IsA(IScheminType ast, Type type)
-		{
-			if (ast.GetType() == type)
-			{
-				return true;
-			}
-
-			return false;
 		}
 
 		public bool IsEmptyList(IScheminType type)
@@ -203,19 +197,21 @@ namespace Schemin.Evaluate
 			return false;
 		}
 
-		public IScheminType GetEnvValueRecursive(ScheminAtom symbol, Environment env)
+		public IScheminType GetEnvValue(ScheminAtom symbol, Environment env)
 		{
-			if (env.HasValue(symbol))
+			Environment parent = env;
+			while (parent != null)
 			{
-				return env.bindings[symbol.Name];
+				if (parent.HasValue(symbol))
+				{
+					return parent.bindings[symbol.Name];
+					
+				}
+
+				parent = parent.parent;
 			}
 
-			if (env.parent == null)
-			{
-				return null;
-			}
-
-			return GetEnvValueRecursive(symbol, env.parent);
+			return null;
 		}
 
 		public void SetStatePrimitive(ScheminPrimitive prim)
@@ -236,6 +232,9 @@ namespace Schemin.Evaluate
 					break;
 				case "if":
 					this.EvalState = EvaluatorState.IfArgs;
+					break;
+				case "set!":
+					this.EvalState = EvaluatorState.SetBangArgs;
 					break;
 			}
 		}
@@ -270,7 +269,6 @@ namespace Schemin.Evaluate
 
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
 			prebound.Add("begin", GeneralOperations.Begin);
-			prebound.Add("set!", GeneralOperations.SetBang);
 			prebound.Add("display", GeneralOperations.Display);
 			prebound.Add("newline", GeneralOperations.Newline);
 

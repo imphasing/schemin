@@ -10,7 +10,33 @@ namespace Schemin.AST
 	{
 		public IScheminType Head = null;
 		public ScheminList Rest = null;
-		public bool Empty;
+		public bool Empty = true;
+
+		public int Length
+		{
+			get
+			{
+				int count = 0;
+				foreach (IScheminType type in this)
+				{
+					if (type != null)
+					{
+						if (type.GetType() == typeof(ScheminList))
+						{
+							ScheminList temp = (ScheminList) type;
+							if (!temp.Empty)
+								count++;
+						}
+						else
+						{
+							count++;
+						}
+					}
+				}
+
+				return count;
+			}
+		}
 
 		public ScheminList()
 		{
@@ -32,11 +58,21 @@ namespace Schemin.AST
 
 		public IScheminType Car()
 		{
+			if (this.Head == null)
+			{
+				return new ScheminList();
+			}
+
 			return this.Head;
 		}
 
 		public ScheminList Cdr()
 		{
+			if (this.Rest == null)
+			{
+				return new ScheminList();
+			}
+
 			return this.Rest;
 		}
 
@@ -85,12 +121,12 @@ namespace Schemin.AST
 
 		public IEnumerator<IScheminType> GetEnumerator ()
 		{
-			var c = Rest;
-			yield return Head;
-			c = Rest;
-			while (c != null) {
-				yield return c.Head;
-				c = c.Rest;
+			var c = Cdr();
+			yield return Car();
+			c = Cdr();
+			while (!c.Empty) {
+				yield return c.Car();
+				c = c.Cdr();
 			}
 		}
 

@@ -21,7 +21,7 @@ namespace Schemin.Evaluate.Primitives
 			Add = (args, env, eval) => {
 				BigInteger result = new BigInteger(0);
 
-				if (false)//args.Count() < 2)
+				if (args.Length < 2)
 				{
 					var first = (ScheminInteger) args.Car();
 					return new ScheminInteger(first.Value * 1);
@@ -43,7 +43,7 @@ namespace Schemin.Evaluate.Primitives
 				var first = (ScheminInteger) args.Car();
 				BigInteger result = first.Value;
 
-				if (false)//args.List.Count() < 2)
+				if (args.Length < 2)
 				{
 					return new ScheminInteger(result * -1);
 				}

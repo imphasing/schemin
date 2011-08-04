@@ -53,8 +53,9 @@ namespace Schemin.Tokenize
 			string addedWhitespace = input.Replace("(", " ( ");
 			addedWhitespace = addedWhitespace.Replace(")", " ) ");
 			string removedNewlines = addedWhitespace.Replace(System.Environment.NewLine, " ");
+			string removedTabs = removedNewlines.Replace('\t', ' ');
 
-			List<string> stringTokens = removedNewlines.Split(' ').ToList();
+			List<string> stringTokens = removedTabs.Split(' ').ToList();
 			Func<string, bool> filter = token => (token != String.Empty && token != "");
 			stringTokens = stringTokens.Where(filter).ToList();
 

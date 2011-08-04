@@ -77,6 +77,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(GeneralOperations.If, "if");
 				case "let":
 					return new ScheminPrimitive(GeneralOperations.Let, "let");
+				case "set!":
+					return new ScheminPrimitive(GeneralOperations.SetBang, "set!");
 				default:
 					return atom;
 			}

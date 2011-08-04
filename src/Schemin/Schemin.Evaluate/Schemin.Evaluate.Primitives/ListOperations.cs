@@ -28,7 +28,7 @@ namespace Schemin.Evaluate.Primitives
 
 			Length = (list, env, eval) => {
 				ScheminList listArg = (ScheminList) list.Car();
-				return new ScheminInteger(0);
+				return new ScheminInteger(listArg.Length);
 			};
 
 			Cons = (list, env, eval) => {
