@@ -56,7 +56,7 @@ namespace Schemin.Evaluate.Primitives
 				ScheminAtom symbol = (ScheminAtom) list.Car();
 				IScheminType definition = list.Cdr().Car();
 
-				if (env.HasValue(symbol))
+				if (env.bindings.ContainsKey(symbol.Name))
 				{
 					env.RemoveBinding(symbol);
 					env.AddBinding(symbol, definition);
@@ -188,7 +188,7 @@ namespace Schemin.Evaluate.Primitives
 				ScheminAtom symbol = (ScheminAtom) args.Car();
 				IScheminType definition = args.Cdr().Car();
 
-				if (env.HasValue(symbol))
+				if (env.bindings.ContainsKey(symbol.Name))
 				{
 					env.RemoveBinding(symbol);
 					env.AddBinding(symbol, definition);

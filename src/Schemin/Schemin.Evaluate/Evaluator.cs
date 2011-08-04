@@ -202,10 +202,12 @@ namespace Schemin.Evaluate
 			Environment parent = env;
 			while (parent != null)
 			{
-				if (parent.HasValue(symbol))
+				IScheminType value;
+				parent.bindings.TryGetValue(symbol.Name, out value);
+
+				if (value != null)
 				{
 					return parent.bindings[symbol.Name];
-					
 				}
 
 				parent = parent.parent;

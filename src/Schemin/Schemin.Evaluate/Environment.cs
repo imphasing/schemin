@@ -36,18 +36,6 @@ namespace Schemin.Evaluate
 			}
 		}
 
-		public bool HasValue(ScheminAtom symbol)
-		{
-			if (bindings.ContainsKey(symbol.Name))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
 		public void CloseOver(Environment env)
 		{
 			foreach (KeyValuePair<string, IScheminType> binding in env.bindings)
