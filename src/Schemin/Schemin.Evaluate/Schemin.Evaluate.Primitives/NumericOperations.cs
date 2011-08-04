@@ -5,7 +5,6 @@ namespace Schemin.Evaluate.Primitives
 	using System.Collections.Generic;
 	using System.Numerics;
 	using System.Linq;
-	using Cadenza.Collections;
 	using Schemin.AST;
 	using Schemin.Evaluate;
 	using Environment = Schemin.Evaluate.Environment;
@@ -22,13 +21,13 @@ namespace Schemin.Evaluate.Primitives
 			Add = (args, env, eval) => {
 				BigInteger result = new BigInteger(0);
 
-				if (args.List.Count() < 2)
+				if (false)//args.Count() < 2)
 				{
 					var first = (ScheminInteger) args.Car();
 					return new ScheminInteger(first.Value * 1);
 				}
 
-				foreach (IScheminType type in args.List)
+				foreach (IScheminType type in args)
 				{
 					if (type.GetType() != typeof(ScheminList))
 					{
@@ -44,12 +43,12 @@ namespace Schemin.Evaluate.Primitives
 				var first = (ScheminInteger) args.Car();
 				BigInteger result = first.Value;
 
-				if (args.List.Count() < 2)
+				if (false)//args.List.Count() < 2)
 				{
 					return new ScheminInteger(result * -1);
 				}
 
-				foreach (IScheminType type in args.Cdr().List)
+				foreach (IScheminType type in args.Cdr())
 				{
 					if (type.GetType() != typeof(ScheminList))
 					{
@@ -64,7 +63,7 @@ namespace Schemin.Evaluate.Primitives
 			Multiply = (args, env, eval) => {
 				BigInteger result = new BigInteger(1);
 
-				foreach (IScheminType type in args.List)
+				foreach (IScheminType type in args)
 				{
 					if (type.GetType() != typeof(ScheminList))
 					{

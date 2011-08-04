@@ -4,7 +4,6 @@ namespace Schemin.Evaluate.Primitives
 	using System.Text;
 	using System.Collections.Generic;
 	using System.Linq;
-	using Cadenza.Collections;
 	using Schemin.AST;
 	using Schemin.Evaluate;
 	using Environment = Schemin.Evaluate.Environment;
@@ -29,7 +28,7 @@ namespace Schemin.Evaluate.Primitives
 
 			Length = (list, env, eval) => {
 				ScheminList listArg = (ScheminList) list.Car();
-				return new ScheminInteger(listArg.List.Count());
+				return new ScheminInteger(0);
 			};
 
 			Cons = (list, env, eval) => {
@@ -74,7 +73,7 @@ namespace Schemin.Evaluate.Primitives
 				if (args.GetType() == typeof(ScheminList))
 				{
 					ScheminList temp = (ScheminList) args;
-					foreach (IScheminType type in temp.List)
+					foreach (IScheminType type in temp)
 					{
 						ret.Append(type);
 					}
@@ -90,7 +89,7 @@ namespace Schemin.Evaluate.Primitives
 			Append = (list, env, eval) => {
 				ScheminList appended = new ScheminList();
 
-				foreach (IScheminType type in list.List)
+				foreach (IScheminType type in list)
 				{
 					if (type.GetType() == typeof(ScheminList))
 					{
@@ -101,7 +100,7 @@ namespace Schemin.Evaluate.Primitives
 							continue;
 						}
 
-						foreach (IScheminType subType in temp.List)
+						foreach (IScheminType subType in temp)
 						{
 							appended.Append(subType);
 						}
@@ -128,7 +127,7 @@ namespace Schemin.Evaluate.Primitives
 				{
 
 					ScheminPrimitive proc = (ScheminPrimitive) func;
-					result = toFold.List.Aggregate(init, (total, next) => {
+					result = toFold.Aggregate(init, (total, next) => {
 							ScheminList args = new ScheminList(next);
 							args.Append(total);
 
@@ -139,7 +138,7 @@ namespace Schemin.Evaluate.Primitives
 				{
 					ScheminLambda lam = (ScheminLambda) func;
 
-					result = toFold.List.Aggregate(init, (total, next) => {
+					result = toFold.Aggregate(init, (total, next) => {
 							ScheminList args = new ScheminList(next);
 							args.Append(total);
 
@@ -161,7 +160,7 @@ namespace Schemin.Evaluate.Primitives
 					return toFilter;
 				}
 
-				var filtered = toFilter.List.Where(element => {
+				var filtered = toFilter.Where(element => {
 						var args = new ScheminList(element);
 						ScheminBool predResult = (ScheminBool) lam.Evaluate(args, eval, env);
 						return predResult.Value;
@@ -172,7 +171,13 @@ namespace Schemin.Evaluate.Primitives
 					return new ScheminList();
 				}
 
-				return new ScheminList(new CachedSequence<IScheminType>(filtered));
+				ScheminList temp = new ScheminList();
+				foreach (IScheminType type in filtered)
+				{
+					temp.Append(type);
+				}
+
+				return temp;
 			};
 
 			Map = (list, env, eval) => {
@@ -186,7 +191,7 @@ namespace Schemin.Evaluate.Primitives
 
 				ScheminLambda lam = (ScheminLambda) toApply;
 
-				var mapped = toMap.List.Select(element => {
+				var mapped = toMap.Select(element => {
 						var args = new ScheminList(element);
 						return lam.Evaluate(args, eval, env);
 						});
@@ -196,7 +201,13 @@ namespace Schemin.Evaluate.Primitives
 					return new ScheminList();
 				}
 
-				return new ScheminList(new CachedSequence<IScheminType>(mapped));
+				ScheminList temp = new ScheminList();
+				foreach (IScheminType type in mapped)
+				{
+					temp.Append(type);
+				}
+
+				return temp;
 			};
 		}
 

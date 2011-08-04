@@ -3,75 +3,95 @@ namespace Schemin.AST
 {
 	using System;
 	using System.Text;
-	using Cadenza.Collections;
+	using System.Collections;
+	using System.Collections.Generic;
 
-	public class ScheminList : IScheminType
+	public class ScheminList : IScheminType, IEnumerable<IScheminType>
 	{
-		public CachedSequence<IScheminType> List;
+		public IScheminType Head = null;
+		public ScheminList Rest = null;
 		public bool Empty;
 
 		public ScheminList()
 		{
 			this.Empty = true;
-			this.List = null;
 		}
 
 		public ScheminList(IScheminType head)
 		{
-			this.List = new CachedSequence<IScheminType>(head);
+			this.Head = head;
 			this.Empty = false;
 		}
 
 		public ScheminList(IScheminType head, ScheminList rest)
 		{
-			this.List = new CachedSequence<IScheminType>(head, rest.List);
-			this.Empty = false;
-		}
-
-		public ScheminList(CachedSequence<IScheminType> list)
-		{
-			this.List = list;
+			this.Head = head;
+			this.Rest = rest;
 			this.Empty = false;
 		}
 
 		public IScheminType Car()
 		{
-			if (this.List == null)
-			{
-				return new ScheminList();
-			}
-
-			return this.List.Head;
+			return this.Head;
 		}
 
 		public ScheminList Cdr()
 		{
-			if (this.List == null)
-			{
-				return new ScheminList();
-			}
+			return this.Rest;
+		}
 
-			if (this.List.Tail == null)
-			{
-				return new ScheminList();
-			}
-
-			return new ScheminList(this.List.Tail);
+		public ScheminList Cons(IScheminType type)
+		{
+			return new ScheminList(type, this);
 		}
 
 		public ScheminList Append(IScheminType type)
 		{
-			if (this.List == null)
+			if (this.Head == null)
 			{
-				this.List = new CachedSequence<IScheminType>(type);
+				this.Head = type;
 				this.Empty = false;
+				return this;
+			}
+
+			if (this.Rest == null)
+			{
+				this.Rest = new ScheminList(type);
+				return this;
+			}
+
+			ScheminList rest = this.Rest;
+			while (rest.Rest != null)
+			{
+				rest = rest.Rest;
+			}
+
+			if (rest.Head == null)
+			{
+				rest.Head = type;
+				return this;
 			}
 			else
 			{
-				this.List = this.List.Append(type);
+				rest.Rest = new ScheminList(type);
+				return this;
 			}
+		}
 
-			return this;
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		public IEnumerator<IScheminType> GetEnumerator ()
+		{
+			var c = Rest;
+			yield return Head;
+			c = Rest;
+			while (c != null) {
+				yield return c.Head;
+				c = c.Rest;
+			}
 		}
 
 		public override string ToString()
@@ -90,47 +110,26 @@ namespace Schemin.AST
 			else
 			{
 				builder.Append("(");
-				int index = 0;
-				foreach (var type in list.List)
+				foreach (var type in list)
 				{
 					if (type.GetType() == typeof(ScheminList))
 					{
-						builder.Append("(");
 						builder.Append(ToStringInternal((ScheminList) type));
-						builder.Append(")");
 					}
 					else
 					{
-						if (index == list.List.Count() - 1)
-						{
-							builder.Append(type.ToString());
-						}
-						else
-						{
-							builder.Append(type.ToString() + " ");
-						}
+						builder.Append(type.ToString() + " ");
 					}
-					index++;
 				}
 				builder.Append(")");
 			}
 
-			return "<List: " + builder.ToString() + ">";
+			return builder.ToString();
 		}
 
 		public bool Equals(IScheminType type)
 		{
-			if (this.GetType() != type.GetType())
-			{
-				return false;
-			}
-
-			ScheminList temp = (ScheminList) type;
-			if (this.List == temp.List)
-			{
-				return true;
-			}
-
+			// list comparison isn't implemented
 			return false;
 		}
 	}

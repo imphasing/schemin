@@ -5,7 +5,6 @@ namespace Schemin.Evaluate.Primitives
 	using System.Collections.Generic;
 	using System.Numerics;
 	using System.Linq;
-	using Cadenza.Collections;
 	using Schemin.AST;
 	using Schemin.Evaluate;
 	using Environment = Schemin.Evaluate.Environment;
@@ -27,7 +26,7 @@ namespace Schemin.Evaluate.Primitives
 
 				bool result = false;
 
-				foreach (IScheminType type in list.Cdr().List)
+				foreach (IScheminType type in list.Cdr())
 				{
 					if (last.Equals(type))
 					{

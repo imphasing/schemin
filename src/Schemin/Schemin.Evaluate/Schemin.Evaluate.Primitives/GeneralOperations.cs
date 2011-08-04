@@ -6,7 +6,6 @@ namespace Schemin.Evaluate.Primitives
 	using System.Collections.Generic;
 	using System.Numerics;
 	using System.Linq;
-	using Cadenza.Collections;
 	using Schemin.AST;
 	using Schemin.Evaluate;
 	using Environment = Schemin.Evaluate.Environment;
@@ -72,7 +71,7 @@ namespace Schemin.Evaluate.Primitives
 
 			Begin = (list, env, eval) => {
 				IScheminType last = new ScheminList();
-				foreach (IScheminType type in list.List)
+				foreach (IScheminType type in list)
 				{
 					last = eval.EvaluateInternal(type, env);
 				}
@@ -107,7 +106,7 @@ namespace Schemin.Evaluate.Primitives
 					Environment temporary = new Environment();
 					temporary.parent = env;
 
-					foreach (IScheminType type in bindings.List)
+					foreach (IScheminType type in bindings)
 					{
 						ScheminList binding = (ScheminList) type;
 						ScheminAtom symbol = (ScheminAtom) binding.Car();
@@ -123,7 +122,7 @@ namespace Schemin.Evaluate.Primitives
 					ScheminList argSymbols = new ScheminList();
 					ScheminList argValues = new ScheminList();
 
-					foreach (IScheminType type in bindings.List)
+					foreach (IScheminType type in bindings)
 					{
 						ScheminList binding = (ScheminList) type;
 						ScheminAtom symbol = (ScheminAtom) binding.Car();

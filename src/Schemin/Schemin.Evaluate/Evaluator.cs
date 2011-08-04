@@ -7,7 +7,6 @@ namespace Schemin.Evaluate
 	using System.Collections.Generic;
 	using System.Linq;
 	using Schemin.AST;
-	using Cadenza;
 	using Schemin.Evaluate.Primitives;
 
 	public class Evaluator
@@ -26,7 +25,7 @@ namespace Schemin.Evaluate
 		{
 			IScheminType last = null;
 
-			foreach (IScheminType type in ast.List)
+			foreach (IScheminType type in ast)
 			{
 				last = EvaluateInternal(type, env);
 			}
@@ -70,7 +69,7 @@ namespace Schemin.Evaluate
 					return ast;
 				}
 
-				foreach (IScheminType type in evalList.List)
+				foreach (IScheminType type in evalList)
 				{
 					if (IsA(type, integer))
 					{
