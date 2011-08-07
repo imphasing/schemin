@@ -21,7 +21,7 @@ Implemented featues:
 --------------------
 
 + define and set!
-+ lambdas and mostly-closures
++ lambdas with closures
 + Let and named let
 + Some basic flow control (if and some boolean primitives)
 + A few list operations like map, filter, and foldl (as well as cons, cdr, car, etc)
