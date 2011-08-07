@@ -1,7 +1,0 @@
-Schemin-ish interpreter, written in C#. This is a learning project to help me understand language design, so don't expect too much. Complete enough to run this simple quicksort routine:
-
-    (define qs (lambda (l) (if (null? l) (quote ()) (append (qs (filter (lambda (x) (<= x (car l))) (cdr l))) (cons (car l) (qs (filter (lambda (x) (> x (car l))) (cdr l))) )))))
-
-But not a whole lot else just yet.
-
-Currently, the only interface to the interpreter written is a basic REPL that doesn't support newlines. As such, you'll have to format your progams onto one line until paren counting and newline support sound fun enough to implement.
