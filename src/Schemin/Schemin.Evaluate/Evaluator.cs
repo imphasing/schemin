@@ -114,6 +114,9 @@ namespace Schemin.Evaluate
 							case EvaluatorState.IfArgs:
 								complete.Append(type);
 								continue;
+							case EvaluatorState.CondArgs:
+								complete.Append(type);
+								continue;
 						}
 
 						IScheminType listResult = EvaluateInternal(type, env);
@@ -161,6 +164,8 @@ namespace Schemin.Evaluate
 				case EvaluatorState.LetArgs:
 					return ast;
 				case EvaluatorState.IfArgs:
+					return ast;
+				case EvaluatorState.CondArgs:
 					return ast;
 				case EvaluatorState.SetBangArgs:
 					// only ignore the first argument to set!
@@ -231,6 +236,9 @@ namespace Schemin.Evaluate
 					break;
 				case "if":
 					this.EvalState = EvaluatorState.IfArgs;
+					break;
+				case "cond":
+					this.EvalState = EvaluatorState.CondArgs;
 					break;
 				case "set!":
 					this.EvalState = EvaluatorState.SetBangArgs;

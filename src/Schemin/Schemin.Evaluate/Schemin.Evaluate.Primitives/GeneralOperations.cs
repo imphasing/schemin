@@ -14,6 +14,7 @@ namespace Schemin.Evaluate.Primitives
 	{
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Lambda;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cond;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Begin;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetBang;
@@ -147,6 +148,41 @@ namespace Schemin.Evaluate.Primitives
 
 					return result;
 				}
+			};
+
+			Cond = (list, env, eval) => {
+				eval.EvalState = EvaluatorState.Normal;
+				ScheminList conditions = (ScheminList) list;
+
+				foreach (IScheminType type in conditions)
+				{
+					ScheminList expression = (ScheminList) type;
+					IScheminType condition = expression.Car();
+					ScheminList result = expression.Cdr();
+
+					// check for the else condition first so we can skip anything that comes after
+					if ((condition as ScheminAtom) != null)
+					{
+						ScheminAtom temp = (ScheminAtom) condition;
+						if (temp.Name == "else")
+						{
+							return eval.Evaluate(result, env);
+						}
+					}
+
+					ScheminBool conditionResults = (ScheminBool) eval.EvaluateInternal(condition, env);
+					if (conditionResults.Value)
+					{
+						return eval.Evaluate(result, env);
+					}
+					else
+					{
+						continue;
+					}
+				}
+
+				return new ScheminList();
+
 			};
 
 			If = (list, env, eval) => {

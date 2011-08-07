@@ -75,6 +75,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(GeneralOperations.Quote, "quote");
 				case "if":
 					return new ScheminPrimitive(GeneralOperations.If, "if");
+				case "cond":
+					return new ScheminPrimitive(GeneralOperations.Cond, "cond");
 				case "let":
 					return new ScheminPrimitive(GeneralOperations.Let, "let");
 				case "set!":
