@@ -11,18 +11,22 @@ namespace Schemin.AST
 		public ScheminList Arguments;
 		public Environment Closure;
 
-		public ScheminLambda(ScheminList definition)
+		public ScheminLambda(ScheminList definition, Environment closure)
 		{
 			this.Arguments = (ScheminList) definition.Car();
 			this.Definition = definition.Cdr();
+			this.Closure = closure;
 		}
 
-		public IScheminType Evaluate(ScheminList values, Evaluator eval, Environment env)
+		public IScheminType Evaluate(ScheminList values, Evaluator eval)
 		{
 			IScheminType first = Arguments.Car();
 			ScheminList rest = Arguments.Cdr();
 			IScheminType firstArg = values.Car();
 			ScheminList restArgs = values.Cdr();
+
+			Environment args = new Environment();
+			args.parent = this.Closure;
 
 			for (; ;)
 			{
@@ -35,7 +39,7 @@ namespace Schemin.AST
 					}
 				}
 
-				env.AddBinding((ScheminAtom) first, firstArg);
+				args.AddBinding((ScheminAtom) first, firstArg);
 
 				first = rest.Car();
 				firstArg = restArgs.Car();
@@ -43,28 +47,14 @@ namespace Schemin.AST
 				restArgs = restArgs.Cdr();
 			}
 
-			if (this.Closure != null)
-			{
-				// Only close over the top level with locals, otherwise we clobber our env with global stuff
-				env.CloseOverTop(this.Closure);
-			}
-
-
 			IScheminType last; 
 			if (Definition.GetType() == typeof(ScheminList))
 			{
-				last = eval.Evaluate((ScheminList) Definition, env);
+				last = eval.Evaluate((ScheminList) Definition, args);
 			}
 			else
 			{
-				last = eval.EvaluateInternal(Definition, env); 
-			}
-
-			// Pass closure on to the next lambda if we return one
-			if (last.GetType() == typeof(ScheminLambda))
-			{
-				ScheminLambda temp = (ScheminLambda) last;
-				temp.Closure = env;
+				last = eval.EvaluateInternal(Definition, args); 
 			}
 
 			return last;

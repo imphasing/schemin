@@ -133,10 +133,7 @@ namespace Schemin.Evaluate
 				else if ((functionPosition as ScheminLambda) != null)
 				{
 					ScheminLambda lam = (ScheminLambda) functionPosition;
-
-					Environment child = new Environment();
-					child.parent = env;
-					return lam.Evaluate(functionArgs, this, child);
+					return lam.Evaluate(functionArgs, this);
 				}
 				else
 				{

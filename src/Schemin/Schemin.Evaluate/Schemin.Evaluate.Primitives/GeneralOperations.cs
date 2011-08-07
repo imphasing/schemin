@@ -26,7 +26,7 @@ namespace Schemin.Evaluate.Primitives
 		static GeneralOperations()
 		{
 			Lambda = (list, env, eval) => {
-				ScheminLambda lam = new ScheminLambda(list);
+				ScheminLambda lam = new ScheminLambda(list, env);
 				eval.EvalState = EvaluatorState.Normal;
 				return lam;
 			};
@@ -137,13 +137,15 @@ namespace Schemin.Evaluate.Primitives
 					ScheminList lambdaArgs = new ScheminList(argSymbols);
 					lambdaArgs = lambdaArgs.Append(expression);
 
-					ScheminLambda proc = new ScheminLambda(lambdaArgs);
 					Environment temporary = new Environment();
 					temporary.parent = env;
 
+					ScheminLambda proc = new ScheminLambda(lambdaArgs, temporary);
 					temporary.AddBinding((ScheminAtom) first, proc);
 
-					return proc.Evaluate(argValues, eval, temporary);
+					IScheminType result = proc.Evaluate(argValues, eval);
+
+					return result;
 				}
 			};
 
