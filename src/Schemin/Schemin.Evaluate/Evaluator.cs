@@ -117,6 +117,9 @@ namespace Schemin.Evaluate
 							case EvaluatorState.CondArgs:
 								complete.Append(type);
 								continue;
+							case EvaluatorState.DefineArgs:
+								complete.Append(type);
+								continue;
 						}
 
 						IScheminType listResult = EvaluateInternal(type, env);

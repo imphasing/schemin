@@ -214,21 +214,56 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			Define = (args, env, eval) => {
+				bool deffun = false;
 				eval.EvalState = EvaluatorState.Normal;
-				ScheminAtom symbol = (ScheminAtom) args.Car();
-				IScheminType definition = args.Cdr().Car();
 
-				if (env.bindings.ContainsKey(symbol.Name))
+				if ((args.Car() as ScheminList) != null)
 				{
-					env.RemoveBinding(symbol);
-					env.AddBinding(symbol, definition);
+					deffun = true;
+				}
+
+
+				if (!deffun)
+				{
+					ScheminAtom symbol = (ScheminAtom) args.Car();
+					IScheminType definition = args.Cdr().Car();
+
+					if (env.bindings.ContainsKey(symbol.Name))
+					{
+						env.RemoveBinding(symbol);
+						env.AddBinding(symbol, definition);
+					}
+					else
+					{
+						env.AddBinding(symbol, definition);
+					}
+
+					return new ScheminList();
 				}
 				else
 				{
-					env.AddBinding(symbol, definition);
+					ScheminList arguments = (ScheminList) args.Car();
+					ScheminList expression = args.Cdr();
+
+					ScheminAtom name = (ScheminAtom) arguments.Car();
+					ScheminList argSymbols = arguments.Cdr();
+
+					ScheminList lamArgs = new ScheminList(argSymbols, expression);
+					ScheminLambda lam = new ScheminLambda(lamArgs, env);
+
+					if (env.bindings.ContainsKey(name.Name))
+					{
+						env.RemoveBinding(name);
+						env.AddBinding(name, lam);
+					}
+					else
+					{
+						env.AddBinding(name, lam);
+					}
+					
+					return new ScheminList();
 				}
 
-				return new ScheminList();
 			};
 
 		}
