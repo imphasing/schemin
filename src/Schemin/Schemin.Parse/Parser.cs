@@ -13,6 +13,7 @@ namespace Schemin.Parse
 		public ScheminList Parse(List<Token> tokens)
 		{
 			KeyValuePair<ScheminList, int> parsed = ParseInternal(tokens, 0);
+			TransformQuotes((ScheminList) parsed.Key);
 			return (ScheminList) parsed.Key;
 		}
 
@@ -92,7 +93,6 @@ namespace Schemin.Parse
 
 		private void TransformQuotes(ScheminList ast)
 		{
-			Console.WriteLine("Transforming: " + ast);
 			ScheminList c = ast;
 
 			while (c != null)
@@ -104,11 +104,8 @@ namespace Schemin.Parse
 					ScheminAtom atom = (ScheminAtom) type;
 					if (atom.Name == "'")
 					{
-						Console.WriteLine("Replacing head: " + c.Head);
 						c.Head = new ScheminList(new ScheminPrimitive(GeneralOperations.Quote, "quote"), c.Rest);
 						c.Rest = null;
-						Console.WriteLine("New head: " + c.Head);
-						Console.WriteLine("Result: " + ast);
 						return;
 					}
 				}
