@@ -104,9 +104,12 @@ namespace Schemin.Parse
 					ScheminAtom atom = (ScheminAtom) type;
 					if (atom.Name == "'")
 					{
-						c.Head = new ScheminList(new ScheminPrimitive(GeneralOperations.Quote, "quote"), c.Rest);
-						c.Rest = null;
-						return;
+						// This pass replaces a list like (' a b) with ((quote a) b)
+						ScheminList newhead = new ScheminList(new ScheminPrimitive(GeneralOperations.Quote, "quote"));
+						newhead.Append(c.Rest.Head);
+
+						c.Head = newhead;
+						c.Rest = c.Rest.Rest;
 					}
 				}
 				else if ((type as ScheminList) != null)

@@ -62,6 +62,10 @@ namespace Schemin
 			{	
 				p.WriteOptionDescriptions(Console.Out);
 			}
+			else
+			{
+				ReplPrompt();
+			}
 		}
 
 		static void InterpretFile(string filename)

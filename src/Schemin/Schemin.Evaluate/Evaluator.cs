@@ -127,7 +127,6 @@ namespace Schemin.Evaluate
 				IScheminType functionPosition = complete.Car();
 				ScheminList functionArgs = complete.Cdr();
 
-
 				if ((functionPosition as ScheminPrimitive) != null)
 				{
 					ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
@@ -166,6 +165,8 @@ namespace Schemin.Evaluate
 				case EvaluatorState.IfArgs:
 					return ast;
 				case EvaluatorState.CondArgs:
+					return ast;
+				case EvaluatorState.QuoteArgs:
 					return ast;
 				case EvaluatorState.SetBangArgs:
 					// only ignore the first argument to set!

@@ -56,7 +56,7 @@ namespace Schemin.Tokenize
 			string removedTabs = removedNewlines.Replace('\t', ' ');
 
 			List<string> stringTokens = removedTabs.Split(' ').ToList();
-			Func<string, bool> filter = token => (token != String.Empty && token != "");
+			Func<string, bool> filter = token => (token != String.Empty && token != "" && token != System.Environment.NewLine);
 			stringTokens = stringTokens.Where(filter).ToList();
 
 			var matchTokenTypes = new Dictionary<Regex, TokenType>();
@@ -69,21 +69,31 @@ namespace Schemin.Tokenize
 
 			foreach (string token in stringTokens)
 			{
+				string working = token;
 				bool goodToken = false;
 
-				if (token.Contains("###STRING_LITERAL_"))
+				// Since we replace ( with ' ( ', a leading quote like '(1 2) will automatically be interpreted
+				// as two tokens, but for atoms, ints, etc, there's no spaces added so we need to split the token apart here
+				if (working.StartsWith("'") && working != "'")
 				{
-					tokens.Add(new Token(TokenType.StringLiteral, this.literals[token]));
+					string quoted = token.Substring(1, token.Length - 1);
+					tokens.Add(new Token(TokenType.Quote, "'"));
+					working = quoted;
+				}
+
+				if (working.Contains("###STRING_LITERAL_"))
+				{
+					tokens.Add(new Token(TokenType.StringLiteral, this.literals[working]));
 					goodToken = true;
 				}
 				else
 				{
 					foreach (KeyValuePair<Regex, TokenType> kvp in matchTokenTypes)
 					{
-						Match m = kvp.Key.Match(token);
+						Match m = kvp.Key.Match(working);
 						if (m.Success)
 						{
-							tokens.Add(new Token(kvp.Value, token));
+							tokens.Add(new Token(kvp.Value, working));
 							goodToken = true;
 							break;
 						}
@@ -92,7 +102,7 @@ namespace Schemin.Tokenize
 
 				if (!goodToken)
 				{
-					Console.WriteLine(string.Format("Error: Bad Token \"{0}\"", token));
+					Console.WriteLine(string.Format("Error: Bad Token \"{0}\"", working));
 				}
 			}
 

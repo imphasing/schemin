@@ -209,15 +209,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			DumpEnv = (args, env, eval) => {
-				StringBuilder builder = new StringBuilder();
-
-				foreach (KeyValuePair<string, IScheminType> kvp in env.bindings)
-				{
-					builder.Append(string.Format("({0} => {1}), ", kvp.Key, kvp.Value));
-				}
-
-				Console.WriteLine(builder.ToString());
-
+				Console.WriteLine(env.ToString());
 				return new ScheminList();
 			};
 
