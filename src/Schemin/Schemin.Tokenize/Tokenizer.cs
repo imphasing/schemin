@@ -63,6 +63,7 @@ namespace Schemin.Tokenize
 			matchTokenTypes.Add(new Regex("^#[f|t]"), TokenType.BoolLiteral);
 			matchTokenTypes.Add(new Regex("^[-+]?[0-9]+"), TokenType.IntegerLiteral);
 			matchTokenTypes.Add(new Regex("[^\"\',()]+"), TokenType.Symbol);
+			matchTokenTypes.Add(new Regex("[']"), TokenType.Quote);
 			matchTokenTypes.Add(new Regex("[(]"), TokenType.OpenParen);
 			matchTokenTypes.Add(new Regex("[)]"), TokenType.CloseParen);
 

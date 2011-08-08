@@ -25,7 +25,7 @@ namespace Schemin.Parse
 				if (tokens[startIndex].Type == TokenType.OpenParen)
 				{
 					KeyValuePair<ScheminList, int> descended = ParseInternal(tokens, startIndex + 1);
-					parsed = parsed.Append(descended.Key);
+					parsed.Append(descended.Key);
 
 					startIndex = descended.Value;
 				}
@@ -33,10 +33,14 @@ namespace Schemin.Parse
 				{
 					break;
 				}
+				else if (tokens[startIndex].Type == TokenType.Quote)
+				{
+					parsed.Append(new ScheminAtom("'"));
+				}
 				else
 				{
 					IScheminType converted = ConvertToken(tokens[startIndex]);
-					parsed = parsed.Append(converted);
+					parsed.Append(converted);
 				}
 
 				startIndex++;
@@ -83,6 +87,37 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(GeneralOperations.SetBang, "set!");
 				default:
 					return atom;
+			}
+		}
+
+		private void TransformQuotes(ScheminList ast)
+		{
+			Console.WriteLine("Transforming: " + ast);
+			ScheminList c = ast;
+
+			while (c != null)
+			{
+				IScheminType type = c.Head;
+
+				if ((type as ScheminAtom) != null)
+				{
+					ScheminAtom atom = (ScheminAtom) type;
+					if (atom.Name == "'")
+					{
+						Console.WriteLine("Replacing head: " + c.Head);
+						c.Head = new ScheminList(new ScheminPrimitive(GeneralOperations.Quote, "quote"), c.Rest);
+						c.Rest = null;
+						Console.WriteLine("New head: " + c.Head);
+						Console.WriteLine("Result: " + ast);
+						return;
+					}
+				}
+				else if ((type as ScheminList) != null)
+				{
+					TransformQuotes((ScheminList) type);
+				}
+
+				c = c.Rest;
 			}
 		}
 			

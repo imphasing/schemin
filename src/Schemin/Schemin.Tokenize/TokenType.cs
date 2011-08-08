@@ -7,6 +7,7 @@ namespace Schemin.Tokenize
 		IntegerLiteral,
 		StringLiteral,
 		BoolLiteral,
+		Quote,
 		OpenParen,
 		CloseParen
 	}
