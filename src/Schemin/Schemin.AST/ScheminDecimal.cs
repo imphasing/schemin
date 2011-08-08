@@ -2,18 +2,12 @@
 namespace Schemin.AST
 {
 	using System.Numerics;
-	using System;
 
-	public class ScheminInteger : IScheminType, IScheminNumeric
+	public class ScheminDecimal : IScheminType, IScheminNumeric
 	{
-		public BigInteger Value;
+		public decimal Value;
 
-		public ScheminInteger(int value)
-		{
-			this.Value = new BigInteger(value);
-		}
-
-		public ScheminInteger(BigInteger value)
+		public ScheminDecimal(decimal value)
 		{
 			this.Value = value;
 		}
@@ -30,7 +24,7 @@ namespace Schemin.AST
 				return false;
 			}
 
-			ScheminInteger temp = (ScheminInteger) type;
+			ScheminDecimal temp = (ScheminDecimal) type;
 			if (this.Value == temp.Value)
 			{
 				return true;
@@ -41,12 +35,12 @@ namespace Schemin.AST
 
 		public decimal DecimalValue()
 		{
-			return Convert.ToDecimal((double) this.Value);
+			return this.Value;
 		}
 
 		public BigInteger IntegerValue()
 		{
-			return this.Value;
+			return new BigInteger(this.Value);
 		}
 	}
 }

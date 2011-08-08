@@ -5,6 +5,7 @@ namespace Schemin.Tokenize
 	{
 		Symbol,
 		IntegerLiteral,
+		DecimalLiteral,
 		StringLiteral,
 		BoolLiteral,
 		Quote,

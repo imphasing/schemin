@@ -14,65 +14,175 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Add;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Subtract;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Multiply;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Divide;
 
 		static NumericOperations()
 		{
-
 			Add = (args, env, eval) => {
-				BigInteger result = new BigInteger(0);
+				bool dec = false;
+				var first = (IScheminNumeric) args.Car();
+				IScheminNumeric result = null;
 
-				if (args.Length < 2)
+				foreach (IScheminType type in args)
 				{
-					var first = (ScheminInteger) args.Car();
-					return new ScheminInteger(first.Value * 1);
+					if ((type as ScheminDecimal) != null)
+					{
+						dec = true;
+						result = new ScheminDecimal(0);
+					}
+				}
+
+				if (!dec)
+				{
+					result = new ScheminInteger(0);
 				}
 
 				foreach (IScheminType type in args)
 				{
-					if (type.GetType() != typeof(ScheminList))
+					if ((type as IScheminNumeric) != null)
 					{
-						var temp = (ScheminInteger) type;
-						result += temp.Value;
+						var temp = (IScheminNumeric) type;
+						if (dec)
+						{
+							result = new ScheminDecimal(result.DecimalValue() + temp.DecimalValue());
+						}
+						else
+						{
+							result = new ScheminInteger(result.IntegerValue() + temp.IntegerValue());
+						}
 					}
 				}
 
-				return new ScheminInteger(result);
+
+				return (IScheminType) result;
 			};
 
 			Subtract = (args, env, eval) => {
-				var first = (ScheminInteger) args.Car();
-				BigInteger result = first.Value;
+				bool dec = false;
+				var first = (IScheminNumeric) args.Car();
+				IScheminNumeric result = null;
+
+				foreach (IScheminType type in args)
+				{
+					if ((type as ScheminDecimal) != null)
+					{
+						dec = true;
+						result = new ScheminDecimal(first.DecimalValue());
+					}
+				}
+
+				if (!dec)
+				{
+					result = new ScheminInteger(first.IntegerValue());
+				}
 
 				if (args.Length < 2)
 				{
-					return new ScheminInteger(result * -1);
+					if (dec)
+					{
+						return new ScheminDecimal(first.DecimalValue() * -1);
+					}
+					else
+					{
+						return new ScheminInteger(first.IntegerValue() * -1);
+					}
 				}
 
 				foreach (IScheminType type in args.Cdr())
 				{
-					if (type.GetType() != typeof(ScheminList))
+					if ((type as IScheminNumeric) != null)
 					{
-						var temp = (ScheminInteger) type;
-						result -= temp.Value;
+						var temp = (IScheminNumeric) type;
+						if (dec)
+						{
+							result = new ScheminDecimal(result.DecimalValue() - temp.DecimalValue());
+						}
+						else
+						{
+							result = new ScheminInteger(result.IntegerValue() - temp.IntegerValue());
+						}
 					}
 				}
 
-				return new ScheminInteger(result);
+
+				return (IScheminType) result;
 			};
 
 			Multiply = (args, env, eval) => {
-				BigInteger result = new BigInteger(1);
+				bool dec = false;
+				var first = (IScheminNumeric) args.Car();
+				IScheminNumeric result = null;
 
 				foreach (IScheminType type in args)
 				{
-					if (type.GetType() != typeof(ScheminList))
+					if ((type as ScheminDecimal) != null)
 					{
-						var temp = (ScheminInteger) type;
-						result = temp.Value * result;
+						dec = true;
+						result = new ScheminDecimal(1);
 					}
 				}
 
-				return new ScheminInteger(result);
+				if (!dec)
+				{
+					result = new ScheminInteger(1);
+				}
+
+				foreach (IScheminType type in args)
+				{
+					if ((type as IScheminNumeric) != null)
+					{
+						var temp = (IScheminNumeric) type;
+						if (dec)
+						{
+							result = new ScheminDecimal(result.DecimalValue() * temp.DecimalValue());
+						}
+						else
+						{
+							result = new ScheminInteger(result.IntegerValue() * temp.IntegerValue());
+						}
+					}
+				}
+
+
+				return (IScheminType) result;
+			};
+
+			Divide = (args, env, eval) => {
+				bool dec = false;
+				var first = (IScheminNumeric) args.Car();
+				IScheminNumeric result = null;
+
+				foreach (IScheminType type in args)
+				{
+					if ((type as ScheminDecimal) != null)
+					{
+						dec = true;
+						result = new ScheminDecimal(first.DecimalValue());
+					}
+				}
+
+				if (!dec)
+				{
+					result = new ScheminInteger(first.IntegerValue());
+				}
+
+				foreach (IScheminType type in args.Cdr())
+				{
+					if ((type as IScheminNumeric) != null)
+					{
+						var temp = (IScheminNumeric) type;
+						if (dec)
+						{
+							result = new ScheminDecimal(result.DecimalValue() / temp.DecimalValue());
+						}
+						else
+						{
+							result = new ScheminInteger(result.IntegerValue() / temp.IntegerValue());
+						}
+					}
+				}
+				
+				return (IScheminType) result;
 			};
 		}
 	}

@@ -64,8 +64,10 @@
     <Compile Include="Schemin.Parse\Parser.cs" />
 
     <Compile Include="Schemin.AST\IScheminType.cs" />
+    <Compile Include="Schemin.AST\IScheminNumeric.cs" />
     <Compile Include="Schemin.AST\ScheminAtom.cs" />
     <Compile Include="Schemin.AST\ScheminInteger.cs" />
+    <Compile Include="Schemin.AST\ScheminDecimal.cs" />
     <Compile Include="Schemin.AST\ScheminList.cs" />
     <Compile Include="Schemin.AST\ScheminLambda.cs" />
     <Compile Include="Schemin.AST\ScheminPrimitive.cs" />

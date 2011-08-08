@@ -35,7 +35,7 @@ namespace Schemin.Evaluate
 
 		public IScheminType EvaluateInternal(IScheminType ast, Environment env)
 		{
-			if ((ast as ScheminInteger) != null)
+			if ((ast as IScheminNumeric) != null)
 			{
 				return ast;
 			}
@@ -71,7 +71,7 @@ namespace Schemin.Evaluate
 
 				foreach (IScheminType type in evalList)
 				{
-					if ((type as ScheminInteger) != null)
+					if ((type as IScheminNumeric) != null)
 					{
 						complete.Append(type);
 					}
@@ -254,6 +254,7 @@ namespace Schemin.Evaluate
 			prebound.Add("+", NumericOperations.Add);
 			prebound.Add("-", NumericOperations.Subtract);
 			prebound.Add( "*", NumericOperations.Multiply);
+			prebound.Add( "/", NumericOperations.Divide);
 
 			prebound.Add("car", ListOperations.Car);
 			prebound.Add("cons", ListOperations.Cons);
@@ -271,6 +272,7 @@ namespace Schemin.Evaluate
 			prebound.Add("=", BooleanOperations.Equal);
 			prebound.Add("eq?", BooleanOperations.Equal);
 			prebound.Add(">", BooleanOperations.GreaterThan);
+			prebound.Add(">=", BooleanOperations.GreaterThanOr);
 			prebound.Add("<", BooleanOperations.LessThan);
 			prebound.Add("<=", BooleanOperations.LessThanOr);
 			prebound.Add("not", BooleanOperations.Not);

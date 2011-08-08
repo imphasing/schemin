@@ -12,6 +12,7 @@ namespace Schemin.Evaluate.Primitives
 	public static class BooleanOperations
 	{
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThan;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThanOr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThan;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThanOr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
@@ -54,36 +55,88 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			GreaterThan = (args, env, eval) => {
-				ScheminInteger first = (ScheminInteger) args.Car();
-				ScheminInteger second = (ScheminInteger) args.Cdr().Car();
+				IScheminNumeric first = (IScheminNumeric) args.Car();
+				IScheminNumeric second = (IScheminNumeric) args.Cdr().Car();
 
-				if (first.Value > second.Value)
+				if ((first as ScheminDecimal) != null || (second as ScheminDecimal) != null)
 				{
-					return new ScheminBool(true);
+					if (first.DecimalValue() > second.DecimalValue())
+					{
+						return new ScheminBool(true);
+					}
+				}
+				else
+				{
+					if (first.IntegerValue() > second.IntegerValue())
+					{
+						return new ScheminBool(true);
+					}
+				}
+
+				return new ScheminBool(false);
+			};
+
+			GreaterThanOr = (args, env, eval) => {
+				IScheminNumeric first = (IScheminNumeric) args.Car();
+				IScheminNumeric second = (IScheminNumeric) args.Cdr().Car();
+
+				if ((first as ScheminDecimal) != null || (second as ScheminDecimal) != null)
+				{
+					if (first.DecimalValue() >= second.DecimalValue())
+					{
+						return new ScheminBool(true);
+					}
+				}
+				else
+				{
+					if (first.IntegerValue() >= second.IntegerValue())
+					{
+						return new ScheminBool(true);
+					}
 				}
 
 				return new ScheminBool(false);
 			};
 
 			LessThan = (args, env, eval) => {
-				ScheminInteger first = (ScheminInteger) args.Car();
-				ScheminInteger second = (ScheminInteger) args.Cdr().Car();
+				IScheminNumeric first = (IScheminNumeric) args.Car();
+				IScheminNumeric second = (IScheminNumeric) args.Cdr().Car();
 
-				if (first.Value < second.Value)
+				if ((first as ScheminDecimal) != null || (second as ScheminDecimal) != null)
 				{
-					return new ScheminBool(true);
+					if (first.DecimalValue() < second.DecimalValue())
+					{
+						return new ScheminBool(true);
+					}
+				}
+				else
+				{
+					if (first.IntegerValue() < second.IntegerValue())
+					{
+						return new ScheminBool(true);
+					}
 				}
 
 				return new ScheminBool(false);
 			};
 
 			LessThanOr = (args, env, eval) => {
-				ScheminInteger first = (ScheminInteger) args.Car();
-				ScheminInteger second = (ScheminInteger) args.Cdr().Car();
+				IScheminNumeric first = (IScheminNumeric) args.Car();
+				IScheminNumeric second = (IScheminNumeric) args.Cdr().Car();
 
-				if (first.Value <= second.Value)
+				if ((first as ScheminDecimal) != null || (second as ScheminDecimal) != null)
 				{
-					return new ScheminBool(true);
+					if (first.DecimalValue() <= second.DecimalValue())
+					{
+						return new ScheminBool(true);
+					}
+				}
+				else
+				{
+					if (first.IntegerValue() <= second.IntegerValue())
+					{
+						return new ScheminBool(true);
+					}
 				}
 
 				return new ScheminBool(false);

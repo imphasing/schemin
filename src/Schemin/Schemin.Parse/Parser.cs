@@ -58,6 +58,8 @@ namespace Schemin.Parse
 					return ConvertAtom(new ScheminAtom(token.Value));
 				case TokenType.IntegerLiteral:
 					return new ScheminInteger(int.Parse(token.Value));
+				case TokenType.DecimalLiteral:
+					return new ScheminDecimal(decimal.Parse(token.Value));
 				case TokenType.StringLiteral:
 					return new ScheminString(token.Value);
 				case TokenType.BoolLiteral:
