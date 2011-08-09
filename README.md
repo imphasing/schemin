@@ -22,10 +22,10 @@ Implemented featues:
 
 + define and set!
 + lambdas with closures
-+ Let and named let
-+ Some basic flow control (if and some boolean primitives)
++ Let, named let and letrec
++ Some basic flow control (if, cond and some boolean primitives)
 + A few list operations like map, filter, and foldl (as well as cons, cdr, car, etc)
-+ Some basic numerical primitives (no decimal support yet :( )
++ Some basic numerical primitives and decimal support
 
 
 To do:
@@ -34,7 +34,6 @@ To do:
 + Implement continuations as a first-class type
 + Re-implement the evaluator so it's not recursive
 + Possibly implement a parser generator instead of our recursive parser
-+ Implement some of the numerical tower at least, so we can use decimals
 + Implement more common primitives
 
 
