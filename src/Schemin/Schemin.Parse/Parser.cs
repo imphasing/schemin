@@ -86,6 +86,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(GeneralOperations.Cond, "cond");
 				case "let":
 					return new ScheminPrimitive(GeneralOperations.Let, "let");
+				case "letrec":
+					return new ScheminPrimitive(GeneralOperations.LetRec, "letrec");
 				case "set!":
 					return new ScheminPrimitive(GeneralOperations.SetBang, "set!");
 				default:

@@ -10,6 +10,8 @@ namespace Schemin.Evaluate
 		IfArgs,
 		CondArgs,
 		SetBangArgs,
+		AndArgs,
+		OrArgs,
 		Normal
 	}
 }

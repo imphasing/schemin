@@ -120,6 +120,12 @@ namespace Schemin.Evaluate
 							case EvaluatorState.DefineArgs:
 								complete.Append(type);
 								continue;
+							case EvaluatorState.AndArgs:
+								complete.Append(type);
+								continue;
+							case EvaluatorState.OrArgs:
+								complete.Append(type);
+								continue;
 						}
 
 						IScheminType listResult = EvaluateInternal(type, env);
@@ -238,11 +244,20 @@ namespace Schemin.Evaluate
 				case "let":
 					this.EvalState = EvaluatorState.LetArgs;
 					break;
+				case "letrec":
+					this.EvalState = EvaluatorState.LetArgs;
+					break;
 				case "if":
 					this.EvalState = EvaluatorState.IfArgs;
 					break;
 				case "cond":
 					this.EvalState = EvaluatorState.CondArgs;
+					break;
+				case "and":
+					this.EvalState = EvaluatorState.AndArgs;
+					break;
+				case "or":
+					this.EvalState = EvaluatorState.OrArgs;
 					break;
 				case "set!":
 					this.EvalState = EvaluatorState.SetBangArgs;
@@ -279,6 +294,8 @@ namespace Schemin.Evaluate
 			prebound.Add("<", BooleanOperations.LessThan);
 			prebound.Add("<=", BooleanOperations.LessThanOr);
 			prebound.Add("not", BooleanOperations.Not);
+			prebound.Add("and", BooleanOperations.And);
+			prebound.Add("or", BooleanOperations.Or);
 
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
 			prebound.Add("begin", GeneralOperations.Begin);

@@ -15,7 +15,6 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Lambda;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cond;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Begin;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetBang;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Display;
@@ -23,6 +22,8 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Define;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> DumpEnv;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Quote;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> LetRec;
 
 		static GeneralOperations()
 		{
@@ -78,6 +79,35 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return last;
+			};
+
+			LetRec = (list, env, eval) => {
+				eval.EvalState = EvaluatorState.Normal;
+				ScheminList bindings = (ScheminList) list.Car();
+				IScheminType expression = list.Cdr().Car();
+
+				Environment temporary = new Environment();
+				temporary.parent = env;
+
+				// Fill bindings with an empty list for now
+				foreach (IScheminType type in bindings)
+				{
+					ScheminList binding = (ScheminList) type;
+					ScheminAtom symbol = (ScheminAtom) binding.Car();
+
+					env.AddBinding(symbol, new ScheminList());
+				}
+
+				foreach (IScheminType type in bindings)
+				{
+					ScheminList binding = (ScheminList) type;
+					ScheminAtom symbol = (ScheminAtom) binding.Car();
+					IScheminType val = binding.Cdr().Car();
+
+					temporary.AddBinding(symbol, eval.EvaluateInternal(val, temporary));
+				}
+
+				return eval.EvaluateInternal(expression, temporary);
 			};
 
 			Let = (list, env, eval) => {

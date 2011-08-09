@@ -18,6 +18,8 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Null;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Not;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> And;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Or;
 
 		static BooleanOperations()
 		{
@@ -49,6 +51,40 @@ namespace Schemin.Evaluate.Primitives
 				{
 					ScheminBool temp = (ScheminBool) first;
 					return new ScheminBool(!temp.Value);
+				}
+
+				return new ScheminBool(false);
+			};
+
+			And = (args, env, eval) => {
+				eval.EvalState = EvaluatorState.Normal;
+
+				foreach (IScheminType type in args)
+				{
+					IScheminType result = eval.EvaluateInternal(type, env);
+					ScheminBool conditionResult = (ScheminBool) result;
+
+					if (conditionResult.Value != true)
+					{
+						return new ScheminBool(false);
+					}
+				}
+
+				return new ScheminBool(true);
+			};
+
+			Or = (args, env, eval) => {
+				eval.EvalState = EvaluatorState.Normal;
+
+				foreach (IScheminType type in args)
+				{
+					IScheminType result = eval.EvaluateInternal(type, env);
+					ScheminBool conditionResult = (ScheminBool) result;
+
+					if (conditionResult.Value == true)
+					{
+						return new ScheminBool(true);
+					}
 				}
 
 				return new ScheminBool(false);
