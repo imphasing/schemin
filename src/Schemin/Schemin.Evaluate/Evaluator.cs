@@ -294,8 +294,6 @@ namespace Schemin.Evaluate
 			prebound.Add("<", BooleanOperations.LessThan);
 			prebound.Add("<=", BooleanOperations.LessThanOr);
 			prebound.Add("not", BooleanOperations.Not);
-			prebound.Add("and", BooleanOperations.And);
-			prebound.Add("or", BooleanOperations.Or);
 
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
 			prebound.Add("begin", GeneralOperations.Begin);

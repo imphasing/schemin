@@ -82,6 +82,10 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(GeneralOperations.Quote, "quote");
 				case "if":
 					return new ScheminPrimitive(GeneralOperations.If, "if");
+				case "or":
+					return new ScheminPrimitive(BooleanOperations.Or, "or");
+				case "and":
+					return new ScheminPrimitive(BooleanOperations.And, "and");
 				case "cond":
 					return new ScheminPrimitive(GeneralOperations.Cond, "cond");
 				case "let":
