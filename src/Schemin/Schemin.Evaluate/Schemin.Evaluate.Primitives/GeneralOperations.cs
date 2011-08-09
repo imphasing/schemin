@@ -91,7 +91,7 @@ namespace Schemin.Evaluate.Primitives
 			LetRec = (list, env, eval) => {
 				eval.EvalState = EvaluatorState.Normal;
 				ScheminList bindings = (ScheminList) list.Car();
-				IScheminType expression = list.Cdr().Car();
+				ScheminList expression = list.Cdr();
 
 				Environment temporary = new Environment();
 				temporary.parent = env;
@@ -114,7 +114,7 @@ namespace Schemin.Evaluate.Primitives
 					temporary.AddBinding(symbol, eval.EvaluateInternal(val, temporary));
 				}
 
-				return eval.EvaluateInternal(expression, temporary);
+				return eval.Evaluate(expression, temporary);
 			};
 
 			Let = (list, env, eval) => {
@@ -128,6 +128,7 @@ namespace Schemin.Evaluate.Primitives
 
 				ScheminList bindings;
 				IScheminType expression;
+
 				if (isNamed)
 				{
 					bindings = (ScheminList) list.Cdr().Car();
@@ -136,7 +137,7 @@ namespace Schemin.Evaluate.Primitives
 				else
 				{
 					bindings = (ScheminList) list.Car();
-					expression = list.Cdr().Car();
+					expression = list.Cdr();
 				}
 
 				if (!isNamed)
@@ -153,7 +154,7 @@ namespace Schemin.Evaluate.Primitives
 						temporary.AddBinding(symbol, eval.EvaluateInternal(val, env));
 					}
 
-					return eval.EvaluateInternal(expression, temporary);
+					return eval.Evaluate((ScheminList) expression, temporary);
 				}
 				else
 				{

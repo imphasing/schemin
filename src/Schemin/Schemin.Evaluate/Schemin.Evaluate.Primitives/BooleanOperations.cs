@@ -15,6 +15,8 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThanOr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThan;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThanOr;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Zero;
+
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Null;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Not;
@@ -30,6 +32,24 @@ namespace Schemin.Evaluate.Primitives
 
 		static BooleanOperations()
 		{
+			Zero = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as IScheminNumeric) != null)
+				{
+					IScheminNumeric num = (IScheminNumeric) type;
+					if ((type as ScheminDecimal) != null)
+					{
+						return new ScheminBool(num.DecimalValue() == 0);
+					}
+					else
+					{
+						return new ScheminBool(num.IntegerValue() == 0);
+					}
+				}
+
+				return new ScheminBool(false);
+			};
 
 			Boolean = (list, env, eval) => {
 				IScheminType type = list.Car();

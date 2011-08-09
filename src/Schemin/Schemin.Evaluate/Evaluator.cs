@@ -289,10 +289,13 @@ namespace Schemin.Evaluate
 			prebound.Add("null?", BooleanOperations.Null);
 			prebound.Add("=", BooleanOperations.Equal);
 			prebound.Add("eq?", BooleanOperations.Equal);
+
 			prebound.Add(">", BooleanOperations.GreaterThan);
 			prebound.Add(">=", BooleanOperations.GreaterThanOr);
 			prebound.Add("<", BooleanOperations.LessThan);
 			prebound.Add("<=", BooleanOperations.LessThanOr);
+			prebound.Add("zero?", BooleanOperations.Zero);
+
 			prebound.Add("not", BooleanOperations.Not);
 			prebound.Add("boolean?", BooleanOperations.Boolean);
 			prebound.Add("symbol?", BooleanOperations.Symbol);
