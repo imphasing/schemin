@@ -21,8 +21,85 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> And;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Or;
 
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Boolean;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Symbol;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Procedure;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Pair;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Number;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> String;
+
 		static BooleanOperations()
 		{
+
+			Boolean = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminBool) != null)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
+			};
+
+			Symbol = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminAtom) != null)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
+			};
+
+			Procedure = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminPrimitive) != null || (type as ScheminLambda) != null)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
+			};
+
+			Pair = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminList) != null)
+				{
+					ScheminList temp = (ScheminList) type;
+					if (temp.Length == 2)
+					{
+						return new ScheminBool(true);
+					}
+				}
+
+				return new ScheminBool(false);
+			};
+
+			Number = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminInteger) != null || (type as ScheminDecimal) != null)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
+			};
+
+			String = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminString) != null)
+				{
+					return new ScheminBool(true);
+				}
+
+				return new ScheminBool(false);
+			};
 
 			Equal = (list, env, eval) => {
 				IScheminType last = list.Car();
