@@ -58,17 +58,24 @@ namespace Schemin.Evaluate.Primitives
 				ScheminAtom symbol = (ScheminAtom) list.Car();
 				IScheminType definition = list.Cdr().Car();
 
-				if (env.bindings.ContainsKey(symbol.Name))
+				Environment parent = env;
+				while (parent != null)
 				{
-					env.RemoveBinding(symbol);
-					env.AddBinding(symbol, definition);
-				}
-				else
-				{
-					throw new UnboundAtomException(string.Format("Unbound atom: {0}", symbol));
+					IScheminType value;
+					parent.bindings.TryGetValue(symbol.Name, out value);
+
+					if (value != null)
+					{
+
+						parent.RemoveBinding(symbol);
+						parent.AddBinding(symbol, definition);
+						return new ScheminList();
+					}
+
+					parent = parent.parent;
 				}
 
-				return new ScheminList();
+				throw new UnboundAtomException(string.Format("Unbound atom: {0}", symbol));
 			};
 
 			Begin = (list, env, eval) => {
