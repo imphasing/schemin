@@ -168,5 +168,10 @@ namespace Schemin.AST
 			// list comparison isn't implemented
 			return false;
 		}
+
+		public ScheminBool BoolValue()
+		{
+			return new ScheminBool(true);
+		}
 	}
 }

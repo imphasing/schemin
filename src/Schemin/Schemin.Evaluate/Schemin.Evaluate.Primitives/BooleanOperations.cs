@@ -123,14 +123,9 @@ namespace Schemin.Evaluate.Primitives
 
 			Not = (args, env, eval) => {
 				IScheminType first = args.Car();
-				
-				if (first.GetType() == typeof(ScheminBool))
-				{
-					ScheminBool temp = (ScheminBool) first;
-					return new ScheminBool(!temp.Value);
-				}
 
-				return new ScheminBool(false);
+				ScheminBool temp = first.BoolValue();
+				return new ScheminBool(!temp.Value);
 			};
 
 			And = (args, env, eval) => {
@@ -139,7 +134,7 @@ namespace Schemin.Evaluate.Primitives
 				foreach (IScheminType type in args)
 				{
 					IScheminType result = eval.EvaluateInternal(type, env);
-					ScheminBool conditionResult = (ScheminBool) result;
+					ScheminBool conditionResult = result.BoolValue();
 
 					if (conditionResult.Value != true)
 					{
@@ -156,7 +151,7 @@ namespace Schemin.Evaluate.Primitives
 				foreach (IScheminType type in args)
 				{
 					IScheminType result = eval.EvaluateInternal(type, env);
-					ScheminBool conditionResult = (ScheminBool) result;
+					ScheminBool conditionResult = result.BoolValue();
 
 					if (conditionResult.Value == true)
 					{

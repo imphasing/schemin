@@ -42,5 +42,10 @@ namespace Schemin.AST
 		{
 			return new BigInteger(this.Value);
 		}
+
+		public ScheminBool BoolValue()
+		{
+			return new ScheminBool(true);
+		}
 	}
 }

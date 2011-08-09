@@ -200,7 +200,7 @@ namespace Schemin.Evaluate.Primitives
 						}
 					}
 
-					ScheminBool conditionResults = (ScheminBool) eval.EvaluateInternal(condition, env);
+					ScheminBool conditionResults = eval.EvaluateInternal(condition, env).BoolValue();
 					if (conditionResults.Value)
 					{
 						return eval.Evaluate(result, env);
@@ -221,7 +221,7 @@ namespace Schemin.Evaluate.Primitives
 				IScheminType then = list.Cdr().Car();
 				IScheminType otherwise = list.Cdr().Cdr().Car();
 
-				ScheminBool conditionResults = (ScheminBool) eval.EvaluateInternal(condition, env);
+				ScheminBool conditionResults = eval.EvaluateInternal(condition, env).BoolValue();
 				if (conditionResults.Value)
 				{
 					return eval.EvaluateInternal(then, env);

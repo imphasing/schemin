@@ -30,5 +30,10 @@ namespace Schemin.AST
 
 			return false;
 		}
+
+		public ScheminBool BoolValue()
+		{
+			return new ScheminBool(true);
+		}
 	}
 }

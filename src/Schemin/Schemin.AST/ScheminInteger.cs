@@ -48,5 +48,10 @@ namespace Schemin.AST
 		{
 			return this.Value;
 		}
+
+		public ScheminBool BoolValue()
+		{
+			return new ScheminBool(true);
+		}
 	}
 }
