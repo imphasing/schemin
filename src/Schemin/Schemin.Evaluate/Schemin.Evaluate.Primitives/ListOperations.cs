@@ -120,10 +120,9 @@ namespace Schemin.Evaluate.Primitives
 				IScheminType init = list.Cdr().Car();
 				ScheminList toFold = (ScheminList) list.Cdr().Cdr().Car();
 
-
 				IScheminType result;
 
-				if (func.GetType() == typeof(ScheminPrimitive))
+				if ((func as ScheminPrimitive) != null)
 				{
 
 					ScheminPrimitive proc = (ScheminPrimitive) func;
@@ -153,18 +152,35 @@ namespace Schemin.Evaluate.Primitives
 				IScheminType toApply = (IScheminType) list.Car();
 				ScheminList toFilter = (ScheminList) list.Cdr().Car();
 
-				ScheminLambda lam = (ScheminLambda) toApply;
 
 				if (toFilter.Empty)
 				{
 					return toFilter;
 				}
 
-				var filtered = toFilter.Where(element => {
-						var args = new ScheminList(element);
-						ScheminBool predResult = (ScheminBool) lam.Evaluate(args, eval);
-						return predResult.Value;
-						});
+				List<IScheminType> filtered;
+
+				if ((toApply as ScheminPrimitive) != null)
+				{
+					ScheminPrimitive proc = (ScheminPrimitive) toApply;
+
+					filtered = toFilter.Where(element => {
+							var args = new ScheminList(element);
+							ScheminBool predResult = (ScheminBool) proc.Evaluate(args, env, eval);
+							return predResult.Value;
+					}).ToList();
+				}
+				else
+				{
+
+					ScheminLambda lam = (ScheminLambda) toApply;
+
+					filtered = toFilter.Where(element => {
+							var args = new ScheminList(element);
+							ScheminBool predResult = (ScheminBool) lam.Evaluate(args, eval);
+							return predResult.Value;
+					}).ToList();
+				}
 
 				if (filtered.Count() < 1)
 				{
@@ -189,12 +205,26 @@ namespace Schemin.Evaluate.Primitives
 					return toMap;
 				}
 
-				ScheminLambda lam = (ScheminLambda) toApply;
+				List<IScheminType> mapped;
 
-				var mapped = toMap.Select(element => {
-						var args = new ScheminList(element);
-						return lam.Evaluate(args, eval);
-						});
+				if ((toApply as ScheminPrimitive) != null)
+				{
+					ScheminPrimitive proc = (ScheminPrimitive) toApply;
+
+					mapped = toMap.Select(element => {
+							var args = new ScheminList(element);
+							return proc.Evaluate(args, env, eval);
+					}).ToList();
+				}
+				else
+				{
+					ScheminLambda lam = (ScheminLambda) toApply;
+
+					mapped = toMap.Select(element => {
+							var args = new ScheminList(element);
+							return lam.Evaluate(args, eval);
+					}).ToList();
+				}
 
 				if (mapped.Count() < 1)
 				{
