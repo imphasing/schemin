@@ -72,7 +72,7 @@ namespace Schemin.AST
 
 		public ScheminBool BoolValue()
 		{
-			return new ScheminBool(true);
+			return ScheminBool.True;
 		}
 	}
 }

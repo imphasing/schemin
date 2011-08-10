@@ -3,6 +3,25 @@ namespace Schemin.AST
 {
 	public class ScheminBool : IScheminType
 	{
+		public static ScheminBool True;
+		public static ScheminBool False;
+		
+		static ScheminBool()
+		{
+			True = new ScheminBool(true);
+			False = new ScheminBool(false);
+		}
+
+		public static ScheminBool GetValue(bool value)
+		{
+			if (value)
+			{
+				return True;
+			}
+			
+			return False;
+		}
+
 		public bool Value;
 
 		public ScheminBool(string value)
@@ -49,7 +68,15 @@ namespace Schemin.AST
 
 		public ScheminBool BoolValue()
 		{
-			return new ScheminBool(this.Value);
+			if (this.Value)
+			{
+				return ScheminBool.True;
+
+			}
+			else
+			{
+				return ScheminBool.False;
+			}
 		}
 	}
 }
