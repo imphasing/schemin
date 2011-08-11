@@ -40,15 +40,15 @@ namespace Schemin.Evaluate.Primitives
 					IScheminNumeric num = (IScheminNumeric) type;
 					if ((type as ScheminDecimal) != null)
 					{
-						return new ScheminBool(num.DecimalValue() == 0);
+						return ScheminBool.GetValue(num.DecimalValue() == 0);
 					}
 					else
 					{
-						return new ScheminBool(num.IntegerValue() == 0);
+						return ScheminBool.GetValue(num.IntegerValue() == 0);
 					}
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			Boolean = (list, env, eval) => {
@@ -56,10 +56,10 @@ namespace Schemin.Evaluate.Primitives
 
 				if ((type as ScheminBool) != null)
 				{
-					return new ScheminBool(true);
+					return ScheminBool.True;
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			Symbol = (list, env, eval) => {
@@ -67,10 +67,10 @@ namespace Schemin.Evaluate.Primitives
 
 				if ((type as ScheminAtom) != null)
 				{
-					return new ScheminBool(true);
+					return ScheminBool.True;
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			Procedure = (list, env, eval) => {
@@ -78,10 +78,10 @@ namespace Schemin.Evaluate.Primitives
 
 				if ((type as ScheminPrimitive) != null || (type as ScheminLambda) != null)
 				{
-					return new ScheminBool(true);
+					return ScheminBool.True;
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			Pair = (list, env, eval) => {
@@ -92,11 +92,11 @@ namespace Schemin.Evaluate.Primitives
 					ScheminList temp = (ScheminList) type;
 					if (temp.Length == 2)
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			Number = (list, env, eval) => {
@@ -104,10 +104,10 @@ namespace Schemin.Evaluate.Primitives
 
 				if ((type as ScheminInteger) != null || (type as ScheminDecimal) != null)
 				{
-					return new ScheminBool(true);
+					return ScheminBool.True;
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			String = (list, env, eval) => {
@@ -115,10 +115,10 @@ namespace Schemin.Evaluate.Primitives
 
 				if ((type as ScheminString) != null)
 				{
-					return new ScheminBool(true);
+					return ScheminBool.True;
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			Equal = (list, env, eval) => {
@@ -138,14 +138,14 @@ namespace Schemin.Evaluate.Primitives
 					}
 				}
 
-				return new ScheminBool(result);
+				return ScheminBool.GetValue(result);
 			};
 
 			Not = (args, env, eval) => {
 				IScheminType first = args.Car();
 
 				ScheminBool temp = first.BoolValue();
-				return new ScheminBool(!temp.Value);
+				return ScheminBool.GetValue(!temp.Value);
 			};
 
 			And = (args, env, eval) => {
@@ -158,11 +158,11 @@ namespace Schemin.Evaluate.Primitives
 
 					if (conditionResult.Value != true)
 					{
-						return new ScheminBool(false);
+						return ScheminBool.False;
 					}
 				}
 
-				return new ScheminBool(true);
+				return ScheminBool.True;
 			};
 
 			Or = (args, env, eval) => {
@@ -175,11 +175,11 @@ namespace Schemin.Evaluate.Primitives
 
 					if (conditionResult.Value == true)
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			GreaterThan = (args, env, eval) => {
@@ -190,18 +190,18 @@ namespace Schemin.Evaluate.Primitives
 				{
 					if (first.DecimalValue() > second.DecimalValue())
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 				else
 				{
 					if (first.IntegerValue() > second.IntegerValue())
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			GreaterThanOr = (args, env, eval) => {
@@ -212,18 +212,18 @@ namespace Schemin.Evaluate.Primitives
 				{
 					if (first.DecimalValue() >= second.DecimalValue())
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 				else
 				{
 					if (first.IntegerValue() >= second.IntegerValue())
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			LessThan = (args, env, eval) => {
@@ -234,18 +234,18 @@ namespace Schemin.Evaluate.Primitives
 				{
 					if (first.DecimalValue() < second.DecimalValue())
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 				else
 				{
 					if (first.IntegerValue() < second.IntegerValue())
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			LessThanOr = (args, env, eval) => {
@@ -256,18 +256,18 @@ namespace Schemin.Evaluate.Primitives
 				{
 					if (first.DecimalValue() <= second.DecimalValue())
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 				else
 				{
 					if (first.IntegerValue() <= second.IntegerValue())
 					{
-						return new ScheminBool(true);
+						return ScheminBool.True;
 					}
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 
 			Null = (list, env, eval) => {
@@ -275,10 +275,10 @@ namespace Schemin.Evaluate.Primitives
 
 				if (listArg.Empty)
 				{
-					return new ScheminBool(true);
+					return ScheminBool.True;
 				}
 
-				return new ScheminBool(false);
+				return ScheminBool.False;
 			};
 		}
 	}

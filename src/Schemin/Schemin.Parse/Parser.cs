@@ -63,7 +63,7 @@ namespace Schemin.Parse
 				case TokenType.StringLiteral:
 					return new ScheminString(token.Value);
 				case TokenType.BoolLiteral:
-					return new ScheminBool(token.Value);
+					return ScheminBool.GetValue(token.Value == "#t" ? true : false);
 				default:
 					throw new Exception(string.Format("Unable to convert token of type: {0}", token.Type));
 			}
