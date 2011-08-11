@@ -24,6 +24,7 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Quote;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LetRec;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> LetStar;
 
 		static GeneralOperations()
 		{
@@ -115,6 +116,27 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return eval.Evaluate(expression, temporary);
+			};
+
+			LetStar = (list, env, eval) => {
+				eval.EvalState = EvaluatorState.Normal;
+
+				ScheminList bindings = (ScheminList) list.Car();
+				IScheminType expression = list.Cdr();
+
+				Environment temporary = new Environment();
+				temporary.parent = env;
+
+				foreach (IScheminType type in bindings)
+				{
+					ScheminList binding = (ScheminList) type;
+					ScheminAtom symbol = (ScheminAtom) binding.Car();
+					IScheminType val = binding.Cdr().Car();
+
+					temporary.AddBinding(symbol, eval.EvaluateInternal(val, temporary));
+				}
+
+				return eval.Evaluate((ScheminList) expression, temporary);
 			};
 
 			Let = (list, env, eval) => {

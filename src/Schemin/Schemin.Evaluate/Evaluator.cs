@@ -247,6 +247,9 @@ namespace Schemin.Evaluate
 				case "letrec":
 					this.EvalState = EvaluatorState.LetArgs;
 					break;
+				case "let*":
+					this.EvalState = EvaluatorState.LetArgs;
+					break;
 				case "if":
 					this.EvalState = EvaluatorState.IfArgs;
 					break;
