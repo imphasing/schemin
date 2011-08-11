@@ -22,8 +22,8 @@ Implemented featues:
 
 + define and set!
 + lambdas with closures
-+ Let, named let and letrec
-+ Some basic flow control (if, cond and some boolean primitives)
++ Let, named let, letrec and let\*
++ Some flow control (if, cond and boolean primitives)
 + A few list operations like map, filter, and foldl (as well as cons, cdr, car, etc)
 + Some basic numerical primitives and decimal support
 

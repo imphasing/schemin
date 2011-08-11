@@ -103,26 +103,12 @@ namespace Schemin.Evaluate
 						switch (this.EvalState)
 						{
 							case EvaluatorState.LambdaArgs:
-								complete.Append(type);
-								continue;
 							case EvaluatorState.QuoteArgs:
-								complete.Append(type);
-								continue;
 							case EvaluatorState.LetArgs:
-								complete.Append(type);
-								continue;
 							case EvaluatorState.IfArgs:
-								complete.Append(type);
-								continue;
 							case EvaluatorState.CondArgs:
-								complete.Append(type);
-								continue;
 							case EvaluatorState.DefineArgs:
-								complete.Append(type);
-								continue;
 							case EvaluatorState.AndArgs:
-								complete.Append(type);
-								continue;
 							case EvaluatorState.OrArgs:
 								complete.Append(type);
 								continue;
@@ -168,15 +154,10 @@ namespace Schemin.Evaluate
 					this.EvalState = EvaluatorState.Normal;
 					return ast;
 				case EvaluatorState.LambdaArgs:
-					return ast;
 				case EvaluatorState.LetArgs:
-					return ast;
 				case EvaluatorState.IfArgs:
-					return ast;
 				case EvaluatorState.CondArgs:
-					return ast;
 				case EvaluatorState.QuoteArgs:
-					return ast;
 				case EvaluatorState.SetBangArgs:
 					// only ignore the first argument to set!
 					this.EvalState = EvaluatorState.Normal;
