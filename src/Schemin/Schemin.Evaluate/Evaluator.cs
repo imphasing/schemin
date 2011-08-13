@@ -123,7 +123,7 @@ namespace Schemin.Evaluate
                     ScheminList after = current.After;
                     IScheminType WaitingOn = current.WaitingOn;
 
-                    if ((WaitingOn as ScheminList) == null)
+                    if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn))
                     {
                         StackFrame next = new StackFrame();
 
