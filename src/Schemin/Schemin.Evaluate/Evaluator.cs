@@ -135,7 +135,15 @@ namespace Schemin.Evaluate
                             }
 
                             StackFrame previous = Stack.Pop();
-                            next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
+                            if (previous.Before == null && previous.After == null)
+                            {
+                                next.WaitingOn = WaitingOn;
+                            }
+                            else
+                            {
+                                next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
+                            }
+
                             Stack.Push(next);
                             continue;
                         }
@@ -214,8 +222,6 @@ namespace Schemin.Evaluate
                             Stack.Push(next);
 
                             goto StackStart;
-                            //IScheminType listResult = EvaluateInternal(type, env);
-                            //complete.Append(listResult);
                         }
 
                         rest = rest.Cdr();
