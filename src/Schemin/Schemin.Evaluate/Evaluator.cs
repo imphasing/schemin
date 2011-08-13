@@ -158,6 +158,7 @@ namespace Schemin.Evaluate
 				case EvaluatorState.IfArgs:
 				case EvaluatorState.CondArgs:
 				case EvaluatorState.QuoteArgs:
+					return ast;
 				case EvaluatorState.SetBangArgs:
 					// only ignore the first argument to set!
 					this.EvalState = EvaluatorState.Normal;
