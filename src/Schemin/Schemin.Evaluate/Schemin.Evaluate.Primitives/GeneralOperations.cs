@@ -265,7 +265,6 @@ namespace Schemin.Evaluate.Primitives
 			Quote = (list, env, eval) => {
 				eval.EvalState = EvaluatorState.Normal;
 				IScheminType arg = list.Car();
-
 				return arg;
 			};
 

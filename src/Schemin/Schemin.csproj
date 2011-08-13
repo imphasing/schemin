@@ -72,7 +72,6 @@
     <Compile Include="Schemin.AST\ScheminLambda.cs" />
     <Compile Include="Schemin.AST\ScheminPrimitive.cs" />
     <Compile Include="Schemin.AST\ScheminString.cs" />
-    <Compile Include="Schemin.AST\ScheminContinuation.cs" />
     <Compile Include="Schemin.AST\ScheminBool.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

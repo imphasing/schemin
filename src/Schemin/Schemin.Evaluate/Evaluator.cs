@@ -21,13 +21,6 @@ namespace Schemin.Evaluate
 
 		public EvaluatorState EvalState = EvaluatorState.Normal;
 
-		public Stack<KeyValuePair<ScheminContinuation, ScheminList>> Continuations;
-
-		public Evaluator()
-		{
-			Continuations = new Stack<KeyValuePair<ScheminContinuation, ScheminList>>();
-		}
-
 		public IScheminType Evaluate(ScheminList ast, Environment env)
 		{
 			IScheminType last = null;
@@ -39,78 +32,6 @@ namespace Schemin.Evaluate
 
 			return last;
 		}
-
-		public KeyValuePair<ScheminContinuation, ScheminList> ExtractFirstSublist(ScheminList evalList, Environment env)
-		{
-			bool encounteredList = false;
-			ScheminList before = new ScheminList();
-			ScheminList after = new ScheminList();
-			ScheminList sublist = null;
-
-			foreach (IScheminType type in evalList)
-			{
-                IScheminType working = type;
-
-                if ((working as ScheminAtom) != null)
-                {
-                    working = EvalAtom((ScheminAtom) working, env);
-                }
-
-                if ((working as ScheminPrimitive) != null)
-                {
-                    SetStatePrimitive((ScheminPrimitive) working);
-                }
-
-				if ((working as ScheminList) != null)
-				{
-                    ScheminList tempList = (ScheminList) working;
-                    if (((tempList.Car() as ScheminPrimitive != null) || (tempList.Car() as ScheminLambda != null)) && !encounteredList)
-                    {
-                        sublist = (ScheminList) working;
-						encounteredList = true;
-						continue;
-                    }
-				}
-
-				if (encounteredList)
-				{
-					after.Append(working);
-				}
-				else
-				{
-					before.Append(working);
-				}
-			}
-
-			ScheminContinuation current = new ScheminContinuation(before, after);
-			return new KeyValuePair<ScheminContinuation, ScheminList>(current, sublist);
-		}
-
-        public IScheminType EvaluateSublist(ScheminList sublist, Environment env)
-        {
-            IScheminType functionPosition = sublist.Car();
-            ScheminList functionArgs = sublist.Cdr();
-
-            if ((functionPosition as ScheminAtom) != null)
-            {
-                functionPosition = EvalAtom((ScheminAtom)functionPosition, env);
-            }
-
-            if ((functionPosition as ScheminPrimitive) != null)
-            {
-                ScheminPrimitive prim = (ScheminPrimitive)functionPosition;
-                return prim.Evaluate(functionArgs, env, this);
-            }
-            else if ((functionPosition as ScheminLambda) != null)
-            {
-                ScheminLambda lam = (ScheminLambda)functionPosition;
-                return lam.Evaluate(functionArgs, this);
-            }
-            else
-            {
-                throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
-            }
-        }
 
 		public IScheminType EvaluateInternal(IScheminType ast, Environment env)
 		{
@@ -140,178 +61,211 @@ namespace Schemin.Evaluate
 			}
 			else if ((ast as ScheminList) != null)
 			{
+				ScheminList evalList = (ScheminList) ast;
+				ScheminList complete = new ScheminList();
+
 				if (IsEmptyList(ast))
 				{
 					return ast;
 				}
 
-				var cont = ExtractFirstSublist((ScheminList) ast, env);
-				this.Continuations.Push(cont);
-
-				while (this.Continuations.Count > 0)
+				foreach (IScheminType type in evalList)
 				{
-					var current = this.Continuations.Pop();
+					if ((type as IScheminNumeric) != null)
+					{
+						complete.Append(type);
+					}
+					else if ((type as ScheminString) != null)
+					{
+						complete.Append(type);
+					}
+					else if ((type as ScheminBool) != null)
+					{
+						complete.Append(type);
+					}
+					else if ((type as ScheminAtom) != null)
+					{
+						IScheminType atomResult = EvalAtom(type, env);
+						complete.Append(atomResult);
+					}
+					else if ((type as ScheminPrimitive) != null)
+					{
+						ScheminPrimitive prim = (ScheminPrimitive) type;
+						SetStatePrimitive(prim);
+						complete.Append(type);
+					}
+					else if ((type as ScheminLambda) != null)
+					{
+						complete.Append(type);
+					}
+					else if ((type as ScheminList) != null)
+					{
+						switch (this.EvalState)
+						{
+							case EvaluatorState.LambdaArgs:
+							case EvaluatorState.QuoteArgs:
+							case EvaluatorState.LetArgs:
+							case EvaluatorState.IfArgs:
+							case EvaluatorState.CondArgs:
+							case EvaluatorState.DefineArgs:
+							case EvaluatorState.AndArgs:
+							case EvaluatorState.OrArgs:
+								complete.Append(type);
+								continue;
+						}
 
-					ScheminContinuation waiting = current.Key;
-					ScheminList sublist = current.Value;
+						IScheminType listResult = EvaluateInternal(type, env);
+						complete.Append(listResult);
+					}
+				}
 
-					IScheminType continuationValue = null;
+				IScheminType functionPosition = complete.Car();
+				ScheminList functionArgs = complete.Cdr();
 
-                    if (sublist != null)
-                    {
-                        var nextCycle = ExtractFirstSublist(sublist, env);
-                        this.Continuations.Push(current);
-                        this.Continuations.Push(nextCycle);
-                    }
-                    else
-                    {
-                        continuationValue = EvaluateSublist(waiting.InvokeWith(null), env);
-
-                        if (Continuations.Count < 1)
-                        {
-                            return continuationValue;
-                        }
-
-                        var previous = this.Continuations.Pop();
-
-                        ScheminList previousList = previous.Key.InvokeWith(continuationValue);
-                        var extracted = ExtractFirstSublist(previousList, env);
-
-                        this.Continuations.Push(extracted);
-                        continue;
-                    }
+				if ((functionPosition as ScheminPrimitive) != null)
+				{
+					ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
+					return prim.Evaluate(functionArgs, env, this);
+				}
+				else if ((functionPosition as ScheminLambda) != null)
+				{
+					ScheminLambda lam = (ScheminLambda) functionPosition;
+					return lam.Evaluate(functionArgs, this);
+				}
+				else
+				{
+					throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
 				}
 			}
-		    else
-		    {
-			    // something weird happened
-			    return ast;
-		    }
-
-            return new ScheminList();
-	}
-
-	public IScheminType EvalAtom(IScheminType ast, Environment env)
-	{
-		switch (this.EvalState)
-		{
-			case EvaluatorState.DefineArgs:
-				// only ignore the FIRST symbol after a define
-				this.EvalState = EvaluatorState.Normal;
-				return ast;
-			case EvaluatorState.LambdaArgs:
-			case EvaluatorState.LetArgs:
-			case EvaluatorState.IfArgs:
-			case EvaluatorState.CondArgs:
-			case EvaluatorState.QuoteArgs:
-				return ast;
-			case EvaluatorState.SetBangArgs:
-				// only ignore the first argument to set!
-				this.EvalState = EvaluatorState.Normal;
-				return ast;
-		}
-
-		ScheminAtom temp = (ScheminAtom) ast;
-
-		IScheminType bound = GetEnvValue(temp, env);
-		if (bound == null)
-		{
-			throw new UnboundAtomException(string.Format("Unbound atom: {0}", temp));
-		}
-
-
-		return bound;
-	}
-
-	public bool IsEmptyList(IScheminType type)
-	{
-		if (type.GetType() == typeof(ScheminList))
-		{
-			ScheminList temp = (ScheminList) type;
-			if (temp.Empty == true)
+			else
 			{
-				return true;
+				// something weird happened
+				return ast;
 			}
 		}
 
-		return false;
-	}
 
-	public IScheminType GetEnvValue(ScheminAtom symbol, Environment env)
-	{
-		Environment parent = env;
-		while (parent != null)
+		public IScheminType EvalAtom(IScheminType ast, Environment env)
 		{
-			IScheminType value;
-			parent.bindings.TryGetValue(symbol.Name, out value);
-
-			if (value != null)
+			switch (this.EvalState)
 			{
-				return parent.bindings[symbol.Name];
+				case EvaluatorState.DefineArgs:
+					// only ignore the FIRST symbol after a define
+					this.EvalState = EvaluatorState.Normal;
+					return ast;
+				case EvaluatorState.LambdaArgs:
+				case EvaluatorState.LetArgs:
+				case EvaluatorState.IfArgs:
+				case EvaluatorState.CondArgs:
+				case EvaluatorState.QuoteArgs:
+					return ast;
+				case EvaluatorState.SetBangArgs:
+					// only ignore the first argument to set!
+					this.EvalState = EvaluatorState.Normal;
+					return ast;
 			}
 
-			parent = parent.parent;
+			ScheminAtom temp = (ScheminAtom) ast;
+
+			IScheminType bound = GetEnvValue(temp, env);
+			if (bound == null)
+			{
+				throw new UnboundAtomException(string.Format("Unbound atom: {0}", temp));
+			}
+
+
+			return bound;
 		}
 
-		return null;
-	}
-
-	public void SetStatePrimitive(ScheminPrimitive prim)
-	{
-		switch (prim.Name)
+		public bool IsEmptyList(IScheminType type)
 		{
-			case "define":
-				this.EvalState = EvaluatorState.DefineArgs;
-				break;
-			case "lambda":
-				this.EvalState = EvaluatorState.LambdaArgs;
-				break;
-			case "quote":
-				this.EvalState = EvaluatorState.QuoteArgs;
-				break;
-			case "let":
-				this.EvalState = EvaluatorState.LetArgs;
-				break;
-			case "letrec":
-				this.EvalState = EvaluatorState.LetArgs;
-				break;
-			case "let*":
-				this.EvalState = EvaluatorState.LetArgs;
-				break;
-			case "if":
-				this.EvalState = EvaluatorState.IfArgs;
-				break;
-			case "cond":
-				this.EvalState = EvaluatorState.CondArgs;
-				break;
-			case "and":
-				this.EvalState = EvaluatorState.AndArgs;
-				break;
-			case "or":
-				this.EvalState = EvaluatorState.OrArgs;
-				break;
-			case "set!":
-				this.EvalState = EvaluatorState.SetBangArgs;
-				break;
+			if (type.GetType() == typeof(ScheminList))
+			{
+				ScheminList temp = (ScheminList) type;
+				if (temp.Empty == true)
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
-	}
 
-	public void DefinePrimitives(Environment env)
-	{
-		var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
+		public IScheminType GetEnvValue(ScheminAtom symbol, Environment env)
+		{
+			Environment parent = env;
+			while (parent != null)
+			{
+				IScheminType value;
+				parent.bindings.TryGetValue(symbol.Name, out value);
 
-		prebound.Add("+", NumericOperations.Add);
-		prebound.Add("-", NumericOperations.Subtract);
-		prebound.Add( "*", NumericOperations.Multiply);
-		prebound.Add( "/", NumericOperations.Divide);
+				if (value != null)
+				{
+					return parent.bindings[symbol.Name];
+				}
 
-		prebound.Add("car", ListOperations.Car);
-		prebound.Add("cons", ListOperations.Cons);
-		prebound.Add("cdr", ListOperations.Cdr);
-		prebound.Add("cadr", ListOperations.Cadr);
-		prebound.Add("cddr", ListOperations.Cddr);
-		prebound.Add("length", ListOperations.Length);
-		prebound.Add("list", ListOperations.List);
+				parent = parent.parent;
+			}
+
+			return null;
+		}
+
+		public void SetStatePrimitive(ScheminPrimitive prim)
+		{
+			switch (prim.Name)
+			{
+				case "define":
+					this.EvalState = EvaluatorState.DefineArgs;
+					break;
+				case "lambda":
+					this.EvalState = EvaluatorState.LambdaArgs;
+					break;
+				case "quote":
+					this.EvalState = EvaluatorState.QuoteArgs;
+					break;
+				case "let":
+					this.EvalState = EvaluatorState.LetArgs;
+					break;
+				case "letrec":
+					this.EvalState = EvaluatorState.LetArgs;
+					break;
+				case "let*":
+					this.EvalState = EvaluatorState.LetArgs;
+					break;
+				case "if":
+					this.EvalState = EvaluatorState.IfArgs;
+					break;
+				case "cond":
+					this.EvalState = EvaluatorState.CondArgs;
+					break;
+				case "and":
+					this.EvalState = EvaluatorState.AndArgs;
+					break;
+				case "or":
+					this.EvalState = EvaluatorState.OrArgs;
+					break;
+				case "set!":
+					this.EvalState = EvaluatorState.SetBangArgs;
+					break;
+			}
+		}
+
+		public void DefinePrimitives(Environment env)
+		{
+			var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
+
+			prebound.Add("+", NumericOperations.Add);
+			prebound.Add("-", NumericOperations.Subtract);
+			prebound.Add( "*", NumericOperations.Multiply);
+			prebound.Add( "/", NumericOperations.Divide);
+
+			prebound.Add("car", ListOperations.Car);
+			prebound.Add("cons", ListOperations.Cons);
+			prebound.Add("cdr", ListOperations.Cdr);
+			prebound.Add("cadr", ListOperations.Cadr);
+			prebound.Add("cddr", ListOperations.Cddr);
+			prebound.Add("length", ListOperations.Length);
+			prebound.Add("list", ListOperations.List);
 			prebound.Add("append", ListOperations.Append);
 			prebound.Add("map", ListOperations.Map);
 			prebound.Add("filter", ListOperations.Filter);
