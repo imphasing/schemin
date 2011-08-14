@@ -22,6 +22,14 @@ namespace Schemin.Evaluate
 		public EvaluatorState EvalState = EvaluatorState.Normal;
         public Stack<StackFrame> Stack = new Stack<StackFrame>();
 
+        public class StackFrame
+        {
+            public ScheminList Before;
+            public ScheminList After;
+
+            public IScheminType WaitingOn;
+        }
+
 		public IScheminType Evaluate(ScheminList ast, Environment env)
 		{
 			IScheminType last = null;
@@ -34,25 +42,211 @@ namespace Schemin.Evaluate
 			return last;
 		}
 
-        public class StackFrame
-        {
-            public ScheminList Before;
-            public ScheminList After;
+		public IScheminType EvaluateInternal(IScheminType ast, Environment env)
+		{
+            if ((ast as ScheminAtom) != null)
+			{
+				return EvalAtom(ast, env);
+			}
+            else if ((ast as ScheminList) != null)
+			{
+                return EvaluateList((ScheminList)ast, env);
+			}
+			else
+			{
+				return ast;
+			}
+		}
 
-            public IScheminType WaitingOn;
+        public IScheminType EvaluateList(ScheminList list, Environment env)
+        {
+            StackFrame start = new StackFrame();
+            start.WaitingOn = list;
+
+            Stack.Push(start);
+
+        StackStart:
+            while (Stack.Count > 0)
+            {
+                StackFrame current = Stack.Pop();
+
+                ScheminList before = current.Before;
+                ScheminList after = current.After;
+                IScheminType WaitingOn = current.WaitingOn;
+                ScheminList checkQuoted = WaitingOn as ScheminList;
+
+                if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn) || (checkQuoted != null && checkQuoted.Quoted == true))
+                {
+                    StackFrame next = new StackFrame();
+
+                    if (before == null && after == null)
+                    {
+                        if (Stack.Count < 1)
+                        {
+                            return WaitingOn;
+                        }
+
+                        StackFrame previous = Stack.Pop();
+                        if (previous.Before == null && previous.After == null)
+                        {
+                            next.WaitingOn = WaitingOn;
+                        }
+                        else
+                        {
+                            next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
+                        }
+
+                        Stack.Push(next);
+                        continue;
+                    }
+
+                    next.WaitingOn = CombineStackFrame(before, after, WaitingOn);
+                    Stack.Push(next);
+                    continue;
+                }
+
+                ScheminList evalList = (ScheminList)WaitingOn;
+                ScheminList complete = new ScheminList();
+                complete.Quoted = false;
+
+                bool foundWaiting = false;
+
+                if (IsEmptyList(evalList))
+                {
+                    continue;
+                }
+
+                ScheminList rest = evalList;
+                ScheminList pendingBefore = new ScheminList();
+                pendingBefore.Quoted = false;
+
+                ScheminList pendingAfter = new ScheminList();
+                pendingAfter.Quoted = false;
+
+                while (!rest.Empty)
+                {
+                    IScheminType type = rest.Car();
+
+                    if ((type as ScheminAtom) != null)
+                    {
+                        IScheminType atomResult = EvalAtom(type, env);
+                        AppendToPartialStackFrame(pendingBefore, pendingAfter, atomResult, foundWaiting);
+                    }
+                    else if ((type as ScheminPrimitive) != null)
+                    {
+                        ScheminPrimitive prim = (ScheminPrimitive)type;
+                        SetStatePrimitive(prim);
+                        AppendToPartialStackFrame(pendingBefore, pendingAfter, prim, foundWaiting);
+                    }
+                    else if ((type as ScheminList) != null)
+                    {
+                        ScheminList tempList = (ScheminList)type;
+                        switch (this.EvalState)
+                        {
+                            case EvaluatorState.LambdaArgs:
+                            case EvaluatorState.QuoteArgs:
+                            case EvaluatorState.LetArgs:
+                            case EvaluatorState.IfArgs:
+                            case EvaluatorState.CondArgs:
+                            case EvaluatorState.DefineArgs:
+                            case EvaluatorState.AndArgs:
+                            case EvaluatorState.OrArgs:
+                                AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+                                rest = rest.Cdr();
+                                continue;
+                        }
+
+                        if (tempList.Quoted)
+                        {
+                            AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+                            rest = rest.Cdr();
+                            continue;
+                        }
+
+                        StackFrame next = new StackFrame();
+                        next.WaitingOn = type;
+                        next.After = rest.Cdr();
+                        next.Before = pendingBefore;
+
+                        Stack.Push(current);
+                        Stack.Push(next);
+
+                        goto StackStart;
+                    }
+                    else
+                    {
+                        AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+                    }
+
+                    rest = rest.Cdr();
+                }
+
+                ScheminList completed = CombineStackFrame(pendingBefore, pendingAfter, null);
+
+                IScheminType functionPosition = completed.Car();
+                ScheminList functionArgs = completed.Cdr();
+
+                StackFrame completeFrame = new StackFrame();
+
+                if ((functionPosition as ScheminPrimitive) != null)
+                {
+                    ScheminPrimitive prim = (ScheminPrimitive)functionPosition;
+                    completeFrame.Before = before;
+                    completeFrame.After = after;
+                    completeFrame.WaitingOn = prim.Evaluate(functionArgs, env, this);
+
+                    Stack.Push(completeFrame);
+                    continue;
+                }
+                else if ((functionPosition as ScheminLambda) != null)
+                {
+                    ScheminLambda lam = (ScheminLambda)functionPosition;
+                    completeFrame.Before = before;
+                    completeFrame.After = after;
+                    completeFrame.WaitingOn = lam.Evaluate(functionArgs);
+
+                    Stack.Push(completeFrame);
+                    continue;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
+                }
+            }
+
+            throw new InvalidOperationException("Control escaped list evaluator...");
         }
 
-        public void AppendToStackFrame(ScheminList before, ScheminList after, IScheminType toAppend, bool foundWaiting)
-        {
-            if (foundWaiting)
-            {
-                after.Append(toAppend);
-            }
-            else
-            {
-                before.Append(toAppend);
-            }
-        }
+		public IScheminType EvalAtom(IScheminType ast, Environment env)
+		{
+			switch (this.EvalState)
+			{
+				case EvaluatorState.DefineArgs:
+					// only ignore the FIRST symbol after a define
+					this.EvalState = EvaluatorState.Normal;
+					return ast;
+				case EvaluatorState.LambdaArgs:
+				case EvaluatorState.LetArgs:
+				case EvaluatorState.IfArgs:
+				case EvaluatorState.CondArgs:
+				case EvaluatorState.QuoteArgs:
+					return ast;
+				case EvaluatorState.SetBangArgs:
+					// only ignore the first argument to set!
+					this.EvalState = EvaluatorState.Normal;
+					return ast;
+			}
+
+			ScheminAtom temp = (ScheminAtom) ast;
+
+			IScheminType bound = GetEnvValue(temp, env);
+			if (bound == null)
+			{
+				throw new UnboundAtomException(string.Format("Unbound atom: {0}", temp));
+			}
+
+			return bound;
+		}
 
         public ScheminList CombineStackFrame(ScheminList before, ScheminList after, IScheminType result)
         {
@@ -83,241 +277,17 @@ namespace Schemin.Evaluate
             return complete;
         }
 
-		public IScheminType EvaluateInternal(IScheminType ast, Environment env)
-		{
-			if ((ast as IScheminNumeric) != null)
-			{
-				return ast;
-			}
-			else if ((ast as ScheminString) != null)
-			{
-				return ast;
-			}
-			else if ((ast as ScheminBool) != null)
-			{
-				return ast;
-			}
-			else if ((ast as ScheminAtom) != null)
-			{
-				return EvalAtom(ast, env);
-			}
-			else if ((ast as ScheminPrimitive) != null)
-			{
-				return ast;
-			}
-			else if ((ast as ScheminLambda) != null)
-			{
-				return ast;
-			}
-			else if ((ast as ScheminList) != null)
-			{
-                StackFrame start = new StackFrame();
-                start.WaitingOn = ast;
-
-                Stack.Push(start);
-
-            StackStart:
-                while (Stack.Count > 0)
-                {
-                    StackFrame current = Stack.Pop();
-
-                    ScheminList before = current.Before;
-                    ScheminList after = current.After;
-                    IScheminType WaitingOn = current.WaitingOn;
-                    ScheminList checkQuoted = WaitingOn as ScheminList;
-
-                    if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn) || (checkQuoted != null && checkQuoted.Quoted == true))
-                    {
-                        StackFrame next = new StackFrame();
-
-                        if (before == null && after == null)
-                        {
-                            if (Stack.Count < 1)
-                            {
-                                return WaitingOn;
-                            }
-
-                            StackFrame previous = Stack.Pop();
-                            if (previous.Before == null && previous.After == null)
-                            {
-                                next.WaitingOn = WaitingOn;
-                            }
-                            else
-                            {
-                                next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
-                            }
-
-                            Stack.Push(next);
-                            continue;
-                        }
-                        
-                        next.WaitingOn = CombineStackFrame(before, after, WaitingOn);
-                        Stack.Push(next);
-                        continue;
-                    }
-
-                    ScheminList evalList = (ScheminList) WaitingOn;
-                    ScheminList complete = new ScheminList();
-                    complete.Quoted = false;
-
-                    bool foundWaiting = false;
-
-                    if (IsEmptyList(evalList))
-                    {
-                        continue;
-                    }
-
-                    ScheminList rest = evalList;
-                    ScheminList pendingBefore = new ScheminList();
-                    pendingBefore.Quoted = false;
-
-                    ScheminList pendingAfter = new ScheminList();
-                    pendingAfter.Quoted = false;
-
-                    while (!rest.Empty)
-                    {
-                        IScheminType type = rest.Car();
-
-                        if ((type as IScheminNumeric) != null)
-                        {
-                            AppendToStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                        }
-                        else if ((type as ScheminString) != null)
-                        {
-                            AppendToStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                        }
-                        else if ((type as ScheminBool) != null)
-                        {
-                            AppendToStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                        }
-                        else if ((type as ScheminAtom) != null)
-                        {
-                            IScheminType atomResult = EvalAtom(type, env);
-                            AppendToStackFrame(pendingBefore, pendingAfter, atomResult, foundWaiting);
-                        }
-                        else if ((type as ScheminPrimitive) != null)
-                        {
-                            ScheminPrimitive prim = (ScheminPrimitive)type;
-                            SetStatePrimitive(prim);
-                            AppendToStackFrame(pendingBefore, pendingAfter, prim, foundWaiting);
-                        }
-                        else if ((type as ScheminLambda) != null)
-                        {
-                            AppendToStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                        }
-                        else if ((type as ScheminList) != null)
-                        {
-                            ScheminList tempList = (ScheminList) type;
-                            switch (this.EvalState)
-                            {
-                                case EvaluatorState.LambdaArgs:
-                                case EvaluatorState.QuoteArgs:
-                                case EvaluatorState.LetArgs:
-                                case EvaluatorState.IfArgs:
-                                case EvaluatorState.CondArgs:
-                                case EvaluatorState.DefineArgs:
-                                case EvaluatorState.AndArgs:
-                                case EvaluatorState.OrArgs:
-                                    AppendToStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                                    rest = rest.Cdr();
-                                    continue;
-                            }
-
-                            if (tempList.Quoted)
-                            {
-                                AppendToStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                                rest = rest.Cdr();
-                                continue;
-                            }
-
-                            StackFrame next = new StackFrame();
-                            next.WaitingOn = type;
-                            next.After = rest.Cdr();
-                            next.Before = pendingBefore;
-
-                            Stack.Push(current);
-                            Stack.Push(next);
-
-                            goto StackStart;
-                        }
-
-                        rest = rest.Cdr();
-                    }
-
-                    ScheminList completed = CombineStackFrame(pendingBefore, pendingAfter, null);
-
-                    IScheminType functionPosition = completed.Car();
-                    ScheminList functionArgs = completed.Cdr();
-
-                    StackFrame completeFrame = new StackFrame();
-
-                    if ((functionPosition as ScheminPrimitive) != null)
-                    {
-                        ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
-                        completeFrame.Before = before;
-                        completeFrame.After = after;
-                        completeFrame.WaitingOn = prim.Evaluate(functionArgs, env, this);
-
-                        Stack.Push(completeFrame);
-                        continue;
-                    }
-                    else if ((functionPosition as ScheminLambda) != null)
-                    {
-                        ScheminLambda lam = (ScheminLambda) functionPosition;
-                        completeFrame.Before = before;
-                        completeFrame.After = after;
-                        completeFrame.WaitingOn = lam.Evaluate(functionArgs);
-
-                        Stack.Push(completeFrame);
-                        continue;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
-                    }
-                }
-
-                return new ScheminList();
-			}
-			else
-			{
-				// something weird happened
-				return ast;
-			}
-		}
-
-
-		public IScheminType EvalAtom(IScheminType ast, Environment env)
-		{
-			switch (this.EvalState)
-			{
-				case EvaluatorState.DefineArgs:
-					// only ignore the FIRST symbol after a define
-					this.EvalState = EvaluatorState.Normal;
-					return ast;
-				case EvaluatorState.LambdaArgs:
-				case EvaluatorState.LetArgs:
-				case EvaluatorState.IfArgs:
-				case EvaluatorState.CondArgs:
-				case EvaluatorState.QuoteArgs:
-					return ast;
-				case EvaluatorState.SetBangArgs:
-					// only ignore the first argument to set!
-					this.EvalState = EvaluatorState.Normal;
-					return ast;
-			}
-
-			ScheminAtom temp = (ScheminAtom) ast;
-
-			IScheminType bound = GetEnvValue(temp, env);
-			if (bound == null)
-			{
-				throw new UnboundAtomException(string.Format("Unbound atom: {0}", temp));
-			}
-
-
-			return bound;
-		}
+        public void AppendToPartialStackFrame(ScheminList before, ScheminList after, IScheminType toAppend, bool foundWaiting)
+        {
+            if (foundWaiting)
+            {
+                after.Append(toAppend);
+            }
+            else
+            {
+                before.Append(toAppend);
+            }
+        }
 
 		public bool IsEmptyList(IScheminType type)
 		{
