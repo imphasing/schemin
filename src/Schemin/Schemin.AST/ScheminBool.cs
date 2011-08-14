@@ -41,6 +41,19 @@ namespace Schemin.AST
 			this.Value = value;
 		}
 
+        public bool Quoted()
+        {
+            return false;
+        }
+
+        public void Quote()
+        {
+        }
+
+        public void UnQuote()
+        {
+        }
+
 		public override string ToString()
 		{
 			if (Value)

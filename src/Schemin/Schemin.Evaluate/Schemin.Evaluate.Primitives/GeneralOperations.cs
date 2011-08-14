@@ -29,8 +29,12 @@ namespace Schemin.Evaluate.Primitives
 		static GeneralOperations()
 		{
 			Lambda = (list, env, eval) => {
+                foreach (IScheminType type in list)
+                {
+                    type.UnQuote();
+                }
+
 				ScheminLambda lam = new ScheminLambda(list, env);
-				eval.EvalState = EvaluatorState.Normal;
 				return lam;
 			};
 
@@ -251,32 +255,31 @@ namespace Schemin.Evaluate.Primitives
 
 			};*/
 
-			/*If = (list, env, eval) => {
-                eval.EvalState = EvaluatorState.Normal;
+			If = (list, env, eval) => {
                 eval = new Evaluator();
-				IScheminType condition = list.Car();
+				ScheminBool condition = list.Car().BoolValue();
 				IScheminType then = list.Cdr().Car();
 				IScheminType otherwise = list.Cdr().Cdr().Car();
 
-				ScheminBool conditionResults = eval.EvaluateInternal(condition, env).BoolValue();
-				if (conditionResults.Value)
+				if (condition.Value)
 				{
-					return eval.EvaluateInternal(then, env);
+                    then.UnQuote();
+                    return then;
 				}
 				else
 				{
-					return eval.EvaluateInternal(otherwise, env);
+                    otherwise.UnQuote();
+                    return otherwise;
 				}
-			};*/
+			};
 
 			Quote = (list, env, eval) => {
-				eval.EvalState = EvaluatorState.Normal;
 				IScheminType arg = list.Car();
 
                 if ((arg as ScheminList) != null)
                 {
                     ScheminList tempList = (ScheminList)arg;
-                    tempList.Quoted = true;
+                    tempList.UnQuote();
                 }
 
 				return arg;
@@ -289,13 +292,11 @@ namespace Schemin.Evaluate.Primitives
 
 			Define = (args, env, eval) => {
 				bool deffun = false;
-				eval.EvalState = EvaluatorState.Normal;
 
 				if ((args.Car() as ScheminList) != null)
 				{
 					deffun = true;
 				}
-
 
 				if (!deffun)
 				{
@@ -318,6 +319,11 @@ namespace Schemin.Evaluate.Primitives
 				{
 					ScheminList arguments = (ScheminList) args.Car();
 					ScheminList expression = args.Cdr();
+
+                    foreach (IScheminType type in expression)
+                    {
+                        type.UnQuote();
+                    }
 
 					ScheminAtom name = (ScheminAtom) arguments.Car();
 					ScheminList argSymbols = arguments.Cdr();

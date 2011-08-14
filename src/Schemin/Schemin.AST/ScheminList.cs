@@ -11,7 +11,8 @@ namespace Schemin.AST
 		public IScheminType Head = null;
 		public ScheminList Rest = null;
 		public bool Empty = true;
-        public bool Quoted = true;
+
+        private bool quoted = true;
 
         public static bool QuoteLists = true;
 
@@ -45,7 +46,7 @@ namespace Schemin.AST
 		{
             if (!QuoteLists)
             {
-                this.Quoted = false;
+                this.quoted = false;
             }
 
 			this.Empty = true;
@@ -55,7 +56,7 @@ namespace Schemin.AST
 		{
             if (!QuoteLists)
             {
-                this.Quoted = false;
+                this.quoted = false;
             }
 
 			this.Head = head;
@@ -66,7 +67,7 @@ namespace Schemin.AST
 		{
             if (!QuoteLists)
             {
-                this.Quoted = false;
+                this.quoted = false;
             }
 
 			this.Head = head;
@@ -79,7 +80,7 @@ namespace Schemin.AST
 			if (this.Head == null)
 			{
                 ScheminList ret = new ScheminList();
-                ret.Quoted = Quoted;
+                ret.quoted = quoted;
 
                 return ret;
 			}
@@ -93,13 +94,13 @@ namespace Schemin.AST
 			if (this.Rest == null)
 			{
                 ret = new ScheminList();
-                ret.Quoted = Quoted;
+                ret.quoted = quoted;
 
                 return ret;
 			}
 
             ret = this.Rest;
-            ret.Quoted = Quoted;
+            ret.quoted = quoted;
 
             return ret;
 		}
@@ -107,7 +108,7 @@ namespace Schemin.AST
 		public ScheminList Cons(IScheminType type)
 		{
             ScheminList ret = new ScheminList(type, this);
-            ret.Quoted = Quoted;
+            ret.quoted = quoted;
 
             return ret;
 		}
@@ -193,6 +194,21 @@ namespace Schemin.AST
 
 			return builder.ToString();
 		}
+
+        public bool Quoted()
+        {
+            return this.quoted;
+        }
+
+        public void Quote()
+        {
+            quoted = true;
+        }
+
+        public void UnQuote()
+        {
+            quoted = false;
+        }
 
 		public bool Equals(IScheminType type)
 		{

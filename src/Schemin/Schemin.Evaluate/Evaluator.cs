@@ -19,7 +19,6 @@ namespace Schemin.Evaluate
 		private Type lambda = typeof(ScheminLambda);
 		private Type boolean = typeof(ScheminBool);
 
-		public EvaluatorState EvalState = EvaluatorState.Normal;
         public Stack<StackFrame> Stack = new Stack<StackFrame>();
 
         public Environment GlobalEnv;
@@ -79,9 +78,8 @@ namespace Schemin.Evaluate
                 ScheminList before = current.Before;
                 ScheminList after = current.After;
                 IScheminType WaitingOn = current.WaitingOn;
-                ScheminList checkQuoted = WaitingOn as ScheminList;
 
-                if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn) || (checkQuoted != null && checkQuoted.Quoted == true))
+                if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn) || WaitingOn.Quoted() == true)
                 {
                     StackFrame next = new StackFrame();
 
@@ -90,6 +88,11 @@ namespace Schemin.Evaluate
                         if (Stack.Count < 1)
                         {
                             return WaitingOn;
+                        }
+
+                        if ((WaitingOn as ScheminAtom) != null)
+                        {
+                            WaitingOn = EvalAtom(WaitingOn, CurrentEnv);
                         }
 
                         StackFrame previous = Stack.Pop();
@@ -116,21 +119,16 @@ namespace Schemin.Evaluate
 
                 ScheminList evalList = (ScheminList)WaitingOn;
                 ScheminList complete = new ScheminList();
-                complete.Quoted = false;
+                complete.UnQuote();
 
                 bool foundWaiting = false;
 
-                if (IsEmptyList(evalList))
-                {
-                    continue;
-                }
-
                 ScheminList rest = evalList;
                 ScheminList pendingBefore = new ScheminList();
-                pendingBefore.Quoted = false;
+                pendingBefore.UnQuote();
 
                 ScheminList pendingAfter = new ScheminList();
-                pendingAfter.Quoted = false;
+                pendingAfter.UnQuote();
 
                 while (!rest.Empty)
                 {
@@ -138,34 +136,27 @@ namespace Schemin.Evaluate
 
                     if ((type as ScheminAtom) != null)
                     {
-                        IScheminType atomResult = EvalAtom(type, CurrentEnv);
-                        AppendToPartialStackFrame(pendingBefore, pendingAfter, atomResult, foundWaiting);
+                        if (type.Quoted())
+                        {
+                            AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+                        }
+                        else
+                        {
+                            IScheminType atomResult = EvalAtom(type, CurrentEnv);
+                            AppendToPartialStackFrame(pendingBefore, pendingAfter, atomResult, foundWaiting);
+                        }
                     }
                     else if ((type as ScheminPrimitive) != null)
                     {
                         ScheminPrimitive prim = (ScheminPrimitive)type;
-                        SetStatePrimitive(prim);
+                        SetStatePrimitive(prim, rest.Cdr());
                         AppendToPartialStackFrame(pendingBefore, pendingAfter, prim, foundWaiting);
                     }
                     else if ((type as ScheminList) != null)
                     {
                         ScheminList tempList = (ScheminList)type;
-                        switch (this.EvalState)
-                        {
-                            case EvaluatorState.LambdaArgs:
-                            case EvaluatorState.QuoteArgs:
-                            case EvaluatorState.LetArgs:
-                            case EvaluatorState.IfArgs:
-                            case EvaluatorState.CondArgs:
-                            case EvaluatorState.DefineArgs:
-                            case EvaluatorState.AndArgs:
-                            case EvaluatorState.OrArgs:
-                                AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                                rest = rest.Cdr();
-                                continue;
-                        }
 
-                        if (tempList.Quoted)
+                        if (tempList.Quoted())
                         {
                             AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
                             rest = rest.Cdr();
@@ -200,7 +191,7 @@ namespace Schemin.Evaluate
 
                 if ((functionPosition as ScheminPrimitive) != null)
                 {
-                    ScheminPrimitive prim = (ScheminPrimitive)functionPosition;
+                    ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
                     completeFrame.Before = before;
                     completeFrame.After = after;
                     completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
@@ -234,24 +225,6 @@ namespace Schemin.Evaluate
 
 		public IScheminType EvalAtom(IScheminType ast, Environment env)
 		{
-			switch (this.EvalState)
-			{
-				case EvaluatorState.DefineArgs:
-					// only ignore the FIRST symbol after a define
-					this.EvalState = EvaluatorState.Normal;
-					return ast;
-				case EvaluatorState.LambdaArgs:
-				case EvaluatorState.LetArgs:
-				case EvaluatorState.IfArgs:
-				case EvaluatorState.CondArgs:
-				case EvaluatorState.QuoteArgs:
-					return ast;
-				case EvaluatorState.SetBangArgs:
-					// only ignore the first argument to set!
-					this.EvalState = EvaluatorState.Normal;
-					return ast;
-			}
-
 			ScheminAtom temp = (ScheminAtom) ast;
 
 			IScheminType bound = GetEnvValue(temp, env);
@@ -266,7 +239,7 @@ namespace Schemin.Evaluate
         public ScheminList CombineStackFrame(ScheminList before, ScheminList after, IScheminType result)
         {
             ScheminList complete = new ScheminList();
-            complete.Quoted = false;
+            complete.UnQuote();
 
             if (before != null && before.Length > 0)
             {
@@ -337,42 +310,49 @@ namespace Schemin.Evaluate
 			return null;
 		}
 
-		public void SetStatePrimitive(ScheminPrimitive prim)
+		public void SetStatePrimitive(ScheminPrimitive prim, ScheminList args)
 		{
 			switch (prim.Name)
 			{
 				case "define":
-					this.EvalState = EvaluatorState.DefineArgs;
+                    if ((args.Car() as ScheminList) != null)
+                    {
+                        args.Car().Quote();
+                        foreach (IScheminType type in args.Cdr())
+                        {
+                            type.Quote();
+                        }
+                    }
+                    else
+                    {
+                        args.Car().Quote();
+                    }
 					break;
 				case "lambda":
-					this.EvalState = EvaluatorState.LambdaArgs;
+                    foreach (IScheminType type in args)
+                    {
+                        type.Quote();
+                    }
 					break;
 				case "quote":
-					this.EvalState = EvaluatorState.QuoteArgs;
 					break;
 				case "let":
-					this.EvalState = EvaluatorState.LetArgs;
 					break;
 				case "letrec":
-					this.EvalState = EvaluatorState.LetArgs;
 					break;
 				case "let*":
-					this.EvalState = EvaluatorState.LetArgs;
 					break;
 				case "if":
-					this.EvalState = EvaluatorState.IfArgs;
+                    args.Cdr().Car().Quote();
+                    args.Cdr().Cdr().Car().Quote();
 					break;
 				case "cond":
-					this.EvalState = EvaluatorState.CondArgs;
 					break;
 				case "and":
-					this.EvalState = EvaluatorState.AndArgs;
 					break;
 				case "or":
-					this.EvalState = EvaluatorState.OrArgs;
 					break;
 				case "set!":
-					this.EvalState = EvaluatorState.SetBangArgs;
 					break;
 			}
 		}

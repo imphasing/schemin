@@ -4,6 +4,7 @@ namespace Schemin.AST
 	public class ScheminAtom : IScheminType
 	{
 		public string Name;
+        public bool quoted = false;
 
 		public ScheminAtom(string name)
 		{
@@ -14,6 +15,21 @@ namespace Schemin.AST
 		{
 			return Name;
 		}
+
+        public bool Quoted()
+        {
+            return this.quoted;
+        }
+
+        public void Quote()
+        {
+            quoted = true;
+        }
+
+        public void UnQuote()
+        {
+            quoted = false;
+        }
 
 		public bool Equals(IScheminType type)
 		{
