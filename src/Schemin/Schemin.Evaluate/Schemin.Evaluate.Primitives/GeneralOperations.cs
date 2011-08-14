@@ -90,6 +90,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			LetRec = (list, env, eval) => {
+                eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
 				ScheminList bindings = (ScheminList) list.Car();
 				ScheminList expression = list.Cdr();
@@ -119,6 +120,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			LetStar = (list, env, eval) => {
+                eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
 
 				ScheminList bindings = (ScheminList) list.Car();
@@ -140,6 +142,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			Let = (list, env, eval) => {
+                eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
 
 				bool isNamed = false;
@@ -213,6 +216,7 @@ namespace Schemin.Evaluate.Primitives
 
 			Cond = (list, env, eval) => {
 				eval.EvalState = EvaluatorState.Normal;
+                eval = new Evaluator();
 				ScheminList conditions = (ScheminList) list;
 
 				foreach (IScheminType type in conditions)
@@ -247,6 +251,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			If = (list, env, eval) => {
+                eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
 				IScheminType condition = list.Car();
 				IScheminType then = list.Cdr().Car();
