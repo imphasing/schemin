@@ -79,7 +79,7 @@ namespace Schemin.Evaluate.Primitives
 				throw new UnboundAtomException(string.Format("Unbound atom: {0}", symbol));
 			};
 
-			Begin = (list, env, eval) => {
+			/*Begin = (list, env, eval) => {
 				IScheminType last = new ScheminList();
 				foreach (IScheminType type in list)
 				{
@@ -87,9 +87,9 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return last;
-			};
+			};*/
 
-			LetRec = (list, env, eval) => {
+			/*LetRec = (list, env, eval) => {
                 eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
 				ScheminList bindings = (ScheminList) list.Car();
@@ -117,9 +117,9 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return eval.Evaluate(expression, temporary);
-			};
+			};*/
 
-			LetStar = (list, env, eval) => {
+			/*LetStar = (list, env, eval) => {
                 eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
 
@@ -139,8 +139,9 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return eval.Evaluate((ScheminList) expression, temporary);
-			};
+			};*/
 
+            /*
 			Let = (list, env, eval) => {
                 eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
@@ -208,13 +209,13 @@ namespace Schemin.Evaluate.Primitives
 					ScheminLambda proc = new ScheminLambda(lambdaArgs, temporary);
 					temporary.AddBinding((ScheminAtom) first, proc);
 
-					IScheminType result = proc.Evaluate(argValues);
+					IScheminType result = proc.Evaluate(argValues, eval);
 
 					return result;
 				}
-			};
+			};*/
 
-			Cond = (list, env, eval) => {
+			/*Cond = (list, env, eval) => {
 				eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
 				ScheminList conditions = (ScheminList) list;
@@ -248,9 +249,9 @@ namespace Schemin.Evaluate.Primitives
 
 				return new ScheminList();
 
-			};
+			};*/
 
-			If = (list, env, eval) => {
+			/*If = (list, env, eval) => {
                 eval.EvalState = EvaluatorState.Normal;
                 eval = new Evaluator();
 				IScheminType condition = list.Car();
@@ -266,7 +267,7 @@ namespace Schemin.Evaluate.Primitives
 				{
 					return eval.EvaluateInternal(otherwise, env);
 				}
-			};
+			};*/
 
 			Quote = (list, env, eval) => {
 				eval.EvalState = EvaluatorState.Normal;

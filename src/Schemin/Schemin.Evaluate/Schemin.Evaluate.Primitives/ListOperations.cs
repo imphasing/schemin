@@ -115,7 +115,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 
-			Foldl = (list, env, eval) => {
+			/*Foldl = (list, env, eval) => {
 				IScheminType func = (IScheminType) list.Car();
 				IScheminType init = list.Cdr().Car();
 				ScheminList toFold = (ScheminList) list.Cdr().Cdr().Car();
@@ -141,13 +141,14 @@ namespace Schemin.Evaluate.Primitives
 							ScheminList args = new ScheminList(next);
 							args.Append(total);
 
-							return lam.Evaluate(args);
+							return lam.Evaluate(args, eval);
 							}); 
 				}
 
 				return result;
-			};
+			};*/
 
+            /*
 			Filter = (list, env, eval) => {
 				IScheminType toApply = (IScheminType) list.Car();
 				ScheminList toFilter = (ScheminList) list.Cdr().Car();
@@ -194,8 +195,9 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return temp;
-			};
+			};*/
 
+            /*
 			Map = (list, env, eval) => {
 				IScheminType toApply = (IScheminType) list.Car();
 				ScheminList toMap = (ScheminList) list.Cdr().Car();
@@ -238,7 +240,7 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return temp;
-			};
+			};*/
 		}
 
 	}

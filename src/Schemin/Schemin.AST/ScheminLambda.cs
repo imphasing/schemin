@@ -14,14 +14,12 @@ namespace Schemin.AST
 		public ScheminLambda(ScheminList definition, Environment closure)
 		{
 			this.Arguments = (ScheminList) definition.Car();
-			this.Definition = definition.Cdr();
+			this.Definition = definition.Cdr().Car();
 			this.Closure = closure;
 		}
 
-		public IScheminType Evaluate(ScheminList values)
+		public Environment Evaluate(ScheminList values, Evaluator eval)
 		{
-            Evaluator eval = new Evaluator();
-
 			IScheminType first = Arguments.Car();
 			ScheminList rest = Arguments.Cdr();
 			IScheminType firstArg = values.Car();
@@ -49,17 +47,7 @@ namespace Schemin.AST
 				restArgs = restArgs.Cdr();
 			}
 
-			IScheminType last; 
-			if (Definition.GetType() == typeof(ScheminList))
-			{
-				last = eval.Evaluate((ScheminList) Definition, args);
-			}
-			else
-			{
-				last = eval.EvaluateInternal(Definition, args); 
-			}
-
-			return last;
+            return args;
 		}
 
 		public override string ToString()

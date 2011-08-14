@@ -148,7 +148,7 @@ namespace Schemin.Evaluate.Primitives
 				return ScheminBool.GetValue(!temp.Value);
 			};
 
-			And = (args, env, eval) => {
+			/*And = (args, env, eval) => {
 				eval.EvalState = EvaluatorState.Normal;
 
 				foreach (IScheminType type in args)
@@ -180,7 +180,7 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return ScheminBool.False;
-			};
+			};*/
 
 			GreaterThan = (args, env, eval) => {
 				IScheminNumeric first = (IScheminNumeric) args.Car();

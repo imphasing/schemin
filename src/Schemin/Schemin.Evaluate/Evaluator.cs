@@ -22,35 +22,39 @@ namespace Schemin.Evaluate
 		public EvaluatorState EvalState = EvaluatorState.Normal;
         public Stack<StackFrame> Stack = new Stack<StackFrame>();
 
+        public Environment GlobalEnv;
+
         public class StackFrame
         {
             public ScheminList Before;
             public ScheminList After;
+            public Environment CurrentEnv;
 
             public IScheminType WaitingOn;
         }
 
 		public IScheminType Evaluate(ScheminList ast, Environment env)
 		{
+            this.GlobalEnv = env;
 			IScheminType last = null;
 
 			foreach (IScheminType type in ast)
 			{
-				last = EvaluateInternal(type, env);
+				last = EvaluateInternal(type);
 			}
 
 			return last;
 		}
 
-		public IScheminType EvaluateInternal(IScheminType ast, Environment env)
+		public IScheminType EvaluateInternal(IScheminType ast)
 		{
             if ((ast as ScheminAtom) != null)
 			{
-				return EvalAtom(ast, env);
+				return EvalAtom(ast, this.GlobalEnv);
 			}
             else if ((ast as ScheminList) != null)
 			{
-                return EvaluateList((ScheminList)ast, env);
+                return EvaluateList((ScheminList) ast);
 			}
 			else
 			{
@@ -58,10 +62,11 @@ namespace Schemin.Evaluate
 			}
 		}
 
-        public IScheminType EvaluateList(ScheminList list, Environment env)
+        public IScheminType EvaluateList(ScheminList list)
         {
             StackFrame start = new StackFrame();
             start.WaitingOn = list;
+            start.CurrentEnv = this.GlobalEnv;
 
             Stack.Push(start);
 
@@ -69,6 +74,7 @@ namespace Schemin.Evaluate
             while (Stack.Count > 0)
             {
                 StackFrame current = Stack.Pop();
+                Environment CurrentEnv = current.CurrentEnv;
 
                 ScheminList before = current.Before;
                 ScheminList after = current.After;
@@ -96,11 +102,14 @@ namespace Schemin.Evaluate
                             next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
                         }
 
+                        next.CurrentEnv = previous.CurrentEnv;
+
                         Stack.Push(next);
                         continue;
                     }
 
                     next.WaitingOn = CombineStackFrame(before, after, WaitingOn);
+                    next.CurrentEnv = CurrentEnv;
                     Stack.Push(next);
                     continue;
                 }
@@ -129,7 +138,7 @@ namespace Schemin.Evaluate
 
                     if ((type as ScheminAtom) != null)
                     {
-                        IScheminType atomResult = EvalAtom(type, env);
+                        IScheminType atomResult = EvalAtom(type, CurrentEnv);
                         AppendToPartialStackFrame(pendingBefore, pendingAfter, atomResult, foundWaiting);
                     }
                     else if ((type as ScheminPrimitive) != null)
@@ -167,6 +176,7 @@ namespace Schemin.Evaluate
                         next.WaitingOn = type;
                         next.After = rest.Cdr();
                         next.Before = pendingBefore;
+                        next.CurrentEnv = CurrentEnv;
 
                         Stack.Push(current);
                         Stack.Push(next);
@@ -193,7 +203,8 @@ namespace Schemin.Evaluate
                     ScheminPrimitive prim = (ScheminPrimitive)functionPosition;
                     completeFrame.Before = before;
                     completeFrame.After = after;
-                    completeFrame.WaitingOn = prim.Evaluate(functionArgs, env, this);
+                    completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
+                    completeFrame.CurrentEnv = CurrentEnv;
 
                     Stack.Push(completeFrame);
                     continue;
@@ -203,7 +214,11 @@ namespace Schemin.Evaluate
                     ScheminLambda lam = (ScheminLambda)functionPosition;
                     completeFrame.Before = before;
                     completeFrame.After = after;
-                    completeFrame.WaitingOn = lam.Evaluate(functionArgs);
+
+                    Environment args = lam.Evaluate(functionArgs, this);
+
+                    completeFrame.WaitingOn = lam.Definition;
+                    completeFrame.CurrentEnv = args;
 
                     Stack.Push(completeFrame);
                     continue;
