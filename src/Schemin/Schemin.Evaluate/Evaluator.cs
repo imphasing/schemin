@@ -202,11 +202,12 @@ namespace Schemin.Evaluate
                 }
                 else if ((functionPosition as ScheminLambda) != null)
                 {
-                    ScheminLambda lam = (ScheminLambda)functionPosition;
+                    ScheminLambda lam = (ScheminLambda) functionPosition;
                     completeFrame.Before = before;
                     completeFrame.After = after;
 
                     Environment args = lam.Evaluate(functionArgs, this);
+                    lam.Closure.parent = CurrentEnv;
 
                     completeFrame.WaitingOn = lam.Definition;
                     completeFrame.CurrentEnv = args;
