@@ -141,7 +141,7 @@ namespace Schemin.Evaluate.Primitives
 							ScheminList args = new ScheminList(next);
 							args.Append(total);
 
-							return lam.Evaluate(args, eval);
+							return lam.Evaluate(args);
 							}); 
 				}
 
@@ -177,7 +177,7 @@ namespace Schemin.Evaluate.Primitives
 
 					filtered = toFilter.Where(element => {
 							var args = new ScheminList(element);
-							ScheminBool predResult = (ScheminBool) lam.Evaluate(args, eval);
+							ScheminBool predResult = (ScheminBool) lam.Evaluate(args);
 							return predResult.Value;
 					}).ToList();
 				}
@@ -222,7 +222,7 @@ namespace Schemin.Evaluate.Primitives
 
 					mapped = toMap.Select(element => {
 							var args = new ScheminList(element);
-							return lam.Evaluate(args, eval);
+							return lam.Evaluate(args);
 					}).ToList();
 				}
 

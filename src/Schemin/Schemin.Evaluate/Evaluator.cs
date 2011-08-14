@@ -57,6 +57,8 @@ namespace Schemin.Evaluate
         public ScheminList CombineStackFrame(ScheminList before, ScheminList after, IScheminType result)
         {
             ScheminList complete = new ScheminList();
+            complete.Quoted = false;
+
             if (before != null && before.Length > 0)
             {
                 foreach (IScheminType type in before)
@@ -122,8 +124,9 @@ namespace Schemin.Evaluate
                     ScheminList before = current.Before;
                     ScheminList after = current.After;
                     IScheminType WaitingOn = current.WaitingOn;
+                    ScheminList checkQuoted = WaitingOn as ScheminList;
 
-                    if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn))
+                    if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn) || (checkQuoted != null && checkQuoted.Quoted == true))
                     {
                         StackFrame next = new StackFrame();
 
@@ -155,6 +158,8 @@ namespace Schemin.Evaluate
 
                     ScheminList evalList = (ScheminList) WaitingOn;
                     ScheminList complete = new ScheminList();
+                    complete.Quoted = false;
+
                     bool foundWaiting = false;
 
                     if (IsEmptyList(evalList))
@@ -164,7 +169,10 @@ namespace Schemin.Evaluate
 
                     ScheminList rest = evalList;
                     ScheminList pendingBefore = new ScheminList();
+                    pendingBefore.Quoted = false;
+
                     ScheminList pendingAfter = new ScheminList();
+                    pendingAfter.Quoted = false;
 
                     while (!rest.Empty)
                     {
@@ -199,6 +207,7 @@ namespace Schemin.Evaluate
                         }
                         else if ((type as ScheminList) != null)
                         {
+                            ScheminList tempList = (ScheminList) type;
                             switch (this.EvalState)
                             {
                                 case EvaluatorState.LambdaArgs:
@@ -213,6 +222,14 @@ namespace Schemin.Evaluate
                                     rest = rest.Cdr();
                                     continue;
                             }
+
+                            if (tempList.Quoted)
+                            {
+                                AppendToStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+                                rest = rest.Cdr();
+                                continue;
+                            }
+
                             StackFrame next = new StackFrame();
                             next.WaitingOn = type;
                             next.After = rest.Cdr();
@@ -236,7 +253,7 @@ namespace Schemin.Evaluate
 
                     if ((functionPosition as ScheminPrimitive) != null)
                     {
-                        ScheminPrimitive prim = (ScheminPrimitive)functionPosition;
+                        ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
                         completeFrame.Before = before;
                         completeFrame.After = after;
                         completeFrame.WaitingOn = prim.Evaluate(functionArgs, env, this);
@@ -246,10 +263,10 @@ namespace Schemin.Evaluate
                     }
                     else if ((functionPosition as ScheminLambda) != null)
                     {
-                        ScheminLambda lam = (ScheminLambda)functionPosition;
+                        ScheminLambda lam = (ScheminLambda) functionPosition;
                         completeFrame.Before = before;
                         completeFrame.After = after;
-                        completeFrame.WaitingOn = lam.Evaluate(functionArgs, this);
+                        completeFrame.WaitingOn = lam.Evaluate(functionArgs);
 
                         Stack.Push(completeFrame);
                         continue;

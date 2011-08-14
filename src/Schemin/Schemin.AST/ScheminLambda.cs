@@ -18,8 +18,10 @@ namespace Schemin.AST
 			this.Closure = closure;
 		}
 
-		public IScheminType Evaluate(ScheminList values, Evaluator eval)
+		public IScheminType Evaluate(ScheminList values)
 		{
+            Evaluator eval = new Evaluator();
+
 			IScheminType first = Arguments.Car();
 			ScheminList rest = Arguments.Cdr();
 			IScheminType firstArg = values.Car();

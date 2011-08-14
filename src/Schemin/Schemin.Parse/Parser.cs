@@ -12,8 +12,10 @@ namespace Schemin.Parse
 	{
 		public ScheminList Parse(List<Token> tokens)
 		{
+            ScheminList.QuoteLists = false;
 			KeyValuePair<ScheminList, int> parsed = ParseInternal(tokens, 0);
 			TransformQuotes((ScheminList) parsed.Key);
+            ScheminList.QuoteLists = true;
 			return (ScheminList) parsed.Key;
 		}
 

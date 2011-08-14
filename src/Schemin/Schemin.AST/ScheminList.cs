@@ -11,6 +11,9 @@ namespace Schemin.AST
 		public IScheminType Head = null;
 		public ScheminList Rest = null;
 		public bool Empty = true;
+        public bool Quoted = true;
+
+        public static bool QuoteLists = true;
 
 		public int Length
 		{
@@ -40,17 +43,32 @@ namespace Schemin.AST
 
 		public ScheminList()
 		{
+            if (!QuoteLists)
+            {
+                this.Quoted = false;
+            }
+
 			this.Empty = true;
 		}
 
 		public ScheminList(IScheminType head)
 		{
+            if (!QuoteLists)
+            {
+                this.Quoted = false;
+            }
+
 			this.Head = head;
 			this.Empty = false;
 		}
 
 		public ScheminList(IScheminType head, ScheminList rest)
 		{
+            if (!QuoteLists)
+            {
+                this.Quoted = false;
+            }
+
 			this.Head = head;
 			this.Rest = rest;
 			this.Empty = false;
@@ -60,7 +78,10 @@ namespace Schemin.AST
 		{
 			if (this.Head == null)
 			{
-				return new ScheminList();
+                ScheminList ret = new ScheminList();
+                ret.Quoted = Quoted;
+
+                return ret;
 			}
 
 			return this.Head;
@@ -68,17 +89,27 @@ namespace Schemin.AST
 
 		public ScheminList Cdr()
 		{
+            ScheminList ret;
 			if (this.Rest == null)
 			{
-				return new ScheminList();
+                ret = new ScheminList();
+                ret.Quoted = Quoted;
+
+                return ret;
 			}
 
-			return this.Rest;
+            ret = this.Rest;
+            ret.Quoted = Quoted;
+
+            return ret;
 		}
 
 		public ScheminList Cons(IScheminType type)
 		{
-			return new ScheminList(type, this);
+            ScheminList ret = new ScheminList(type, this);
+            ret.Quoted = Quoted;
+
+            return ret;
 		}
 
 		public ScheminList Append(IScheminType type)

@@ -90,7 +90,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			LetRec = (list, env, eval) => {
-				eval.EvalState = EvaluatorState.Normal;
+                eval = new Evaluator();
 				ScheminList bindings = (ScheminList) list.Car();
 				ScheminList expression = list.Cdr();
 
@@ -119,7 +119,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			LetStar = (list, env, eval) => {
-				eval.EvalState = EvaluatorState.Normal;
+                eval = new Evaluator();
 
 				ScheminList bindings = (ScheminList) list.Car();
 				IScheminType expression = list.Cdr();
@@ -140,7 +140,8 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			Let = (list, env, eval) => {
-				eval.EvalState = EvaluatorState.Normal;
+                eval = new Evaluator();
+
 				bool isNamed = false;
 				IScheminType first = list.Car();
 				if (first.GetType() == typeof(ScheminAtom))
@@ -204,7 +205,7 @@ namespace Schemin.Evaluate.Primitives
 					ScheminLambda proc = new ScheminLambda(lambdaArgs, temporary);
 					temporary.AddBinding((ScheminAtom) first, proc);
 
-					IScheminType result = proc.Evaluate(argValues, eval);
+					IScheminType result = proc.Evaluate(argValues);
 
 					return result;
 				}
@@ -246,7 +247,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			If = (list, env, eval) => {
-				eval.EvalState = EvaluatorState.Normal;
+                eval = new Evaluator();
 				IScheminType condition = list.Car();
 				IScheminType then = list.Cdr().Car();
 				IScheminType otherwise = list.Cdr().Cdr().Car();
@@ -265,6 +266,13 @@ namespace Schemin.Evaluate.Primitives
 			Quote = (list, env, eval) => {
 				eval.EvalState = EvaluatorState.Normal;
 				IScheminType arg = list.Car();
+
+                if ((arg as ScheminList) != null)
+                {
+                    ScheminList tempList = (ScheminList)arg;
+                    tempList.Quoted = true;
+                }
+
 				return arg;
 			};
 
