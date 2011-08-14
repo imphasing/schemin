@@ -275,13 +275,6 @@ namespace Schemin.Evaluate.Primitives
 
 			Quote = (list, env, eval) => {
 				IScheminType arg = list.Car();
-
-                if ((arg as ScheminList) != null)
-                {
-                    ScheminList tempList = (ScheminList)arg;
-                    tempList.UnQuote();
-                }
-
 				return arg;
 			};
 

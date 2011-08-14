@@ -335,6 +335,7 @@ namespace Schemin.Evaluate
                     }
 					break;
 				case "quote":
+                    args.Car().Quote();
 					break;
 				case "let":
 					break;
@@ -359,6 +360,22 @@ namespace Schemin.Evaluate
 
 		public void DefinePrimitives(Environment env)
 		{
+            var prebound_schemin = new Dictionary<string, string>();
+            prebound_schemin.Add("map", ListOperations.Map);
+            prebound_schemin.Add("filter", ListOperations.Filter);
+            prebound_schemin.Add("foldl", ListOperations.Foldl);
+            prebound_schemin.Add("foldr", ListOperations.Foldr);
+
+            Tokenize.Tokenizer t = new Tokenize.Tokenizer();
+            Schemin.Parse.Parser p = new Parse.Parser();
+
+            foreach (KeyValuePair<string, string> kvp in prebound_schemin)
+            {
+                var tokens = t.Tokenize(kvp.Value);
+                var ast = p.Parse(tokens);
+                Evaluate(ast, env);
+            }
+
 			var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
 
 			prebound.Add("+", NumericOperations.Add);
@@ -374,9 +391,6 @@ namespace Schemin.Evaluate
 			prebound.Add("length", ListOperations.Length);
 			prebound.Add("list", ListOperations.List);
 			prebound.Add("append", ListOperations.Append);
-			prebound.Add("map", ListOperations.Map);
-			prebound.Add("filter", ListOperations.Filter);
-			prebound.Add("foldl", ListOperations.Foldl);
 
 			prebound.Add("null?", BooleanOperations.Null);
 			prebound.Add("=", BooleanOperations.Equal);
