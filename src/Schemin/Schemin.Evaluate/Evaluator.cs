@@ -206,8 +206,7 @@ namespace Schemin.Evaluate
                     completeFrame.Before = before;
                     completeFrame.After = after;
 
-                    Environment args = lam.Evaluate(functionArgs, this);
-                    lam.Closure.parent = CurrentEnv;
+                    Environment args = lam.MakeEnvironment(functionArgs, CurrentEnv, this);
 
                     completeFrame.WaitingOn = lam.Definition;
                     completeFrame.CurrentEnv = args;

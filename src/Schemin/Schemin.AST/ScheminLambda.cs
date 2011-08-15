@@ -18,7 +18,7 @@ namespace Schemin.AST
 			this.Closure = closure;
 		}
 
-		public Environment Evaluate(ScheminList values, Evaluator eval)
+		public Environment MakeEnvironment(ScheminList values, Environment env, Evaluator eval)
 		{
 			IScheminType first = Arguments.Car();
 			ScheminList rest = Arguments.Cdr();
@@ -27,6 +27,7 @@ namespace Schemin.AST
 
 			Environment args = new Environment();
 			args.parent = this.Closure;
+            this.Closure.parent = env;
 
 			for (; ;)
 			{
