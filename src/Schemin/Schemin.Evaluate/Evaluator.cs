@@ -67,6 +67,7 @@ namespace Schemin.Evaluate
             start.WaitingOn = list;
             start.CurrentEnv = this.GlobalEnv;
 
+            Stack.Clear();
             Stack.Push(start);
 
         StackStart:
@@ -111,8 +112,10 @@ namespace Schemin.Evaluate
                         continue;
                     }
 
+                    // We need to use the PREVIOUS environment here, so peek it.. otherwise we're re-using the same environment for the previous context.
+                    StackFrame peeked = Stack.Peek();
                     next.WaitingOn = CombineStackFrame(before, after, WaitingOn);
-                    next.CurrentEnv = CurrentEnv;
+                    next.CurrentEnv = peeked.CurrentEnv;
                     Stack.Push(next);
                     continue;
                 }
@@ -206,7 +209,7 @@ namespace Schemin.Evaluate
                     completeFrame.Before = before;
                     completeFrame.After = after;
 
-                    Environment args = lam.MakeEnvironment(functionArgs, CurrentEnv, this);
+                    Environment args = lam.MakeEnvironment(functionArgs, this);
 
                     completeFrame.WaitingOn = lam.Definition;
                     completeFrame.CurrentEnv = args;
