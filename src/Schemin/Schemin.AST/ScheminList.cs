@@ -28,7 +28,7 @@ namespace Schemin.AST
 						if (type.GetType() == typeof(ScheminList))
 						{
 							ScheminList temp = (ScheminList) type;
-							if (!temp.Empty)
+							if (!temp.Empty || temp.Quoted())
 								count++;
 						}
 						else

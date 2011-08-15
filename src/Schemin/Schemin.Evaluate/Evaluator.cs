@@ -167,7 +167,7 @@ namespace Schemin.Evaluate
                     {
                         ScheminList tempList = (ScheminList)type;
 
-                        if (tempList.Quoted())
+                        if (tempList.Quoted() || tempList.Empty)
                         {
                             AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
                             rest = rest.Cdr();
@@ -355,8 +355,23 @@ namespace Schemin.Evaluate
                     }
 					break;
 				case "letrec":
+                    foreach (IScheminType type in args)
+                    {
+                        type.Quote();
+                    }
 					break;
 				case "let*":
+					break;
+                case "begin":
+                    foreach (IScheminType type in args)
+                    {
+                        type.Quote();
+                    }
+
+                    if ((args.Car() as ScheminList) != null && !IsEmptyList(args.Car()))
+                    {
+                        args.Car().UnQuote();
+                    }
 					break;
 				case "if":
                     args.Cdr().Car().Quote();
@@ -427,7 +442,6 @@ namespace Schemin.Evaluate
 			prebound.Add("string?", BooleanOperations.String);
 
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
-			prebound.Add("begin", GeneralOperations.Begin);
 			prebound.Add("display", GeneralOperations.Display);
 			prebound.Add("newline", GeneralOperations.Newline);
 
