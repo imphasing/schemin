@@ -61,6 +61,7 @@ namespace Schemin.Evaluate.Primitives
 
 			SetBang = (list, env, eval) => {
 				ScheminAtom symbol = (ScheminAtom) list.Car();
+                symbol.UnQuote();
 				IScheminType definition = list.Cdr().Car();
 
 				Environment parent = env;
@@ -145,79 +146,74 @@ namespace Schemin.Evaluate.Primitives
 				return eval.Evaluate((ScheminList) expression, temporary);
 			};*/
 
-            /*
+
 			Let = (list, env, eval) => {
-                eval.EvalState = EvaluatorState.Normal;
-                eval = new Evaluator();
+                foreach (IScheminType type in list)
+                {
+                    type.UnQuote();
+                }
 
-				bool isNamed = false;
-				IScheminType first = list.Car();
-				if (first.GetType() == typeof(ScheminAtom))
-				{
-					isNamed = true;
-				}
+                bool isNamed = false;
+                if (list.Car().GetType() == typeof(ScheminAtom))
+                {
+                    isNamed = true;
+                }
 
-				ScheminList bindings;
-				IScheminType expression;
+                ScheminList bindings;
+                IScheminType expression;
 
-				if (isNamed)
-				{
-					bindings = (ScheminList) list.Cdr().Car();
-					expression = list.Cdr().Cdr().Car();
-				}
-				else
-				{
-					bindings = (ScheminList) list.Car();
-					expression = list.Cdr();
-				}
+                if (!isNamed)
+                {
+                    expression = list.Cdr().Car();
+                    bindings = (ScheminList)list.Car();
+                }
+                else
+                {
+                    expression = list.Cdr().Cdr().Car();
+                    bindings = (ScheminList)list.Cdr().Car();
+                }
 
-				if (!isNamed)
-				{
-					Environment temporary = new Environment();
-					temporary.parent = env;
+                ScheminList args = new ScheminList();
+                ScheminList argExps = new ScheminList();
 
-					foreach (IScheminType type in bindings)
-					{
-						ScheminList binding = (ScheminList) type;
-						ScheminAtom symbol = (ScheminAtom) binding.Car();
-						IScheminType val = binding.Cdr().Car();
+                args.UnQuote();
+                argExps.UnQuote();
 
-						temporary.AddBinding(symbol, eval.EvaluateInternal(val, env));
-					}
+                foreach (ScheminList bindingPair in bindings)
+                {
+                    args.Append(bindingPair.Car());
+                    argExps.Append(bindingPair.Cdr().Car());
+                }
+                
+                ScheminList lambdaDef = new ScheminList(args);
+                lambdaDef.UnQuote();
+                lambdaDef.Append(expression);
 
-					return eval.Evaluate((ScheminList) expression, temporary);
-				}
-				else
-				{
-					ScheminList argSymbols = new ScheminList();
-					ScheminList argValues = new ScheminList();
+                Environment closure = env;
+                if (isNamed)
+                {
+                    closure = new Environment();
+                    closure.parent = env;
+                }
 
-					foreach (IScheminType type in bindings)
-					{
-						ScheminList binding = (ScheminList) type;
-						ScheminAtom symbol = (ScheminAtom) binding.Car();
-						IScheminType val = binding.Cdr().Car();
+                ScheminLambda lam = new ScheminLambda(lambdaDef, closure);
 
-						IScheminType evaledVal = eval.EvaluateInternal(val, env);
+                if (isNamed)
+                {
+                    ScheminAtom name = (ScheminAtom)list.Car();
+                    closure.AddBinding(name, lam);
+                }
 
-						argSymbols.Append(symbol);
-						argValues.Append(evaledVal);
-					}
+                ScheminList toEvaluate = new ScheminList(lam);
+                toEvaluate.UnQuote();
 
-					ScheminList lambdaArgs = new ScheminList(argSymbols);
-					lambdaArgs = lambdaArgs.Append(expression);
+                foreach (IScheminType arg in argExps)
+                {
+                    toEvaluate.Append(arg);
+                }
 
-					Environment temporary = new Environment();
-					temporary.parent = env;
-
-					ScheminLambda proc = new ScheminLambda(lambdaArgs, temporary);
-					temporary.AddBinding((ScheminAtom) first, proc);
-
-					IScheminType result = proc.Evaluate(argValues, eval);
-
-					return result;
-				}
-			};*/
+                return toEvaluate;
+			};
 
 			/*Cond = (list, env, eval) => {
 				eval.EvalState = EvaluatorState.Normal;

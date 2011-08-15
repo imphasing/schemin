@@ -106,7 +106,15 @@ namespace Schemin.Evaluate
                             next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
                         }
 
-                        next.CurrentEnv = previous.CurrentEnv;
+                        // Use the previous environmeny in this case as well
+                        if (Stack.Count > 0)
+                        {
+                            next.CurrentEnv = Stack.Peek().CurrentEnv;
+                        }
+                        else
+                        {
+                            next.CurrentEnv = previous.CurrentEnv;
+                        }
 
                         Stack.Push(next);
                         continue;
@@ -152,7 +160,7 @@ namespace Schemin.Evaluate
                     else if ((type as ScheminPrimitive) != null)
                     {
                         ScheminPrimitive prim = (ScheminPrimitive)type;
-                        SetStatePrimitive(prim, rest.Cdr());
+                        TransformASTPrimitive(prim, rest.Cdr());
                         AppendToPartialStackFrame(pendingBefore, pendingAfter, prim, foundWaiting);
                     }
                     else if ((type as ScheminList) != null)
@@ -313,7 +321,7 @@ namespace Schemin.Evaluate
 			return null;
 		}
 
-		public void SetStatePrimitive(ScheminPrimitive prim, ScheminList args)
+		public void TransformASTPrimitive(ScheminPrimitive prim, ScheminList args)
 		{
 			switch (prim.Name)
 			{
@@ -341,6 +349,10 @@ namespace Schemin.Evaluate
                     args.Car().Quote();
 					break;
 				case "let":
+                    foreach (IScheminType type in args)
+                    {
+                        type.Quote();
+                    }
 					break;
 				case "letrec":
 					break;
@@ -357,6 +369,7 @@ namespace Schemin.Evaluate
 				case "or":
 					break;
 				case "set!":
+                    args.Car().Quote();
 					break;
 			}
 		}

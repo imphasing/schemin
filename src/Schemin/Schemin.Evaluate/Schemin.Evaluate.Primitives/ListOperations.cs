@@ -126,9 +126,9 @@ namespace Schemin.Evaluate.Primitives
                             end
                             (func (car lst) (foldr func end (cdr lst)))))";
 
-            Filter = @"(define (filter pred lst)   (foldr (lambda (x y) (if (pred x) (cons x y) y)) '() lst))";
+            Filter = @"(define (filter pred lst) (foldr (lambda (x y) (if (pred x) (cons x y) y)) '() lst))";
 
-            Map = @"(define (map func lst)      (foldr (lambda (x y) (cons (func x) y)) '() lst))";
+            Map = @"(define (map func lst) (foldr (lambda (x y) (cons (func x) y)) '() lst))";
 		}
 
 	}
