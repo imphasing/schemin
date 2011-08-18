@@ -85,29 +85,7 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			Begin = (list, env, eval) => {
-				ScheminList nextCycle = new ScheminList();
-				nextCycle.UnQuote();
-				nextCycle.Append(new ScheminPrimitive(Primitives.GeneralOperations.Begin, "begin"));
-
-				if (list.Length == 1)
-				{
-					return list.Car();
-				}
-				else
-				{
-					bool first = true;
-					foreach (IScheminType type in list)
-					{
-						if (!first)
-						{
-							nextCycle.Append(type);
-						}
-
-						first = false;
-					}
-				}
-
-				return nextCycle;
+                return list.Last();
 			};
 
 			LetRec = (list, env, eval) =>

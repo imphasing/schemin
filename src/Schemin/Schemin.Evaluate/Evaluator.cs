@@ -362,15 +362,6 @@ namespace Schemin.Evaluate
 				case "let*":
 					break;
 				case "begin":
-					foreach (IScheminType type in args)
-					{
-						type.Quote();
-					}
-
-					if ((args.Car() as ScheminList) != null && !IsEmptyList(args.Car()))
-					{
-						args.Car().UnQuote();
-					}
 					break;
 				case "if":
 					args.Cdr().Car().Quote();
