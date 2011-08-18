@@ -19,22 +19,22 @@ namespace Schemin.Evaluate
 		private Type lambda = typeof(ScheminLambda);
 		private Type boolean = typeof(ScheminBool);
 
-        public Stack<StackFrame> Stack = new Stack<StackFrame>();
+		public Stack<StackFrame> Stack = new Stack<StackFrame>();
 
-        public Environment GlobalEnv;
+		public Environment GlobalEnv;
 
-        public class StackFrame
-        {
-            public ScheminList Before;
-            public ScheminList After;
-            public Environment CurrentEnv;
+		public class StackFrame
+		{
+			public ScheminList Before;
+			public ScheminList After;
+			public Environment CurrentEnv;
 
-            public IScheminType WaitingOn;
-        }
+			public IScheminType WaitingOn;
+		}
 
 		public IScheminType Evaluate(ScheminList ast, Environment env)
 		{
-            this.GlobalEnv = env;
+			this.GlobalEnv = env;
 			IScheminType last = null;
 
 			foreach (IScheminType type in ast)
@@ -47,13 +47,13 @@ namespace Schemin.Evaluate
 
 		public IScheminType EvaluateInternal(IScheminType ast)
 		{
-            if ((ast as ScheminAtom) != null)
+			if ((ast as ScheminAtom) != null)
 			{
 				return EvalAtom(ast, this.GlobalEnv);
 			}
-            else if ((ast as ScheminList) != null)
+			else if ((ast as ScheminList) != null)
 			{
-                return EvaluateList((ScheminList) ast);
+				return EvaluateList((ScheminList) ast);
 			}
 			else
 			{
@@ -61,178 +61,177 @@ namespace Schemin.Evaluate
 			}
 		}
 
-        public IScheminType EvaluateList(ScheminList list)
-        {
-            StackFrame start = new StackFrame();
-            start.WaitingOn = list;
-            start.CurrentEnv = this.GlobalEnv;
+		public IScheminType EvaluateList(ScheminList list)
+		{
+			StackFrame start = new StackFrame();
+			start.WaitingOn = list;
+			start.CurrentEnv = this.GlobalEnv;
 
-            Stack.Clear();
-            Stack.Push(start);
+			Stack.Clear();
+			Stack.Push(start);
 
-        StackStart:
-            while (Stack.Count > 0)
-            {
-                StackFrame current = Stack.Pop();
-                Environment CurrentEnv = current.CurrentEnv;
+StackStart:
+			while (Stack.Count > 0)
+			{
+				StackFrame current = Stack.Pop();
+				Environment CurrentEnv = current.CurrentEnv;
 
-                ScheminList before = current.Before;
-                ScheminList after = current.After;
-                IScheminType WaitingOn = current.WaitingOn;
+				ScheminList before = current.Before;
+				ScheminList after = current.After;
+				IScheminType WaitingOn = current.WaitingOn;
 
-                if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn) || WaitingOn.Quoted() == true)
-                {
-                    StackFrame next = new StackFrame();
+				if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn) || WaitingOn.Quoted() == true)
+				{
+					StackFrame next = new StackFrame();
 
-                    if (before == null && after == null)
-                    {
-                        if (Stack.Count < 1)
-                        {
-                            return WaitingOn;
-                        }
+					if (before == null && after == null)
+					{
+						if (Stack.Count < 1)
+						{
+							return WaitingOn;
+						}
 
-                        if ((WaitingOn as ScheminAtom) != null)
-                        {
-                            WaitingOn = EvalAtom(WaitingOn, CurrentEnv);
-                        }
+						if ((WaitingOn as ScheminAtom) != null)
+						{
+							WaitingOn = EvalAtom(WaitingOn, CurrentEnv);
+						}
 
-                        StackFrame previous = Stack.Pop();
-                        if (previous.Before == null && previous.After == null)
-                        {
-                            next.WaitingOn = WaitingOn;
-                        }
-                        else
-                        {
-                            next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
-                        }
+						StackFrame previous = Stack.Pop();
+						if (previous.Before == null && previous.After == null)
+						{
+							next.WaitingOn = WaitingOn;
+						}
+						else
+						{
+							next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
+						}
 
-                        // Use the previous environmeny in this case as well
-                        if (Stack.Count > 0)
-                        {
-                            next.CurrentEnv = Stack.Peek().CurrentEnv;
-                        }
-                        else
-                        {
-                            next.CurrentEnv = previous.CurrentEnv;
-                        }
+						// Use the previous environmeny in this case as well
+						if (Stack.Count > 0)
+						{
+							next.CurrentEnv = Stack.Peek().CurrentEnv;
+						}
+						else
+						{
+							next.CurrentEnv = previous.CurrentEnv;
+						}
 
-                        Stack.Push(next);
-                        continue;
-                    }
+						Stack.Push(next);
+						continue;
+					}
 
-                    // We need to use the PREVIOUS environment here, so peek it.. otherwise we're re-using the same environment for the previous context.
-                    StackFrame peeked = Stack.Peek();
-                    next.WaitingOn = CombineStackFrame(before, after, WaitingOn);
-                    next.CurrentEnv = peeked.CurrentEnv;
-                    Stack.Push(next);
-                    continue;
-                }
+					// We need to use the PREVIOUS environment here, so peek it.. otherwise we're re-using the same environment for the previous context.
+					StackFrame peeked = Stack.Peek();
+					next.WaitingOn = CombineStackFrame(before, after, WaitingOn);
+					next.CurrentEnv = peeked.CurrentEnv;
+					Stack.Push(next);
+					continue;
+				}
 
-                ScheminList evalList = (ScheminList)WaitingOn;
-                ScheminList complete = new ScheminList();
-                complete.UnQuote();
+				ScheminList evalList = (ScheminList)WaitingOn;
+				ScheminList complete = new ScheminList();
+				complete.UnQuote();
 
-                bool foundWaiting = false;
+				bool foundWaiting = false;
 
-                ScheminList rest = evalList;
-                ScheminList pendingBefore = new ScheminList();
-                pendingBefore.UnQuote();
+				ScheminList rest = evalList;
+				ScheminList pendingBefore = new ScheminList();
+				pendingBefore.UnQuote();
 
-                ScheminList pendingAfter = new ScheminList();
-                pendingAfter.UnQuote();
+				ScheminList pendingAfter = new ScheminList();
+				pendingAfter.UnQuote();
 
-                while (!rest.Empty)
-                {
-                    IScheminType type = rest.Car();
+				while (!rest.Empty)
+				{
+					IScheminType type = rest.Car();
 
-                    if ((type as ScheminAtom) != null)
-                    {
-                        if (type.Quoted())
-                        {
-                            AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                        }
-                        else
-                        {
-                            IScheminType atomResult = EvalAtom(type, CurrentEnv);
-                            AppendToPartialStackFrame(pendingBefore, pendingAfter, atomResult, foundWaiting);
-                        }
-                    }
-                    else if ((type as ScheminPrimitive) != null)
-                    {
-                        ScheminPrimitive prim = (ScheminPrimitive)type;
-                        TransformASTPrimitive(prim, rest.Cdr());
-                        AppendToPartialStackFrame(pendingBefore, pendingAfter, prim, foundWaiting);
-                    }
-                    else if ((type as ScheminList) != null)
-                    {
-                        ScheminList tempList = (ScheminList)type;
+					if ((type as ScheminAtom) != null)
+					{
+						if (type.Quoted())
+						{
+							AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+						}
+						else
+						{
+							IScheminType atomResult = EvalAtom(type, CurrentEnv);
+							AppendToPartialStackFrame(pendingBefore, pendingAfter, atomResult, foundWaiting);
+						}
+					}
+					else if ((type as ScheminPrimitive) != null)
+					{
+						ScheminPrimitive prim = (ScheminPrimitive)type;
+						TransformASTPrimitive(prim, rest.Cdr());
+						AppendToPartialStackFrame(pendingBefore, pendingAfter, prim, foundWaiting);
+					}
+					else if ((type as ScheminList) != null)
+					{
+						ScheminList tempList = (ScheminList)type;
 
-                        if (tempList.Quoted() || tempList.Empty)
-                        {
-                            AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                            rest = rest.Cdr();
-                            continue;
-                        }
+						if (tempList.Quoted() || tempList.Empty)
+						{
+							AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+							rest = rest.Cdr();
+							continue;
+						}
 
-                        StackFrame next = new StackFrame();
-                        next.WaitingOn = type;
-                        next.After = rest.Cdr();
-                        next.Before = pendingBefore;
-                        next.CurrentEnv = CurrentEnv;
+						StackFrame next = new StackFrame();
+						next.WaitingOn = type;
+						next.After = rest.Cdr();
+						next.Before = pendingBefore;
+						next.CurrentEnv = CurrentEnv;
 
-                        Stack.Push(current);
-                        Stack.Push(next);
+						Stack.Push(current);
+						Stack.Push(next);
 
-                        goto StackStart;
-                    }
-                    else
-                    {
-                        AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
-                    }
+						goto StackStart;
+					}
+					else
+					{
+						AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+					}
 
-                    rest = rest.Cdr();
-                }
+					rest = rest.Cdr();
+				}
 
-                ScheminList completed = CombineStackFrame(pendingBefore, pendingAfter, null);
+				ScheminList completed = CombineStackFrame(pendingBefore, pendingAfter, null);
 
-                IScheminType functionPosition = completed.Car();
-                ScheminList functionArgs = completed.Cdr();
+				IScheminType functionPosition = completed.Car();
+				ScheminList functionArgs = completed.Cdr();
 
-                StackFrame completeFrame = new StackFrame();
+				StackFrame completeFrame = new StackFrame();
 
-                if ((functionPosition as ScheminPrimitive) != null)
-                {
-                    ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
-                    completeFrame.Before = before;
-                    completeFrame.After = after;
-                    completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
-                    completeFrame.CurrentEnv = CurrentEnv;
+				if ((functionPosition as ScheminPrimitive) != null)
+				{
+					ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
+					completeFrame.Before = before;
+					completeFrame.After = after;
+					completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
+					completeFrame.CurrentEnv = CurrentEnv;
 
-                    Stack.Push(completeFrame);
-                    continue;
-                }
-                else if ((functionPosition as ScheminLambda) != null)
-                {
-                    ScheminLambda lam = (ScheminLambda) functionPosition;
-                    completeFrame.Before = before;
-                    completeFrame.After = after;
+					Stack.Push(completeFrame);
+					continue;
+				}
+				else if ((functionPosition as ScheminLambda) != null)
+				{
+					ScheminLambda lam = (ScheminLambda) functionPosition;
+					completeFrame.Before = before;
+					completeFrame.After = after;
 
-                    Environment args = lam.MakeEnvironment(functionArgs, this);
+					Environment args = lam.MakeEnvironment(functionArgs, this);
+					completeFrame.WaitingOn = lam.Definition;
+					completeFrame.CurrentEnv = args;
 
-                    completeFrame.WaitingOn = lam.Definition;
-                    completeFrame.CurrentEnv = args;
+					Stack.Push(completeFrame);
+					continue;
+				}
+				else
+				{
+					throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
+				}
+			}
 
-                    Stack.Push(completeFrame);
-                    continue;
-                }
-                else
-                {
-                    throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
-                }
-            }
-
-            throw new InvalidOperationException("Control escaped list evaluator...");
-        }
+			throw new InvalidOperationException("Control escaped list evaluator...");
+		}
 
 		public IScheminType EvalAtom(IScheminType ast, Environment env)
 		{
@@ -247,46 +246,46 @@ namespace Schemin.Evaluate
 			return bound;
 		}
 
-        public ScheminList CombineStackFrame(ScheminList before, ScheminList after, IScheminType result)
-        {
-            ScheminList complete = new ScheminList();
-            complete.UnQuote();
+		public ScheminList CombineStackFrame(ScheminList before, ScheminList after, IScheminType result)
+		{
+			ScheminList complete = new ScheminList();
+			complete.UnQuote();
 
-            if (before != null && before.Length > 0)
-            {
-                foreach (IScheminType type in before)
-                {
-                    complete.Append(type);
-                }
-            }
+			if (before != null && before.Length > 0)
+			{
+				foreach (IScheminType type in before)
+				{
+					complete.Append(type);
+				}
+			}
 
-            if (result != null)
-            {
-                complete.Append(result);
-            }
+			if (result != null)
+			{
+				complete.Append(result);
+			}
 
-            if (after != null && after.Length > 0)
-            {
-                foreach (IScheminType type in after)
-                {
-                    complete.Append(type);
-                }
-            }
+			if (after != null && after.Length > 0)
+			{
+				foreach (IScheminType type in after)
+				{
+					complete.Append(type);
+				}
+			}
 
-            return complete;
-        }
+			return complete;
+		}
 
-        public void AppendToPartialStackFrame(ScheminList before, ScheminList after, IScheminType toAppend, bool foundWaiting)
-        {
-            if (foundWaiting)
-            {
-                after.Append(toAppend);
-            }
-            else
-            {
-                before.Append(toAppend);
-            }
-        }
+		public void AppendToPartialStackFrame(ScheminList before, ScheminList after, IScheminType toAppend, bool foundWaiting)
+		{
+			if (foundWaiting)
+			{
+				after.Append(toAppend);
+			}
+			else
+			{
+				before.Append(toAppend);
+			}
+		}
 
 		public bool IsEmptyList(IScheminType type)
 		{
@@ -326,56 +325,56 @@ namespace Schemin.Evaluate
 			switch (prim.Name)
 			{
 				case "define":
-                    if ((args.Car() as ScheminList) != null)
-                    {
-                        args.Car().Quote();
-                        foreach (IScheminType type in args.Cdr())
-                        {
-                            type.Quote();
-                        }
-                    }
-                    else
-                    {
-                        args.Car().Quote();
-                    }
+					if ((args.Car() as ScheminList) != null)
+					{
+						args.Car().Quote();
+						foreach (IScheminType type in args.Cdr())
+						{
+							type.Quote();
+						}
+					}
+					else
+					{
+						args.Car().Quote();
+					}
 					break;
 				case "lambda":
-                    foreach (IScheminType type in args)
-                    {
-                        type.Quote();
-                    }
+					foreach (IScheminType type in args)
+					{
+						type.Quote();
+					}
 					break;
 				case "quote":
-                    args.Car().Quote();
+					args.Car().Quote();
 					break;
 				case "let":
-                    foreach (IScheminType type in args)
-                    {
-                        type.Quote();
-                    }
+					foreach (IScheminType type in args)
+					{
+						type.Quote();
+					}
 					break;
 				case "letrec":
-                    foreach (IScheminType type in args)
-                    {
-                        type.Quote();
-                    }
+					foreach (IScheminType type in args)
+					{
+						type.Quote();
+					}
 					break;
 				case "let*":
 					break;
-                case "begin":
-                    foreach (IScheminType type in args)
-                    {
-                        type.Quote();
-                    }
+				case "begin":
+					foreach (IScheminType type in args)
+					{
+						type.Quote();
+					}
 
-                    if ((args.Car() as ScheminList) != null && !IsEmptyList(args.Car()))
-                    {
-                        args.Car().UnQuote();
-                    }
+					if ((args.Car() as ScheminList) != null && !IsEmptyList(args.Car()))
+					{
+						args.Car().UnQuote();
+					}
 					break;
 				case "if":
-                    args.Cdr().Car().Quote();
-                    args.Cdr().Cdr().Car().Quote();
+					args.Cdr().Car().Quote();
+					args.Cdr().Cdr().Car().Quote();
 					break;
 				case "cond":
 					break;
@@ -384,28 +383,28 @@ namespace Schemin.Evaluate
 				case "or":
 					break;
 				case "set!":
-                    args.Car().Quote();
+					args.Car().Quote();
 					break;
 			}
 		}
 
 		public void DefinePrimitives(Environment env)
 		{
-            var prebound_schemin = new Dictionary<string, string>();
-            prebound_schemin.Add("map", ListOperations.Map);
-            prebound_schemin.Add("filter", ListOperations.Filter);
-            prebound_schemin.Add("foldl", ListOperations.Foldl);
-            prebound_schemin.Add("foldr", ListOperations.Foldr);
+			var prebound_schemin = new Dictionary<string, string>();
+			prebound_schemin.Add("map", ListOperations.Map);
+			prebound_schemin.Add("filter", ListOperations.Filter);
+			prebound_schemin.Add("foldl", ListOperations.Foldl);
+			prebound_schemin.Add("foldr", ListOperations.Foldr);
 
-            Tokenize.Tokenizer t = new Tokenize.Tokenizer();
-            Schemin.Parse.Parser p = new Parse.Parser();
+			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
+			Schemin.Parse.Parser p = new Parse.Parser();
 
-            foreach (KeyValuePair<string, string> kvp in prebound_schemin)
-            {
-                var tokens = t.Tokenize(kvp.Value);
-                var ast = p.Parse(tokens);
-                Evaluate(ast, env);
-            }
+			foreach (KeyValuePair<string, string> kvp in prebound_schemin)
+			{
+				var tokens = t.Tokenize(kvp.Value);
+				var ast = p.Parse(tokens);
+				Evaluate(ast, env);
+			}
 
 			var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
 

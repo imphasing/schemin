@@ -107,10 +107,12 @@ namespace Schemin.AST
 
 		public ScheminList Cons(IScheminType type)
 		{
-            ScheminList ret = new ScheminList(type, this);
-            ret.quoted = quoted;
+            IScheminType oldHead = this.Head;
 
-            return ret;
+            this.Head = type;
+            this.Rest = new ScheminList(oldHead, this.Rest);
+
+            return this;
 		}
 
 		public ScheminList Append(IScheminType type)
