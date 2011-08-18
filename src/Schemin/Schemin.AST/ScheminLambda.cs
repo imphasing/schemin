@@ -9,15 +9,23 @@ namespace Schemin.AST
 
 	public class ScheminLambda : IScheminType
 	{
-		public ScheminList Definition;
+		public IScheminType Definition;
 		public ScheminList Arguments;
 		public Environment Closure;
 
 		public ScheminLambda(ScheminList definition, Environment closure)
 		{
 			this.Arguments = (ScheminList) definition.Car();
-			this.Definition = definition.Cdr();
-			this.Definition.Cons(new ScheminPrimitive(GeneralOperations.Begin, "begin"));
+            if (definition.Cdr().Length == 1)
+            {
+                this.Definition = definition.Cdr().Car();
+            }
+            else
+            {
+                ScheminList def = definition.Cdr();
+                def.Cons(new ScheminPrimitive(GeneralOperations.Begin, "begin"));
+                this.Definition = def;
+            }
 
 			this.Closure = closure;
 		}
