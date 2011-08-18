@@ -70,7 +70,7 @@ namespace Schemin.Evaluate
 			Stack.Clear();
 			Stack.Push(start);
 
-StackStart:
+		StackStart:
 			while (Stack.Count > 0)
 			{
 				StackFrame current = Stack.Pop();
@@ -106,7 +106,7 @@ StackStart:
 							next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
 						}
 
-						// Use the previous environmeny in this case as well
+						// Use the previous environment in this case as well
 						if (Stack.Count > 0)
 						{
 							next.CurrentEnv = Stack.Peek().CurrentEnv;
