@@ -76,7 +76,7 @@ namespace Schemin.Evaluate.Primitives
 			Procedure = (list, env, eval) => {
 				IScheminType type = list.Car();
 
-				if ((type as ScheminPrimitive) != null || (type as ScheminLambda) != null)
+				if ((type as ScheminPrimitive) != null || (type as ScheminLambda) != null || (type as ScheminContinuation) != null)
 				{
 					return ScheminBool.True;
 				}
@@ -148,39 +148,67 @@ namespace Schemin.Evaluate.Primitives
 				return ScheminBool.GetValue(!temp.Value);
 			};
 
-			/*And = (args, env, eval) => {
-				eval.EvalState = EvaluatorState.Normal;
+			And = (args, env, eval) => {
+                ScheminList nextCycle = new ScheminList();
+                nextCycle.UnQuote();
+                nextCycle.Append(new ScheminPrimitive(Primitives.BooleanOperations.And, "and"));
 
-				foreach (IScheminType type in args)
-				{
-					IScheminType result = eval.EvaluateInternal(type, env);
-					ScheminBool conditionResult = result.BoolValue();
+                if (args.Car().BoolValue() == ScheminBool.False)
+                {
+                    return ScheminBool.False;
+                }
 
-					if (conditionResult.Value != true)
-					{
-						return ScheminBool.False;
-					}
-				}
+                if (args.Length == 1)
+                {
+                    return args.Car().BoolValue();
+                }
+                else
+                {
+                    bool first = true;
+                    foreach (IScheminType type in args)
+                    {
+                        if (!first)
+                        {
+                            nextCycle.Append(type);
+                        }
 
-				return ScheminBool.True;
+                        first = false;
+                    }
+                }
+
+                return nextCycle;
 			};
 
 			Or = (args, env, eval) => {
-				eval.EvalState = EvaluatorState.Normal;
+                ScheminList nextCycle = new ScheminList();
+                nextCycle.UnQuote();
+                nextCycle.Append(new ScheminPrimitive(Primitives.BooleanOperations.Or, "or"));
 
-				foreach (IScheminType type in args)
-				{
-					IScheminType result = eval.EvaluateInternal(type, env);
-					ScheminBool conditionResult = result.BoolValue();
+                if (args.Car().BoolValue() == ScheminBool.True)
+                {
+                    return ScheminBool.True;
+                }
 
-					if (conditionResult.Value == true)
-					{
-						return ScheminBool.True;
-					}
-				}
+                if (args.Length == 1)
+                {
+                    return args.Car().BoolValue();
+                }
+                else
+                {
+                    bool first = true;
+                    foreach (IScheminType type in args)
+                    {
+                        if (!first)
+                        {
+                            nextCycle.Append(type);
+                        }
 
-				return ScheminBool.False;
-			};*/
+                        first = false;
+                    }
+                }
+
+                return nextCycle;
+			};
 
 			GreaterThan = (args, env, eval) => {
 				IScheminNumeric first = (IScheminNumeric) args.Car();

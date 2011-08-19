@@ -91,7 +91,7 @@ namespace Schemin.Evaluate
 							return WaitingOn;
 						}
 
-						if ((WaitingOn as ScheminAtom) != null)
+						if ((WaitingOn as ScheminAtom) != null && !WaitingOn.Quoted())
 						{
 							WaitingOn = EvalAtom(WaitingOn, CurrentEnv);
 						}
@@ -381,9 +381,19 @@ namespace Schemin.Evaluate
 				case "cond":
 					break;
 				case "and":
+                    foreach (IScheminType type in args)
+                    {
+                        type.Quote();
+                    }
+                    args.Car().UnQuote();
 					break;
-				case "or":
-					break;
+                case "or": 
+                    foreach (IScheminType type in args)
+                    {
+                        type.Quote();
+                    }
+                    args.Car().UnQuote();
+                    break;
 				case "set!":
 					args.Car().Quote();
 					break;
