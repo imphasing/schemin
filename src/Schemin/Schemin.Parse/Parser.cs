@@ -100,6 +100,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(GeneralOperations.LetStar, "let*");
 				case "set!":
 					return new ScheminPrimitive(GeneralOperations.SetBang, "set!");
+                case "call/cc":
+                    return new ScheminPrimitive(GeneralOperations.CallCC, "call/cc");
 				default:
 					return atom;
 			}

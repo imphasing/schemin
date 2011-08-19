@@ -44,25 +44,20 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Assembly\AssemblyInfo.cs" />
-
     <Compile Include="Mono.Options\Options.cs" />
-
+    <Compile Include="Schemin.AST\ScheminContinuation.cs" />
     <Compile Include="Schemin.Evaluate\Environment.cs" />
     <Compile Include="Schemin.Evaluate\Evaluator.cs" />
     <Compile Include="Schemin.Evaluate\EvaluatorState.cs" />
     <Compile Include="Schemin.Evaluate\UnboundAtomException.cs" />
-
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\GeneralOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\BooleanOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\ListOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\NumericOperations.cs" />
-
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />
-
     <Compile Include="Schemin.Parse\Parser.cs" />
-
     <Compile Include="Schemin.AST\IScheminType.cs" />
     <Compile Include="Schemin.AST\IScheminNumeric.cs" />
     <Compile Include="Schemin.AST\ScheminAtom.cs" />

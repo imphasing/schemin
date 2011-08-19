@@ -205,7 +205,11 @@ namespace Schemin.Evaluate
 					ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
 					completeFrame.Before = before;
 					completeFrame.After = after;
+
+                    Stack.Push(current);
 					completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
+                    Stack.Pop();
+
 					completeFrame.CurrentEnv = CurrentEnv;
 
 					Stack.Push(completeFrame);
@@ -224,6 +228,13 @@ namespace Schemin.Evaluate
 					Stack.Push(completeFrame);
 					continue;
 				}
+                else if ((functionPosition as ScheminContinuation) != null)
+                {
+                    ScheminContinuation con = (ScheminContinuation) functionPosition;
+                    this.Stack = new Stack<StackFrame>(con.PreviousStack);
+                    this.Stack.Peek().WaitingOn = functionArgs.Car();
+                    continue;
+                }
 				else
 				{
 					throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());

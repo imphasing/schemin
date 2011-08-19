@@ -25,6 +25,7 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LetRec;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LetStar;
+        public static Func<ScheminList, Environment, Evaluator, IScheminType> CallCC;
 
 		static GeneralOperations()
 		{
@@ -190,16 +191,16 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				ScheminList bindings;
-				IScheminType expression;
+				ScheminList expression;
 
 				if (!isNamed)
 				{
-					expression = list.Cdr().Car();
+					expression = list.Cdr();
 					bindings = (ScheminList)list.Car();
 				}
 				else
 				{
-					expression = list.Cdr().Cdr().Car();
+					expression = list.Cdr().Cdr();
 					bindings = (ScheminList)list.Cdr().Car();
 				}
 
@@ -215,9 +216,13 @@ namespace Schemin.Evaluate.Primitives
 					argExps.Append(bindingPair.Cdr().Car());
 				}
 
-				ScheminList lambdaDef = new ScheminList(args);
+                ScheminList lambdaDef = new ScheminList(args);
 				lambdaDef.UnQuote();
-				lambdaDef.Append(expression);
+
+                foreach (IScheminType type in expression)
+                {
+                    lambdaDef.Append(type);
+                }
 
 				Environment closure = env;
 				if (isNamed)
@@ -303,6 +308,16 @@ namespace Schemin.Evaluate.Primitives
 				IScheminType arg = list.Car();
 				return arg;
 			};
+
+            CallCC = (list, env, eval) => {
+                ScheminList applied = new ScheminList();
+                applied.UnQuote();
+
+                applied.Append(list.Car());
+                applied.Append(new ScheminContinuation(eval.Stack));
+
+                return applied;
+            };
 
 			DumpEnv = (args, env, eval) => {
 				Console.WriteLine(env.ToString());
