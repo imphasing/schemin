@@ -17,13 +17,44 @@ Schemin is a scheme-ish interpreter, written in C#. This is a learning project t
             (for (- times 1)(swap-pass val))
             (swap-pass val)))))
 
+As well as some more complicated things, like this simple example of coroutines using call/cc:
+
+
+    (define (superfluous-computation do-other-stuff) 
+      (let loop () 
+        (map (lambda (graphic) 
+          (display graphic) 
+          (newline) 
+          (set! do-other-stuff (call/cc do-other-stuff))) 
+        '("Straight up." "Quarter after." "Half past."  "Quarter til.")) 
+      (loop))) 
+
+    (define (hefty-computation do-other-stuff) 
+     (let loop ((n 5)) 
+      (display "Hefty computation: ") 
+      (display n) 
+      (newline) 
+      (set! do-other-stuff (call/cc do-other-stuff)) 
+      (display "Hefty computation (b)")  
+      (newline) 
+      (set! do-other-stuff (call/cc do-other-stuff)) 
+      (display "Hefty computation (c)") 
+      (newline) 
+      (set! do-other-stuff (call/cc do-other-stuff)) 
+      (if (> n 0) 
+       (loop (- n 1))))) 
+
+    (hefty-computation superfluous-computation)
+
+
 Implemented featues:
 --------------------
 
++ First-class continuations and call/cc
 + define and set!
 + lambdas with closures
-+ Let, named let, letrec and let\*
-+ Some flow control (if, cond and boolean primitives)
++ Let, named let, letrec
++ Some flow control (if, and boolean primitives)
 + A few list operations like map, filter, and foldl (as well as cons, cdr, car, etc)
 + Some basic numerical primitives and decimal support
 
@@ -31,8 +62,6 @@ Implemented featues:
 To do:
 ------
 
-+ Implement continuations as a first-class type
-+ Re-implement the evaluator so it's not recursive
 + Possibly implement a parser generator instead of our recursive parser
 + Implement more common primitives
 

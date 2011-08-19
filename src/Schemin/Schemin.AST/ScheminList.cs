@@ -12,6 +12,10 @@ namespace Schemin.AST
 		public ScheminList Rest = null;
 		public bool Empty = true;
 
+        private bool quoted = true;
+
+        public static bool QuoteLists = true;
+
 		public int Length
 		{
 			get
@@ -24,7 +28,7 @@ namespace Schemin.AST
 						if (type.GetType() == typeof(ScheminList))
 						{
 							ScheminList temp = (ScheminList) type;
-							if (!temp.Empty)
+							if (!temp.Empty || temp.Quoted())
 								count++;
 						}
 						else
@@ -40,17 +44,32 @@ namespace Schemin.AST
 
 		public ScheminList()
 		{
+            if (!QuoteLists)
+            {
+                this.quoted = false;
+            }
+
 			this.Empty = true;
 		}
 
 		public ScheminList(IScheminType head)
 		{
+            if (!QuoteLists)
+            {
+                this.quoted = false;
+            }
+
 			this.Head = head;
 			this.Empty = false;
 		}
 
 		public ScheminList(IScheminType head, ScheminList rest)
 		{
+            if (!QuoteLists)
+            {
+                this.quoted = false;
+            }
+
 			this.Head = head;
 			this.Rest = rest;
 			this.Empty = false;
@@ -60,7 +79,10 @@ namespace Schemin.AST
 		{
 			if (this.Head == null)
 			{
-				return new ScheminList();
+                ScheminList ret = new ScheminList();
+                ret.quoted = quoted;
+
+                return ret;
 			}
 
 			return this.Head;
@@ -68,17 +90,29 @@ namespace Schemin.AST
 
 		public ScheminList Cdr()
 		{
+            ScheminList ret;
 			if (this.Rest == null)
 			{
-				return new ScheminList();
+                ret = new ScheminList();
+                ret.quoted = quoted;
+
+                return ret;
 			}
 
-			return this.Rest;
+            ret = this.Rest;
+            ret.quoted = quoted;
+
+            return ret;
 		}
 
 		public ScheminList Cons(IScheminType type)
 		{
-			return new ScheminList(type, this);
+            IScheminType oldHead = this.Head;
+
+            this.Head = type;
+            this.Rest = new ScheminList(oldHead, this.Rest);
+
+            return this;
 		}
 
 		public ScheminList Append(IScheminType type)
@@ -162,6 +196,21 @@ namespace Schemin.AST
 
 			return builder.ToString();
 		}
+
+        public bool Quoted()
+        {
+            return this.quoted;
+        }
+
+        public void Quote()
+        {
+            quoted = true;
+        }
+
+        public void UnQuote()
+        {
+            quoted = false;
+        }
 
 		public bool Equals(IScheminType type)
 		{

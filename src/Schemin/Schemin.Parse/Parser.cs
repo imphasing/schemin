@@ -12,8 +12,10 @@ namespace Schemin.Parse
 	{
 		public ScheminList Parse(List<Token> tokens)
 		{
+            ScheminList.QuoteLists = false;
 			KeyValuePair<ScheminList, int> parsed = ParseInternal(tokens, 0);
 			TransformQuotes((ScheminList) parsed.Key);
+            ScheminList.QuoteLists = true;
 			return (ScheminList) parsed.Key;
 		}
 
@@ -80,6 +82,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(GeneralOperations.Define, "define");
 				case "quote":
 					return new ScheminPrimitive(GeneralOperations.Quote, "quote");
+                case "begin":
+                    return new ScheminPrimitive(GeneralOperations.Begin, "begin");
 				case "if":
 					return new ScheminPrimitive(GeneralOperations.If, "if");
 				case "or":
@@ -96,6 +100,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive(GeneralOperations.LetStar, "let*");
 				case "set!":
 					return new ScheminPrimitive(GeneralOperations.SetBang, "set!");
+                case "call/cc":
+                    return new ScheminPrimitive(GeneralOperations.CallCC, "call/cc");
 				default:
 					return atom;
 			}

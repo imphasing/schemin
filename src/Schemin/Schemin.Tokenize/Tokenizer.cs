@@ -53,6 +53,7 @@ namespace Schemin.Tokenize
 			string addedWhitespace = input.Replace("(", " ( ");
 			addedWhitespace = addedWhitespace.Replace(")", " ) ");
 			string removedNewlines = addedWhitespace.Replace(System.Environment.NewLine, " ");
+            removedNewlines = removedNewlines.Replace("\n", " ");
 			string removedTabs = removedNewlines.Replace('\t', ' ');
 
 			List<string> stringTokens = removedTabs.Split(' ').ToList();

@@ -3,6 +3,8 @@ namespace Schemin.AST
 {
 	using System;
 	using Schemin.Evaluate;
+	using Schemin.Evaluate.Primitives;
+
 	using Environment = Schemin.Evaluate.Environment;
 
 	public class ScheminLambda : IScheminType
@@ -14,11 +16,21 @@ namespace Schemin.AST
 		public ScheminLambda(ScheminList definition, Environment closure)
 		{
 			this.Arguments = (ScheminList) definition.Car();
-			this.Definition = definition.Cdr();
+            if (definition.Cdr().Length == 1)
+            {
+                this.Definition = definition.Cdr().Car();
+            }
+            else
+            {
+                ScheminList def = definition.Cdr();
+                def.Cons(new ScheminPrimitive(GeneralOperations.Begin, "begin"));
+                this.Definition = def;
+            }
+
 			this.Closure = closure;
 		}
 
-		public IScheminType Evaluate(ScheminList values, Evaluator eval)
+		public Environment MakeEnvironment(ScheminList values, Evaluator eval)
 		{
 			IScheminType first = Arguments.Car();
 			ScheminList rest = Arguments.Cdr();
@@ -47,22 +59,25 @@ namespace Schemin.AST
 				restArgs = restArgs.Cdr();
 			}
 
-			IScheminType last; 
-			if (Definition.GetType() == typeof(ScheminList))
-			{
-				last = eval.Evaluate((ScheminList) Definition, args);
-			}
-			else
-			{
-				last = eval.EvaluateInternal(Definition, args); 
-			}
-
-			return last;
+			return args;
 		}
 
 		public override string ToString()
 		{
 			return "<Lambda>";
+		}
+
+		public bool Quoted()
+		{
+			return false;
+		}
+
+		public void Quote()
+		{
+		}
+
+		public void UnQuote()
+		{
 		}
 
 		public bool Equals(IScheminType type)

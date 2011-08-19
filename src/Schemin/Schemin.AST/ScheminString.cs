@@ -15,6 +15,19 @@ namespace Schemin.AST
 			return "\"" + Value + "\"";
 		}
 
+        public bool Quoted()
+        {
+            return false;
+        }
+
+        public void Quote()
+        {
+        }
+
+        public void UnQuote()
+        {
+        }
+
 		public bool Equals(IScheminType type)
 		{
 			if (this.GetType() != type.GetType())

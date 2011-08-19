@@ -19,9 +19,10 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> List;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Append;
 
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Map;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Filter;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Foldl;
+		public static string Map;
+		public static string Filter;
+        public static string Foldl; 
+        public static string Foldr;
 
 		static ListOperations()
 		{
@@ -115,130 +116,19 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 
-			Foldl = (list, env, eval) => {
-				IScheminType func = (IScheminType) list.Car();
-				IScheminType init = list.Cdr().Car();
-				ScheminList toFold = (ScheminList) list.Cdr().Cdr().Car();
+			Foldl = @"(define (foldl func accum lst)
+                      (if (null? lst)
+                        accum
+                        (foldl func (func accum (car lst)) (cdr lst))))";
 
-				IScheminType result;
+            Foldr = @"(define (foldr func end lst)
+                        (if (null? lst)
+                            end
+                            (func (car lst) (foldr func end (cdr lst)))))";
 
-				if ((func as ScheminPrimitive) != null)
-				{
+            Filter = @"(define (filter pred lst) (foldr (lambda (x y) (if (pred x) (cons x y) y)) '() lst))";
 
-					ScheminPrimitive proc = (ScheminPrimitive) func;
-					result = toFold.Aggregate(init, (total, next) => {
-							ScheminList args = new ScheminList(next);
-							args.Append(total);
-
-							return proc.Evaluate(args, env, eval);
-							});
-				}
-				else
-				{
-					ScheminLambda lam = (ScheminLambda) func;
-
-					result = toFold.Aggregate(init, (total, next) => {
-							ScheminList args = new ScheminList(next);
-							args.Append(total);
-
-							return lam.Evaluate(args, eval);
-							}); 
-				}
-
-				return result;
-			};
-
-			Filter = (list, env, eval) => {
-				IScheminType toApply = (IScheminType) list.Car();
-				ScheminList toFilter = (ScheminList) list.Cdr().Car();
-
-
-				if (toFilter.Empty)
-				{
-					return toFilter;
-				}
-
-				List<IScheminType> filtered;
-
-				if ((toApply as ScheminPrimitive) != null)
-				{
-					ScheminPrimitive proc = (ScheminPrimitive) toApply;
-
-					filtered = toFilter.Where(element => {
-							var args = new ScheminList(element);
-							ScheminBool predResult = (ScheminBool) proc.Evaluate(args, env, eval);
-							return predResult.Value;
-					}).ToList();
-				}
-				else
-				{
-
-					ScheminLambda lam = (ScheminLambda) toApply;
-
-					filtered = toFilter.Where(element => {
-							var args = new ScheminList(element);
-							ScheminBool predResult = (ScheminBool) lam.Evaluate(args, eval);
-							return predResult.Value;
-					}).ToList();
-				}
-
-				if (filtered.Count() < 1)
-				{
-					return new ScheminList();
-				}
-
-				ScheminList temp = new ScheminList();
-				foreach (IScheminType type in filtered)
-				{
-					temp.Append(type);
-				}
-
-				return temp;
-			};
-
-			Map = (list, env, eval) => {
-				IScheminType toApply = (IScheminType) list.Car();
-				ScheminList toMap = (ScheminList) list.Cdr().Car();
-
-				if (toMap.Empty)
-				{
-					return toMap;
-				}
-
-				List<IScheminType> mapped;
-
-				if ((toApply as ScheminPrimitive) != null)
-				{
-					ScheminPrimitive proc = (ScheminPrimitive) toApply;
-
-					mapped = toMap.Select(element => {
-							var args = new ScheminList(element);
-							return proc.Evaluate(args, env, eval);
-					}).ToList();
-				}
-				else
-				{
-					ScheminLambda lam = (ScheminLambda) toApply;
-
-					mapped = toMap.Select(element => {
-							var args = new ScheminList(element);
-							return lam.Evaluate(args, eval);
-					}).ToList();
-				}
-
-				if (mapped.Count() < 1)
-				{
-					return new ScheminList();
-				}
-
-				ScheminList temp = new ScheminList();
-				foreach (IScheminType type in mapped)
-				{
-					temp.Append(type);
-				}
-
-				return temp;
-			};
+            Map = @"(define (map func lst) (foldr (lambda (x y) (cons (func x) y)) '() lst))";
 		}
 
 	}
