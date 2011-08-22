@@ -54,6 +54,7 @@
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\BooleanOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\ListOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\NumericOperations.cs" />
+    <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\ScheminPrimitives.cs" />
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />

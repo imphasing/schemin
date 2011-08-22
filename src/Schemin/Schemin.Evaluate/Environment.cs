@@ -5,7 +5,7 @@ namespace Schemin.Evaluate
 	using System.Text;
 	using System.Collections.Generic;
 	using Schemin.AST;
-	
+
 	public class Environment
 	{
 		public Dictionary<string, IScheminType> bindings;

@@ -21,8 +21,8 @@ namespace Schemin.Evaluate.Primitives
 
 		public static string Map;
 		public static string Filter;
-        public static string Foldl; 
-        public static string Foldr;
+		public static string Foldl; 
+		public static string Foldr;
 
 		static ListOperations()
 		{
@@ -114,21 +114,6 @@ namespace Schemin.Evaluate.Primitives
 
 				return appended;
 			};
-
-
-			Foldl = @"(define (foldl func accum lst)
-                      (if (null? lst)
-                        accum
-                        (foldl func (func accum (car lst)) (cdr lst))))";
-
-            Foldr = @"(define (foldr func end lst)
-                        (if (null? lst)
-                            end
-                            (func (car lst) (foldr func end (cdr lst)))))";
-
-            Filter = @"(define (filter pred lst) (foldr (lambda (x y) (if (pred x) (cons x y) y)) '() lst))";
-
-            Map = @"(define (map func lst) (foldr (lambda (x y) (cons (func x) y)) '() lst))";
 		}
 
 	}

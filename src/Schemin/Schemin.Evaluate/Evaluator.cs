@@ -86,14 +86,14 @@ namespace Schemin.Evaluate
 
 					if (before == null && after == null)
 					{
-						if (Stack.Count < 1)
-						{
-							return WaitingOn;
-						}
-
 						if ((WaitingOn as ScheminAtom) != null && !WaitingOn.Quoted())
 						{
 							WaitingOn = EvalAtom(WaitingOn, CurrentEnv);
+						}
+
+						if (Stack.Count < 1)
+						{
+							return WaitingOn;
 						}
 
 						StackFrame previous = Stack.Pop();
@@ -206,9 +206,9 @@ namespace Schemin.Evaluate
 					completeFrame.Before = before;
 					completeFrame.After = after;
 
-                    Stack.Push(current);
+					Stack.Push(current);
 					completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
-                    Stack.Pop();
+					Stack.Pop();
 
 					completeFrame.CurrentEnv = CurrentEnv;
 
@@ -228,13 +228,13 @@ namespace Schemin.Evaluate
 					Stack.Push(completeFrame);
 					continue;
 				}
-                else if ((functionPosition as ScheminContinuation) != null)
-                {
-                    ScheminContinuation con = (ScheminContinuation) functionPosition;
-                    this.Stack = new Stack<StackFrame>(con.PreviousStack);
-                    this.Stack.Peek().WaitingOn = functionArgs.Car();
-                    continue;
-                }
+				else if ((functionPosition as ScheminContinuation) != null)
+				{
+					ScheminContinuation con = (ScheminContinuation) functionPosition;
+					this.Stack = new Stack<StackFrame>(con.PreviousStack);
+					this.Stack.Peek().WaitingOn = functionArgs.Car();
+					continue;
+				}
 				else
 				{
 					throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
@@ -381,19 +381,19 @@ namespace Schemin.Evaluate
 				case "cond":
 					break;
 				case "and":
-                    foreach (IScheminType type in args)
-                    {
-                        type.Quote();
-                    }
-                    args.Car().UnQuote();
+					foreach (IScheminType type in args)
+					{
+						type.Quote();
+					}
+					args.Car().UnQuote();
 					break;
-                case "or": 
-                    foreach (IScheminType type in args)
-                    {
-                        type.Quote();
-                    }
-                    args.Car().UnQuote();
-                    break;
+				case "or": 
+					foreach (IScheminType type in args)
+					{
+						type.Quote();
+					}
+					args.Car().UnQuote();
+					break;
 				case "set!":
 					args.Car().Quote();
 					break;
@@ -402,18 +402,23 @@ namespace Schemin.Evaluate
 
 		public void DefinePrimitives(Environment env)
 		{
-			var prebound_schemin = new Dictionary<string, string>();
-			prebound_schemin.Add("map", ListOperations.Map);
-			prebound_schemin.Add("filter", ListOperations.Filter);
-			prebound_schemin.Add("foldl", ListOperations.Foldl);
-			prebound_schemin.Add("foldr", ListOperations.Foldr);
+			var prebound_schemin = new List<string>();
+			prebound_schemin.Add(ScheminPrimitives.Map);
+			prebound_schemin.Add(ScheminPrimitives.Filter);
+			prebound_schemin.Add(ScheminPrimitives.Foldl);
+			prebound_schemin.Add(ScheminPrimitives.Foldr);
+			prebound_schemin.Add(ScheminPrimitives.Not);
+			prebound_schemin.Add(ScheminPrimitives.Id);
+			prebound_schemin.Add(ScheminPrimitives.Flip);
+			prebound_schemin.Add(ScheminPrimitives.Fold);
+			prebound_schemin.Add(ScheminPrimitives.Reduce);
 
 			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
 			Schemin.Parse.Parser p = new Parse.Parser();
 
-			foreach (KeyValuePair<string, string> kvp in prebound_schemin)
+			foreach (string primitive in prebound_schemin)
 			{
-				var tokens = t.Tokenize(kvp.Value);
+				var tokens = t.Tokenize(primitive);
 				var ast = p.Parse(tokens);
 				Evaluate(ast, env);
 			}
@@ -444,7 +449,6 @@ namespace Schemin.Evaluate
 			prebound.Add("<=", BooleanOperations.LessThanOr);
 			prebound.Add("zero?", BooleanOperations.Zero);
 
-			prebound.Add("not", BooleanOperations.Not);
 			prebound.Add("boolean?", BooleanOperations.Boolean);
 			prebound.Add("symbol?", BooleanOperations.Symbol);
 			prebound.Add("procedure?", BooleanOperations.Procedure);

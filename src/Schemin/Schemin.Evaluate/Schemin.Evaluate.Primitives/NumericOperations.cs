@@ -181,7 +181,7 @@ namespace Schemin.Evaluate.Primitives
 						}
 					}
 				}
-				
+
 				return (IScheminType) result;
 			};
 		}
