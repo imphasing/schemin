@@ -69,7 +69,7 @@ namespace Schemin.Evaluate.Primitives
 				if ((type as ScheminList) != null)
 				{
 					ScheminList temp = (ScheminList) type;
-					if (temp.Length == 2)
+					if (!temp.Empty)
 					{
 						return ScheminBool.True;
 					}
