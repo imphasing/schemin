@@ -402,33 +402,13 @@ namespace Schemin.Evaluate
 
 		public void DefinePrimitives(Environment env)
 		{
-			var prebound_schemin = new List<string>();
-			prebound_schemin.Add(ScheminPrimitives.Map);
-			prebound_schemin.Add(ScheminPrimitives.Filter);
-			prebound_schemin.Add(ScheminPrimitives.Foldl);
-			prebound_schemin.Add(ScheminPrimitives.Foldr);
-			prebound_schemin.Add(ScheminPrimitives.Not);
-			prebound_schemin.Add(ScheminPrimitives.Id);
-			prebound_schemin.Add(ScheminPrimitives.Flip);
-			prebound_schemin.Add(ScheminPrimitives.Fold);
-			prebound_schemin.Add(ScheminPrimitives.Reduce);
-
-			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
-			Schemin.Parse.Parser p = new Parse.Parser();
-
-			foreach (string primitive in prebound_schemin)
-			{
-				var tokens = t.Tokenize(primitive);
-				var ast = p.Parse(tokens);
-				Evaluate(ast, env);
-			}
-
 			var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
 
 			prebound.Add("+", NumericOperations.Add);
 			prebound.Add("-", NumericOperations.Subtract);
 			prebound.Add( "*", NumericOperations.Multiply);
 			prebound.Add( "/", NumericOperations.Divide);
+			prebound.Add( "mod", NumericOperations.Mod);
 
 			prebound.Add("car", ListOperations.Car);
 			prebound.Add("cons", ListOperations.Cons);
@@ -447,7 +427,6 @@ namespace Schemin.Evaluate
 			prebound.Add(">=", BooleanOperations.GreaterThanOr);
 			prebound.Add("<", BooleanOperations.LessThan);
 			prebound.Add("<=", BooleanOperations.LessThanOr);
-			prebound.Add("zero?", BooleanOperations.Zero);
 
 			prebound.Add("boolean?", BooleanOperations.Boolean);
 			prebound.Add("symbol?", BooleanOperations.Symbol);
@@ -460,6 +439,8 @@ namespace Schemin.Evaluate
 			prebound.Add("display", GeneralOperations.Display);
 			prebound.Add("newline", GeneralOperations.Newline);
 
+			prebound.Add("apply", GeneralOperations.Apply);
+
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{
 				var func = kvp.Value;
@@ -469,6 +450,36 @@ namespace Schemin.Evaluate
 				ScheminPrimitive prim = new ScheminPrimitive(func, symbolValue);
 
 				env.AddBinding(symbol, prim);
+			}
+
+			var prebound_schemin = new List<string>();
+			prebound_schemin.Add(ScheminPrimitives.Map);
+			prebound_schemin.Add(ScheminPrimitives.Filter);
+			prebound_schemin.Add(ScheminPrimitives.Foldl);
+			prebound_schemin.Add(ScheminPrimitives.Foldr);
+			prebound_schemin.Add(ScheminPrimitives.Not);
+			prebound_schemin.Add(ScheminPrimitives.Id);
+			prebound_schemin.Add(ScheminPrimitives.Flip);
+			prebound_schemin.Add(ScheminPrimitives.Fold);
+			prebound_schemin.Add(ScheminPrimitives.Unfold);
+			prebound_schemin.Add(ScheminPrimitives.Reverse);
+			prebound_schemin.Add(ScheminPrimitives.Curry);
+			prebound_schemin.Add(ScheminPrimitives.Compose);
+			prebound_schemin.Add(ScheminPrimitives.Zero);
+			prebound_schemin.Add(ScheminPrimitives.Positive);
+			prebound_schemin.Add(ScheminPrimitives.Negative);
+			prebound_schemin.Add(ScheminPrimitives.Odd);
+			prebound_schemin.Add(ScheminPrimitives.Even);
+			prebound_schemin.Add(ScheminPrimitives.CallWithCC);
+
+			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
+			Schemin.Parse.Parser p = new Parse.Parser();
+
+			foreach (string primitive in prebound_schemin)
+			{
+				var tokens = t.Tokenize(primitive);
+				var ast = p.Parse(tokens);
+				Evaluate(ast, env);
 			}
 		}
 	}

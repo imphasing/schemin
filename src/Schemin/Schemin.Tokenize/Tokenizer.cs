@@ -4,6 +4,7 @@ namespace Schemin.Tokenize
 	using System;
 	using System.Collections.Generic;
 	using System.Text.RegularExpressions;
+	using System.Text;
 	using System.Linq;
 
 	public class Tokenizer
@@ -37,6 +38,23 @@ namespace Schemin.Tokenize
 			return transformed;
 		}
 
+		private string RemoveComments(string input)
+		{
+			string commentMatch = ";.*$";
+			Regex comment = new Regex(commentMatch);
+
+			StringBuilder removed = new StringBuilder();
+			string[] lines = input.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+			foreach (string line in lines)
+			{
+				removed.Append(comment.Replace(line, String.Empty));
+				removed.Append(System.Environment.NewLine);
+			}
+
+			return removed.ToString();
+		}
+
 		private string TrimQuotes(string input)
 		{
 			string leading = input.Remove(0, 1);
@@ -47,16 +65,23 @@ namespace Schemin.Tokenize
 		{
 			var tokens = new List<Token>();
 
+			// Normalize then remove newlines
+			string normalizedNewlines = input.Replace(System.Environment.NewLine, "\n");
+			normalizedNewlines = normalizedNewlines.Replace("\n", System.Environment.NewLine);
+
 			// Remove string literals so our type recognition doesn't screw up
-			input = ExtractLiterals(input);
+			string removedLiterals = ExtractLiterals(normalizedNewlines);
 
-			string addedWhitespace = input.Replace("(", " ( ");
+			// Remove comments
+			string removedComments = RemoveComments(removedLiterals);
+
+			string removedNewlines = removedComments.Replace(System.Environment.NewLine, String.Empty);
+			string removedTabs = removedNewlines.Replace("\t", String.Empty);
+
+			string addedWhitespace = removedTabs.Replace("(", " ( ");
 			addedWhitespace = addedWhitespace.Replace(")", " ) ");
-			string removedNewlines = addedWhitespace.Replace(System.Environment.NewLine, " ");
-            removedNewlines = removedNewlines.Replace("\n", " ");
-			string removedTabs = removedNewlines.Replace('\t', ' ');
 
-			List<string> stringTokens = removedTabs.Split(' ').ToList();
+			List<string> stringTokens = addedWhitespace.Split(' ').ToList();
 			Func<string, bool> filter = token => (token != String.Empty && token != "" && token != System.Environment.NewLine);
 			stringTokens = stringTokens.Where(filter).ToList();
 

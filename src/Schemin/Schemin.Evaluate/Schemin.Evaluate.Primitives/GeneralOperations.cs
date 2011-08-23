@@ -12,23 +12,54 @@ namespace Schemin.Evaluate.Primitives
 
 	public static class GeneralOperations
 	{
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Lambda;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> If;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Cond;
+
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Begin;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetBang;
+
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Display;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Newline;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> Define;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> DumpEnv;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Quote;
+
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Lambda;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Let;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LetRec;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LetStar;
+
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Define;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetBang;
+
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> CallCC;
+
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Apply;
 
 		static GeneralOperations()
 		{
+			Apply = (list, env, eval) => {
+				IScheminType function = list.Car();
+				ScheminList argList = list.Cdr();
+				ScheminList toApply = (ScheminList) list.Cdr().Last();
+
+				ScheminList args = new ScheminList();
+				args.UnQuote();
+
+				foreach (IScheminType type in toApply)
+				{
+					args.Append(type);
+				}
+
+				foreach (IScheminType type in argList)
+				{
+					if (type != toApply)
+						args.Cons(type);
+				}
+
+				args.Cons(function);
+
+				return args;
+			};
+
 			Lambda = (list, env, eval) => {
 				foreach (IScheminType type in list)
 				{

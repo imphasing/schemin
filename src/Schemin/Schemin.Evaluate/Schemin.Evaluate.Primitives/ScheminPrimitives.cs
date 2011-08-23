@@ -31,6 +31,24 @@ namespace Schemin.Evaluate.Primitives
 						  (if (pred init)
 						    (cons init '())
 						    (cons init (unfold func (func init) pred))))";
+
+		public static string Reverse = "(define (reverse lst) (fold (flip cons) '() lst))";
+
+		public static string Curry = "(define (curry func arg1) (lambda (arg) (apply func (cons arg1 (list arg)))))";
+
+		public static string Compose = "(define (compose f g) (lambda (arg) (f (apply g arg))))";
+
+		public static string Zero = "(define zero? (curry = 0))";
+
+		public static string Positive = "(define positive? (curry < 0))";
+
+		public static string Negative = "(define negative? (curry > 0))";
+
+		public static string Odd = "(define (odd? num) (= (mod num 2) 1))";
+
+		public static string Even = "(define (even? num) (= (mod num 2) 0))";
+
+		public static string CallWithCC = "(define call-with-current-continuation call/cc)";
 	}
 }
 

@@ -15,6 +15,7 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Subtract;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Multiply;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Divide;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Mod;
 
 		static NumericOperations()
 		{
@@ -178,6 +179,44 @@ namespace Schemin.Evaluate.Primitives
 						else
 						{
 							result = new ScheminInteger(result.IntegerValue() / temp.IntegerValue());
+						}
+					}
+				}
+
+				return (IScheminType) result;
+			};
+
+			Mod = (args, env, eval) => {
+				bool dec = false;
+				var first = (IScheminNumeric) args.Car();
+				IScheminNumeric result = null;
+
+				foreach (IScheminType type in args)
+				{
+					if ((type as ScheminDecimal) != null)
+					{
+						dec = true;
+						result = new ScheminDecimal(first.DecimalValue());
+					}
+				}
+
+				if (!dec)
+				{
+					result = new ScheminInteger(first.IntegerValue());
+				}
+
+				foreach (IScheminType type in args.Cdr())
+				{
+					if ((type as IScheminNumeric) != null)
+					{
+						var temp = (IScheminNumeric) type;
+						if (dec)
+						{
+							result = new ScheminDecimal(result.DecimalValue() % temp.DecimalValue());
+						}
+						else
+						{
+							result = new ScheminInteger(result.IntegerValue() % temp.IntegerValue());
 						}
 					}
 				}
