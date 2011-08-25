@@ -212,27 +212,40 @@ namespace Schemin.Evaluate.Primitives
 				return toEvaluate;
 			};
 
-			/*LetStar = (list, env, eval) => {
-			  eval.EvalState = EvaluatorState.Normal;
-			  eval = new Evaluator();
+			LetStar = (list, env, eval) => {
+				foreach (IScheminType type in list)
+				{
+					type.UnQuote();
+				}
 
-			  ScheminList bindings = (ScheminList) list.Car();
-			  IScheminType expression = list.Cdr();
+				ScheminList bindings = (ScheminList) list.Car();
+				IScheminType expression = list.Cdr().Car();
 
-			  Environment temporary = new Environment();
-			  temporary.parent = env;
+				ScheminList first = new ScheminList();
+				first.UnQuote();
+				ScheminList firstBinding = new ScheminList(bindings.Car());
+				first.UnQuote();
 
-			  foreach (IScheminType type in bindings)
-			  {
-			  ScheminList binding = (ScheminList) type;
-			  ScheminAtom symbol = (ScheminAtom) binding.Car();
-			  IScheminType val = binding.Cdr().Car();
+				first.Append(new ScheminPrimitive(GeneralOperations.Let, "let"));
+				first.Append(firstBinding);
 
-			  temporary.AddBinding(symbol, eval.EvaluateInternal(val, temporary));
-			  }
+				if (bindings.Cdr().Length > 0)
+				{
+					ScheminList nextLet = new ScheminList(bindings.Cdr());
+					nextLet.UnQuote();
 
-			  return eval.Evaluate((ScheminList) expression, temporary);
-			  };*/
+					nextLet.Cons(new ScheminPrimitive(GeneralOperations.LetStar, "let*"));
+					nextLet.Append(expression);
+
+					first.Append(nextLet);
+				}
+				else
+				{
+					first.Append(expression);
+				}
+
+				return first;
+			};
 
 
 			Let = (list, env, eval) => {

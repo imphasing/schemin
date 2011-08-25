@@ -396,7 +396,11 @@ namespace Schemin.Evaluate
 						type.Quote();
 					}
 					break;
-				case "let*":
+				case "let*": 
+					foreach (IScheminType type in args)
+					{
+						type.Quote();
+					}
 					break;
 				case "begin":
 					break;
@@ -405,10 +409,10 @@ namespace Schemin.Evaluate
 					args.Cdr().Cdr().Car().Quote();
 					break;
 				case "cond":
-                    foreach (IScheminType type in args)
-                    {
-                        type.Quote();
-                    }
+					foreach (IScheminType type in args)
+					{
+						type.Quote();
+					}
 					break;
 				case "and":
 					foreach (IScheminType type in args)
