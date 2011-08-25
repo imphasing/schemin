@@ -20,6 +20,23 @@
 		n 
 		(+ (fib (- n 1)) (fib (- n 2))))))
 
+(define (fib-clever n)
+  (define (fib-aux a b p q count)
+    (cond ((= count 0) b)
+          ((even? count)
+           (fib-aux a
+                    b
+                    (+ (* p p) (* q q))
+                    (+ (* q q) (* 2 p q))
+                    (/ count 2)))
+          (else
+           (fib-aux (+ (* b q) (* a q) (* a p))
+                    (+ (* b p) (* a q))
+                    p
+                    q
+                    (- count 1)))))
+  (fib-aux 1 0 0 1 n))
+
 
 (define bubblesort (lambda (l)
   (define swap-pass (lambda (l)

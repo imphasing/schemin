@@ -405,6 +405,10 @@ namespace Schemin.Evaluate
 					args.Cdr().Cdr().Car().Quote();
 					break;
 				case "cond":
+                    foreach (IScheminType type in args)
+                    {
+                        type.Quote();
+                    }
 					break;
 				case "and":
 					foreach (IScheminType type in args)

@@ -307,41 +307,48 @@ namespace Schemin.Evaluate.Primitives
 				return toEvaluate;
 			};
 
-			/*Cond = (list, env, eval) => {
-			  eval.EvalState = EvaluatorState.Normal;
-			  eval = new Evaluator();
-			  ScheminList conditions = (ScheminList) list;
+			Cond = (list, env, eval) => {
+				foreach (IScheminType type in list)
+				{
+					type.UnQuote();
+				}
 
-			  foreach (IScheminType type in conditions)
-			  {
-			  ScheminList expression = (ScheminList) type;
-			  IScheminType condition = expression.Car();
-			  ScheminList result = expression.Cdr();
+				ScheminList conditions = (ScheminList) list;
 
-			// check for the else condition first so we can skip anything that comes after
-			if ((condition as ScheminAtom) != null)
-			{
-			ScheminAtom temp = (ScheminAtom) condition;
-			if (temp.Name == "else")
-			{
-			return eval.Evaluate(result, env);
-			}
-			}
+				ScheminList builtIf = new ScheminList();
+				builtIf.UnQuote();
 
-			ScheminBool conditionResults = eval.EvaluateInternal(condition, env).BoolValue();
-			if (conditionResults.Value)
-			{
-			return eval.Evaluate(result, env);
-			}
-			else
-			{
-			continue;
-			}
-			}
+				ScheminList firstCondition = (ScheminList) conditions.Car();
+				if ((firstCondition.Car() as ScheminAtom) != null)
+				{
+					ScheminAtom atom = (ScheminAtom) firstCondition.Car();
+					if (atom.Name == "else")
+					{
+						ScheminList elseClause = firstCondition.Cdr();
+						elseClause.Cons(new ScheminPrimitive(GeneralOperations.Begin, "begin"));
 
-			return new ScheminList();
+						return elseClause;
+					}
+				}
 
-			};*/
+				builtIf.Append(new ScheminPrimitive(GeneralOperations.If, "if"));
+				builtIf.Append(firstCondition.Car());
+
+				ScheminList beginExpression = firstCondition.Cdr();
+				beginExpression.Cons(new ScheminPrimitive(GeneralOperations.Begin, "begin"));
+
+				builtIf.Append(beginExpression);
+
+				if (conditions.Cdr().Length > 0)
+				{
+					ScheminList nextConditions = conditions.Cdr();
+					nextConditions.Cons(new ScheminPrimitive(GeneralOperations.Cond, "cond"));
+
+					builtIf.Append(nextConditions);
+				}
+
+				return builtIf;
+			};
 
 			If = (list, env, eval) => {
 				eval = new Evaluator();

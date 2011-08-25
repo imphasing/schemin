@@ -137,6 +137,8 @@ namespace Schemin.AST
 
 			this.Head = type;
 			this.Rest = new ScheminList(oldHead, this.Rest);
+			this.Rest.quoted = quoted;
+			this.Empty = false;
 
 			return this;
 		}
