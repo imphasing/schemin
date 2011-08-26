@@ -37,18 +37,6 @@ namespace Schemin.Evaluate
 
 	public class Evaluator
 	{
-		private Type integer = typeof(ScheminInteger);
-		private Type atom = typeof(ScheminAtom);
-		private Type list = typeof(ScheminList);
-		private Type str = typeof(ScheminString);
-		private Type primitive = typeof(ScheminPrimitive);
-		private Type lambda = typeof(ScheminLambda);
-		private Type boolean = typeof(ScheminBool);
-
-		public Stack<StackFrame> Stack = new Stack<StackFrame>();
-
-		public Environment GlobalEnv;
-
 		public class StackFrame
 		{
 			public ScheminList Before;
@@ -57,6 +45,9 @@ namespace Schemin.Evaluate
 
 			public IScheminType WaitingOn;
 		}
+
+		public Stack<StackFrame> Stack = new Stack<StackFrame>();
+		public Environment GlobalEnv;
 
 		public IScheminType Evaluate(ScheminList ast, Environment env)
 		{
@@ -106,7 +97,7 @@ namespace Schemin.Evaluate
 				ScheminList after = current.After;
 				IScheminType WaitingOn = current.WaitingOn;
 
-				if ((WaitingOn as ScheminList) == null || IsEmptyList(WaitingOn) || WaitingOn.Quoted() == true)
+				if ((WaitingOn as ScheminList) == null || WaitingOn.Quoted() == true || IsEmptyList(WaitingOn))
 				{
 					StackFrame next = new StackFrame();
 
@@ -154,18 +145,9 @@ namespace Schemin.Evaluate
 					continue;
 				}
 
-				ScheminList evalList = (ScheminList)WaitingOn;
-				ScheminList complete = new ScheminList();
-				complete.UnQuote();
-
-				bool foundWaiting = false;
-
-				ScheminList rest = evalList;
+				ScheminList rest = (ScheminList) WaitingOn;
 				ScheminList pendingBefore = new ScheminList();
 				pendingBefore.UnQuote();
-
-				ScheminList pendingAfter = new ScheminList();
-				pendingAfter.UnQuote();
 
 				while (!rest.Empty)
 				{
@@ -175,27 +157,27 @@ namespace Schemin.Evaluate
 					{
 						if (type.Quoted())
 						{
-							AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+							pendingBefore.Append(type);
 						}
 						else
 						{
 							IScheminType atomResult = EvalAtom(type, CurrentEnv);
-							AppendToPartialStackFrame(pendingBefore, pendingAfter, atomResult, foundWaiting);
+							pendingBefore.Append(atomResult);
 						}
 					}
 					else if ((type as ScheminPrimitive) != null)
 					{
 						ScheminPrimitive prim = (ScheminPrimitive)type;
-						TransformASTPrimitive(prim, rest.Cdr());
-						AppendToPartialStackFrame(pendingBefore, pendingAfter, prim, foundWaiting);
+						QuoteAST(prim, rest.Cdr());
+						pendingBefore.Append(prim);
 					}
 					else if ((type as ScheminList) != null)
 					{
-						ScheminList tempList = (ScheminList)type;
+						ScheminList tempList = (ScheminList) type;
 
 						if (tempList.Quoted() || tempList.Empty)
 						{
-							AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+							pendingBefore.Append(type);
 							rest = rest.Cdr();
 							continue;
 						}
@@ -213,16 +195,14 @@ namespace Schemin.Evaluate
 					}
 					else
 					{
-						AppendToPartialStackFrame(pendingBefore, pendingAfter, type, foundWaiting);
+						pendingBefore.Append(type);
 					}
 
 					rest = rest.Cdr();
 				}
 
-				ScheminList completed = CombineStackFrame(pendingBefore, pendingAfter, null);
-
-				IScheminType functionPosition = completed.Car();
-				ScheminList functionArgs = completed.Cdr();
+				IScheminType functionPosition = pendingBefore.Car();
+				ScheminList functionArgs = pendingBefore.Cdr();
 
 				StackFrame completeFrame = new StackFrame();
 
@@ -232,6 +212,7 @@ namespace Schemin.Evaluate
 					completeFrame.Before = before;
 					completeFrame.After = after;
 
+					// Need to pass push the previous frame back on so we can get access to the current continuation via the evaluator's Stack field.
 					Stack.Push(current);
 					completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
 					Stack.Pop();
@@ -288,11 +269,14 @@ namespace Schemin.Evaluate
 			ScheminList complete = new ScheminList();
 			complete.UnQuote();
 
-			if (before != null && before.Length > 0)
+			if (before != null && !before.Empty)
 			{
-				foreach (IScheminType type in before)
+				complete.Append(before.Head);
+				var restBefore = before.Rest;
+				while (restBefore != null)
 				{
-					complete.Append(type);
+					complete.Append(restBefore.Head);
+					restBefore = restBefore.Rest;
 				}
 			}
 
@@ -301,27 +285,18 @@ namespace Schemin.Evaluate
 				complete.Append(result);
 			}
 
-			if (after != null && after.Length > 0)
+			if (after != null && !after.Empty)
 			{
-				foreach (IScheminType type in after)
+				complete.Append(after.Head);
+				var restAfter = after.Rest;
+				while (restAfter != null)
 				{
-					complete.Append(type);
+					complete.Append(restAfter.Head);
+					restAfter = restAfter.Rest;
 				}
 			}
 
 			return complete;
-		}
-
-		public void AppendToPartialStackFrame(ScheminList before, ScheminList after, IScheminType toAppend, bool foundWaiting)
-		{
-			if (foundWaiting)
-			{
-				after.Append(toAppend);
-			}
-			else
-			{
-				before.Append(toAppend);
-			}
 		}
 
 		public bool IsEmptyList(IScheminType type)
@@ -357,7 +332,7 @@ namespace Schemin.Evaluate
 			return null;
 		}
 
-		public void TransformASTPrimitive(ScheminPrimitive prim, ScheminList args)
+		public void QuoteAST(ScheminPrimitive prim, ScheminList args)
 		{
 			switch (prim.Name)
 			{

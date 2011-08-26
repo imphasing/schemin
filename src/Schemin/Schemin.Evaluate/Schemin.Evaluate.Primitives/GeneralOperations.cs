@@ -98,7 +98,7 @@ namespace Schemin.Evaluate.Primitives
 
 			Newline = (list, env, eval) => {
 				Console.WriteLine();
-				return new ScheminList();
+				return ScheminList.EmptyList;
 			};
 
 			Display = (list, env, eval) => {
@@ -114,7 +114,7 @@ namespace Schemin.Evaluate.Primitives
 					Console.Write(toDisplay.ToString());
 				}
 
-				return new ScheminList();
+				return ScheminList.EmptyList;
 			};
 
 			SetBang = (list, env, eval) => {
@@ -133,7 +133,7 @@ namespace Schemin.Evaluate.Primitives
 
 						parent.RemoveBinding(symbol);
 						parent.AddBinding(symbol, definition);
-						return new ScheminList();
+						return ScheminList.EmptyList;
 					}
 
 					parent = parent.parent;
@@ -206,7 +206,7 @@ namespace Schemin.Evaluate.Primitives
 
 				foreach (IScheminType arg in argExps)
 				{
-					toEvaluate.Append(new ScheminList());
+					toEvaluate.Append(ScheminList.EmptyList);
 				}
 
 				return toEvaluate;
@@ -383,6 +383,14 @@ namespace Schemin.Evaluate.Primitives
 
 			Quote = (list, env, eval) => {
 				IScheminType arg = list.Car();
+				if ((arg as ScheminList) != null)
+				{
+					if (((ScheminList) arg).Empty)
+					{
+						return ScheminList.EmptyList;
+					}
+				}
+
 				return arg;
 			};
 
@@ -398,7 +406,7 @@ namespace Schemin.Evaluate.Primitives
 
 			DumpEnv = (args, env, eval) => {
 				Console.WriteLine(env.ToString());
-				return new ScheminList();
+				return ScheminList.EmptyList;
 			};
 
 			Define = (args, env, eval) => {
@@ -424,7 +432,7 @@ namespace Schemin.Evaluate.Primitives
 						env.AddBinding(symbol, definition);
 					}
 
-					return new ScheminList();
+					return ScheminList.EmptyList;
 				}
 				else
 				{
@@ -454,7 +462,7 @@ namespace Schemin.Evaluate.Primitives
 						env.AddBinding(name, lam);
 					}
 
-					return new ScheminList();
+					return ScheminList.EmptyList;
 				}
 			};
 		}

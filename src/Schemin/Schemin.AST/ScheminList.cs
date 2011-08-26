@@ -41,11 +41,24 @@ namespace Schemin.AST
 		private bool quoted = true;
 
 		public static bool QuoteLists = true;
+		public static ScheminList EmptyList;
+
+		static ScheminList()
+		{
+			ScheminList emptyList = new ScheminList();
+			emptyList.quoted = true;
+			EmptyList = emptyList;
+		}
 
 		public int Length
 		{
 			get
 			{
+				if (Empty)
+				{
+					return 0;
+				}
+
 				int count = 0;
 				foreach (IScheminType type in this)
 				{
@@ -105,10 +118,7 @@ namespace Schemin.AST
 		{
 			if (this.Head == null)
 			{
-				ScheminList ret = new ScheminList();
-				ret.quoted = quoted;
-
-				return ret;
+				return EmptyList;
 			}
 
 			return this.Head;
@@ -119,10 +129,7 @@ namespace Schemin.AST
 			ScheminList ret;
 			if (this.Rest == null)
 			{
-				ret = new ScheminList();
-				ret.quoted = quoted;
-
-				return ret;
+				return EmptyList;
 			}
 
 			ret = this.Rest;
@@ -242,7 +249,14 @@ namespace Schemin.AST
 
 		public bool Equals(IScheminType type)
 		{
-			// list comparison isn't implemented
+			if ((type as ScheminList) != null)
+			{
+				if (type == this)
+				{
+					return true;
+				}
+			}
+
 			return false;
 		}
 

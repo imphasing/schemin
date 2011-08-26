@@ -62,6 +62,14 @@ namespace Schemin.AST
 
 		public bool Equals(IScheminType type)
 		{
+			if ((type as ScheminContinuation) != null)
+			{
+				if (type == this)
+				{
+					return true;
+				}
+			}
+
 			return false;
 		}
 
