@@ -25,53 +25,38 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate
+namespace Schemin.Evaluate.Primitives
 {
 	using System;
 	using System.Text;
 	using System.Collections.Generic;
+	using System.Numerics;
+	using System.Linq;
 	using Schemin.AST;
+	using Schemin.Evaluate;
+	using Environment = Schemin.Evaluate.Environment;
 
-	public class Environment
+	public static class StringOperations
 	{
-		public Dictionary<string, IScheminType> bindings;
-		public Environment parent = null;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> StringRef;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> StringLength;
 
-		public Environment()
+		static StringOperations()
 		{
-			bindings = new Dictionary<string, IScheminType>();
-		}
+			StringRef = (list, env, eval) => {
+				ScheminString str = (ScheminString) list.Car();
+				ScheminInteger pos = (ScheminInteger) list.Cdr().Car();
 
-		public void AddBinding(ScheminAtom symbol, IScheminType type)
-		{
-			if (bindings.ContainsKey(symbol.Name))
-			{
-				bindings[symbol.Name] = type;
-			}
-			else
-			{
-				bindings.Add(symbol.Name, type);
-			}
-		}
+				// convert the bingint to a string, then parse it... uck :|
+				ScheminString chr = new ScheminString(str.Value[int.Parse(pos.Value.ToString())].ToString());
+				return chr;
+			};
 
-		public void RemoveBinding(ScheminAtom symbol)
-		{
-			if (bindings.ContainsKey(symbol.Name))
-			{
-				bindings.Remove(symbol.Name);
-			}
-		}
-
-		public override string ToString()
-		{
-			StringBuilder builder = new StringBuilder();
-
-			foreach (KeyValuePair<string, IScheminType> kvp in bindings)
-			{
-				builder.Append(string.Format("({0}: {1}) ", kvp.Key, kvp.Value));
-			}
-
-			return builder.ToString();
+			StringLength = (list, env, eval) => {
+				ScheminString str = (ScheminString) list.Car();
+				ScheminInteger len = new ScheminInteger(str.Value.Length);
+				return len;
+			};
 		}
 	}
 }

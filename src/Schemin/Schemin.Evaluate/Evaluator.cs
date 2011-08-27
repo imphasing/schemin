@@ -340,10 +340,7 @@ namespace Schemin.Evaluate
 					if ((args.Car() as ScheminList) != null)
 					{
 						args.Car().Quote();
-						foreach (IScheminType type in args.Cdr())
-						{
-							type.Quote();
-						}
+						QuoteAll(args.Cdr());
 					}
 					else
 					{
@@ -351,31 +348,19 @@ namespace Schemin.Evaluate
 					}
 					break;
 				case "lambda":
-					foreach (IScheminType type in args)
-					{
-						type.Quote();
-					}
+					QuoteAll(args);
 					break;
 				case "quote":
 					args.Car().Quote();
 					break;
 				case "let":
-					foreach (IScheminType type in args)
-					{
-						type.Quote();
-					}
+					QuoteAll(args);
 					break;
 				case "letrec":
-					foreach (IScheminType type in args)
-					{
-						type.Quote();
-					}
+					QuoteAll(args);
 					break;
-				case "let*": 
-					foreach (IScheminType type in args)
-					{
-						type.Quote();
-					}
+				case "let*":
+					QuoteAll(args);
 					break;
 				case "begin":
 					break;
@@ -384,28 +369,27 @@ namespace Schemin.Evaluate
 					args.Cdr().Cdr().Car().Quote();
 					break;
 				case "cond":
-					foreach (IScheminType type in args)
-					{
-						type.Quote();
-					}
+					QuoteAll(args);
 					break;
 				case "and":
-					foreach (IScheminType type in args)
-					{
-						type.Quote();
-					}
+					QuoteAll(args);
 					args.Car().UnQuote();
 					break;
-				case "or": 
-					foreach (IScheminType type in args)
-					{
-						type.Quote();
-					}
+				case "or":
+					QuoteAll(args);
 					args.Car().UnQuote();
 					break;
 				case "set!":
 					args.Car().Quote();
 					break;
+			}
+		}
+
+		private void QuoteAll(ScheminList list)
+		{
+			foreach (IScheminType type in list)
+			{
+				type.Quote();
 			}
 		}
 
@@ -415,9 +399,9 @@ namespace Schemin.Evaluate
 
 			prebound.Add("+", NumericOperations.Add);
 			prebound.Add("-", NumericOperations.Subtract);
-			prebound.Add( "*", NumericOperations.Multiply);
-			prebound.Add( "/", NumericOperations.Divide);
-			prebound.Add( "mod", NumericOperations.Mod);
+			prebound.Add("*", NumericOperations.Multiply);
+			prebound.Add("/", NumericOperations.Divide);
+			prebound.Add("mod", NumericOperations.Mod);
 
 			prebound.Add("car", ListOperations.Car);
 			prebound.Add("cons", ListOperations.Cons);
@@ -436,6 +420,7 @@ namespace Schemin.Evaluate
 			prebound.Add(">=", BooleanOperations.GreaterThanOr);
 			prebound.Add("<", BooleanOperations.LessThan);
 			prebound.Add("<=", BooleanOperations.LessThanOr);
+			prebound.Add("prime?", BooleanOperations.Prime);
 
 			prebound.Add("boolean?", BooleanOperations.Boolean);
 			prebound.Add("symbol?", BooleanOperations.Symbol);
@@ -447,8 +432,10 @@ namespace Schemin.Evaluate
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
 			prebound.Add("display", GeneralOperations.Display);
 			prebound.Add("newline", GeneralOperations.Newline);
-
 			prebound.Add("apply", GeneralOperations.Apply);
+
+			prebound.Add("string-ref", StringOperations.StringRef);
+			prebound.Add("string-length", StringOperations.StringLength);
 
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{
@@ -480,6 +467,7 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.Odd);
 			prebound_schemin.Add(ScheminPrimitives.Even);
 			prebound_schemin.Add(ScheminPrimitives.CallWithCC);
+			prebound_schemin.Add(ScheminPrimitives.Error);
 
 			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
 			Schemin.Parse.Parser p = new Parse.Parser();

@@ -30,14 +30,14 @@ namespace Schemin.Evaluate.Primitives
 	public static class ScheminPrimitives
 	{
 		public static string Foldl = @"(define (foldl func accum lst)
-					  (if (null? lst)
-					    accum
-					    (foldl func (func accum (car lst)) (cdr lst))))";
+						 (if (null? lst)
+						   accum
+						   (foldl func (func accum (car lst)) (cdr lst))))";
 
 		public static string Foldr = @"(define (foldr func end lst)
-					  (if (null? lst)
-					    end
-					    (func (car lst) (foldr func end (cdr lst)))))";
+						 (if (null? lst)
+						   end
+						   (func (car lst) (foldr func end (cdr lst)))))";
 
 		public static string Filter = @"(define (filter pred lst) (foldr (lambda (x y) (if (pred x) (cons x y) y)) '() lst))";
 
@@ -75,6 +75,8 @@ namespace Schemin.Evaluate.Primitives
 		public static string Even = "(define (even? num) (= (mod num 2) 0))";
 
 		public static string CallWithCC = "(define call-with-current-continuation call/cc)";
+
+		public static string Error = "(define error display)";
 	}
 }
 

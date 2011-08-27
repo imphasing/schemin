@@ -42,6 +42,7 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> GreaterThanOr;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThan;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> LessThanOr;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Prime;
 
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Equal;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Null;
@@ -306,6 +307,32 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return ScheminBool.False;
+			};
+
+			Prime = (args, env, eval) => {
+				var first = (IScheminNumeric) args.Car();
+				var candidate = first.IntegerValue();
+
+				if ((candidate & 1) == 0)
+				{
+					if (candidate == 2)
+					{
+						return ScheminBool.True;
+					}
+					else
+					{
+						return ScheminBool.False;
+					}
+				}
+
+				for (BigInteger i = 3; (i * i) <= candidate; i += 2)
+				{
+					if ((candidate % i) == 0)
+					{
+						return ScheminBool.False;
+					}
+				}
+				return ScheminBool.GetValue(candidate != 1);
 			};
 		}
 	}
