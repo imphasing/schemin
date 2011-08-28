@@ -454,6 +454,11 @@ namespace Schemin.Evaluate
 			prebound.Add("string-ref", StringOperations.StringRef);
 			prebound.Add("string-length", StringOperations.StringLength);
 
+			prebound.Add("current-input-port", PortOperations.CurrentInputPort);
+			prebound.Add("current-output-port", PortOperations.CurrentOutputPort);
+			prebound.Add("set-current-output-port!", PortOperations.SetCurrentOutputPort);
+			prebound.Add("set-current-input-port!", PortOperations.SetCurrentInputPort);
+
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{
 				var func = kvp.Value;
