@@ -46,8 +46,19 @@ namespace Schemin.Evaluate
 			public IScheminType WaitingOn;
 		}
 
-		public Stack<StackFrame> Stack = new Stack<StackFrame>();
+		public Stack<StackFrame> Stack;
 		public Environment GlobalEnv;
+		public ScheminPort ConsoleIOPort;
+		public ScheminPort CurrentInputPort;
+		public ScheminPort CurrentOutputPort; 
+
+		public Evaluator()
+		{
+			Stack = new Stack<StackFrame>();
+			ConsoleIOPort = new ScheminPort(Console.OpenStandardInput(), Console.OpenStandardOutput());
+			CurrentInputPort = ConsoleIOPort;
+			CurrentOutputPort = ConsoleIOPort;
+		}
 
 		public IScheminType Evaluate(ScheminList ast, Environment env)
 		{
@@ -395,6 +406,9 @@ namespace Schemin.Evaluate
 
 		public void DefinePrimitives(Environment env)
 		{
+			// Add the console IO port as a default binding
+			env.AddBinding(new ScheminAtom("console-i/o-port"), this.ConsoleIOPort);
+
 			var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
 
 			prebound.Add("+", NumericOperations.Add);
@@ -428,6 +442,9 @@ namespace Schemin.Evaluate
 			prebound.Add("pair?", BooleanOperations.Pair);
 			prebound.Add("number?", BooleanOperations.Number);
 			prebound.Add("string?", BooleanOperations.String);
+			prebound.Add("port?", BooleanOperations.Port);
+			prebound.Add("input-port?", BooleanOperations.InputPort);
+			prebound.Add("output-port?", BooleanOperations.OutputPort);
 
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
 			prebound.Add("display", GeneralOperations.Display);

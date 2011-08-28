@@ -104,14 +104,19 @@ namespace Schemin.Evaluate.Primitives
 			Display = (list, env, eval) => {
 				IScheminType toDisplay = list.Car();
 
+				byte[] toWrite;
+				ASCIIEncoding encoding = new ASCIIEncoding();
 				if (toDisplay.GetType() == typeof(ScheminString))
 				{
 					ScheminString temp = (ScheminString) toDisplay;
-					Console.Write(temp.Value);
+
+					toWrite = encoding.GetBytes(temp.Value);
+					eval.CurrentOutputPort.OutputStream.Write(toWrite, 0, toWrite.Length);
 				}
 				else
 				{
-					Console.Write(toDisplay.ToString());
+					toWrite = encoding.GetBytes(toDisplay.ToString());
+					eval.CurrentOutputPort.OutputStream.Write(toWrite, 0, toWrite.Length);
 				}
 
 				return ScheminList.EmptyList;

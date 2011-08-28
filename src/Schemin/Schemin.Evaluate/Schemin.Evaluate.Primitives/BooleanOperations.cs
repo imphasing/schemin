@@ -55,9 +55,53 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Pair;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Number;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> String;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Port;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> OutputPort;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> InputPort;
 
 		static BooleanOperations()
 		{
+			OutputPort = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminPort) != null)
+				{
+					ScheminPort port = (ScheminPort) type;
+					if (port.Type == ScheminPort.PortType.OutputPort || port.Type == ScheminPort.PortType.IOPort)
+					{
+						return ScheminBool.True;
+					}
+				}
+
+				return ScheminBool.False;
+			};
+
+			InputPort = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminPort) != null)
+				{
+					ScheminPort port = (ScheminPort) type;
+					if (port.Type == ScheminPort.PortType.InputPort || port.Type == ScheminPort.PortType.IOPort)
+					{
+						return ScheminBool.True;
+					}
+				}
+
+				return ScheminBool.False;
+			};
+
+			Port = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminPort) != null)
+				{
+					return ScheminBool.True;
+				}
+
+				return ScheminBool.False;
+			};
+
 			Boolean = (list, env, eval) => {
 				IScheminType type = list.Car();
 
