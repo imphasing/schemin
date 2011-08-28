@@ -28,6 +28,7 @@
 namespace Schemin.Evaluate.Primitives
 {
 	using System;
+	using System.IO;
 	using System.Text;
 	using System.Collections.Generic;
 	using System.Numerics;
@@ -44,8 +45,31 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetCurrentOutputPort;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> SetCurrentInputPort;
 
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> OpenInputFile;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> OpenOutputFile;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> ClosePort;
+
 		static PortOperations()
 		{
+			ClosePort = (list, env, eval) => {
+				ScheminPort toClose = (ScheminPort) list.Car();
+
+				if (toClose.Type == ScheminPort.PortType.IOPort)
+				{
+					toClose.InputStream.Close();
+					toClose.OutputStream.Close();
+				}
+				else if (toClose.Type == ScheminPort.PortType.OutputPort)
+				{
+					toClose.OutputStream.Close();
+				}
+				else if (toClose.Type == ScheminPort.PortType.InputPort)
+				{
+					toClose.InputStream.Close();
+				}
+
+				return ScheminList.EmptyList;
+			};
 			CurrentInputPort = (list, env, eval) => {
 				return eval.CurrentInputPort;
 			};
@@ -64,6 +88,22 @@ namespace Schemin.Evaluate.Primitives
 				ScheminPort inputPort = (ScheminPort) list.Car();
 				eval.CurrentInputPort = inputPort;
 				return ScheminList.EmptyList;
+			};
+
+			OpenInputFile = (list, env, eval) => {
+				ScheminString filename = (ScheminString) list.Car();
+				FileStream fs = File.OpenRead(filename.Value);
+				ScheminPort filePort = new ScheminPort(fs, ScheminPort.PortType.InputPort);
+
+				return filePort;
+			};
+
+			OpenOutputFile = (list, env, eval) => {
+				ScheminString filename = (ScheminString) list.Car();
+				FileStream fs = new FileStream(filename.Value, FileMode.Append, FileAccess.Write, FileShare.Write);
+				ScheminPort filePort = new ScheminPort(fs, ScheminPort.PortType.OutputPort);
+
+				return filePort;
 			};
 		}
 	}

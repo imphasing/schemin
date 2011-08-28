@@ -97,7 +97,12 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			Newline = (list, env, eval) => {
-				Console.WriteLine();
+				ASCIIEncoding encoding = new ASCIIEncoding();
+				byte[] toWrite = encoding.GetBytes(System.Environment.NewLine);
+
+				eval.CurrentOutputPort.OutputStream.Write(toWrite, 0, toWrite.Length);
+				eval.CurrentOutputPort.OutputStream.Flush();
+
 				return ScheminList.EmptyList;
 			};
 
@@ -112,11 +117,13 @@ namespace Schemin.Evaluate.Primitives
 
 					toWrite = encoding.GetBytes(temp.Value);
 					eval.CurrentOutputPort.OutputStream.Write(toWrite, 0, toWrite.Length);
+					eval.CurrentOutputPort.OutputStream.Flush();
 				}
 				else
 				{
 					toWrite = encoding.GetBytes(toDisplay.ToString());
 					eval.CurrentOutputPort.OutputStream.Write(toWrite, 0, toWrite.Length);
+					eval.CurrentOutputPort.OutputStream.Flush();
 				}
 
 				return ScheminList.EmptyList;

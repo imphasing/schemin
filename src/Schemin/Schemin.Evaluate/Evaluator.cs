@@ -458,6 +458,9 @@ namespace Schemin.Evaluate
 			prebound.Add("current-output-port", PortOperations.CurrentOutputPort);
 			prebound.Add("set-current-output-port!", PortOperations.SetCurrentOutputPort);
 			prebound.Add("set-current-input-port!", PortOperations.SetCurrentInputPort);
+			prebound.Add("open-input-file", PortOperations.OpenInputFile);
+			prebound.Add("open-output-file", PortOperations.OpenOutputFile);
+			prebound.Add("close-port", PortOperations.ClosePort);
 
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{
