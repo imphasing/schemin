@@ -461,6 +461,7 @@ namespace Schemin.Evaluate
 			prebound.Add("open-input-file", PortOperations.OpenInputFile);
 			prebound.Add("open-output-file", PortOperations.OpenOutputFile);
 			prebound.Add("close-port", PortOperations.ClosePort);
+			prebound.Add("read", PortOperations.Read);
 
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{
@@ -500,7 +501,7 @@ namespace Schemin.Evaluate
 			foreach (string primitive in prebound_schemin)
 			{
 				var tokens = t.Tokenize(primitive);
-				var ast = p.Parse(tokens);
+				var ast = p.Parse(tokens, false);
 				Evaluate(ast, env);
 			}
 		}

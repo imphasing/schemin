@@ -35,6 +35,8 @@ namespace Schemin.Evaluate.Primitives
 	using System.Linq;
 	using Schemin.AST;
 	using Schemin.Evaluate;
+	using Schemin.Tokenize;
+	using Schemin.Parse;
 	using Environment = Schemin.Evaluate.Environment;
 
 	public static class PortOperations
@@ -48,6 +50,7 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> OpenInputFile;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> OpenOutputFile;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> ClosePort;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Read;
 
 		static PortOperations()
 		{
@@ -104,6 +107,79 @@ namespace Schemin.Evaluate.Primitives
 				ScheminPort filePort = new ScheminPort(fs, ScheminPort.PortType.OutputPort);
 
 				return filePort;
+			};
+
+			Read = (list, env, eval) => {
+				IScheminType port = list.Car();
+				ScheminPort readFrom = eval.CurrentInputPort;
+				if ((port as ScheminPort) != null)
+				{
+					readFrom = (ScheminPort) port;
+				}
+
+				Tokenizer t = new Tokenizer();
+				Parser p = new Parser();
+
+				bool completeInput = false;
+				bool emptyInput = true;
+				int openParens = 0;
+				int closeParens = 0;
+
+				List<Token> partialInput = new List<Token>();
+				BinaryReader br = new BinaryReader(readFrom.InputStream, Encoding.UTF8);
+
+				while (completeInput != true)
+				{
+					StringBuilder built = new StringBuilder();
+					char next;
+					for (;;)
+					{
+						try
+						{
+							next = br.ReadChar();
+						}
+						catch
+						{
+							break;
+						}
+
+						if (next == '\n' && !emptyInput)
+						{
+							break;
+						}
+							
+						if (next != '\r')
+						{
+							built.Append(next);
+							emptyInput = false;
+						}
+					}
+
+					var lineTokens = t.Tokenize(built.ToString());
+
+					foreach (Token token in lineTokens)
+					{
+						partialInput.Add(token);
+						if (token.Type == TokenType.OpenParen)
+						{
+							openParens++;
+						}
+						else if (token.Type == TokenType.CloseParen)
+						{
+							closeParens++;
+						}
+					}
+
+					if (openParens == closeParens)
+					{
+						completeInput = true;
+						break;
+					}
+				}
+
+				var parsed = p.Parse(partialInput, true).Car();
+
+				return parsed;
 			};
 		}
 	}

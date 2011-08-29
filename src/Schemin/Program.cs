@@ -104,7 +104,7 @@ namespace Schemin
 
 			string contents = File.ReadAllText(filename);
 			var tokens = t.Tokenize(contents);
-			var parsed = p.Parse(tokens);
+			var parsed = p.Parse(tokens, false);
 			IScheminType returnType = eval.Evaluate(parsed, global);
 			Console.WriteLine(returnType.ToString());
 		}
@@ -173,7 +173,7 @@ namespace Schemin
 						continue;
 					}
 
-					var parsed = p.Parse(partialInput);
+					var parsed = p.Parse(partialInput, false);
 					IScheminType returnType = eval.Evaluate(parsed, global);
 					Console.WriteLine(returnType.ToString());
 				}

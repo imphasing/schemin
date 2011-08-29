@@ -36,9 +36,9 @@ namespace Schemin.Parse
 
 	public class Parser
 	{
-		public ScheminList Parse(List<Token> tokens)
+		public ScheminList Parse(List<Token> tokens, bool quoteLists)
 		{
-			ScheminList.QuoteLists = false;
+			ScheminList.QuoteLists = quoteLists;
 			KeyValuePair<ScheminList, int> parsed = ParseInternal(tokens, 0);
 			TransformQuotes((ScheminList) parsed.Key);
 			ScheminList.QuoteLists = true;
