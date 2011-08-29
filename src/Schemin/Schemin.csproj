@@ -49,6 +49,7 @@
     <Compile Include="Schemin.Evaluate\Environment.cs" />
     <Compile Include="Schemin.Evaluate\Evaluator.cs" />
     <Compile Include="Schemin.Evaluate\UnboundAtomException.cs" />
+    <Compile Include="Schemin.Evaluate\CombinedStream.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\GeneralOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\BooleanOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\ListOperations.cs" />

@@ -55,7 +55,7 @@ namespace Schemin.Evaluate
 		public Evaluator()
 		{
 			Stack = new Stack<StackFrame>();
-			ConsoleIOPort = new ScheminPort(Console.OpenStandardInput(), Console.OpenStandardOutput());
+			ConsoleIOPort = new ScheminPort(new CombinedStream(Console.OpenStandardInput(), Console.OpenStandardOutput()), ScheminPort.PortType.IOPort);
 			CurrentInputPort = ConsoleIOPort;
 			CurrentOutputPort = ConsoleIOPort;
 		}
@@ -447,8 +447,6 @@ namespace Schemin.Evaluate
 			prebound.Add("output-port?", BooleanOperations.OutputPort);
 
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
-			prebound.Add("display", GeneralOperations.Display);
-			prebound.Add("newline", GeneralOperations.Newline);
 			prebound.Add("apply", GeneralOperations.Apply);
 
 			prebound.Add("string-ref", StringOperations.StringRef);
@@ -461,7 +459,14 @@ namespace Schemin.Evaluate
 			prebound.Add("open-input-file", PortOperations.OpenInputFile);
 			prebound.Add("open-output-file", PortOperations.OpenOutputFile);
 			prebound.Add("close-port", PortOperations.ClosePort);
+			prebound.Add("port-closed?", PortOperations.PortClosed);
+			prebound.Add("display", PortOperations.Display);
+			prebound.Add("newline", PortOperations.Newline);
 			prebound.Add("read", PortOperations.Read);
+			prebound.Add("read-char", PortOperations.ReadChar);
+			prebound.Add("read-line", PortOperations.ReadLine);
+			prebound.Add("write", PortOperations.Write);
+			prebound.Add("write-char", PortOperations.WriteChar);
 
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{

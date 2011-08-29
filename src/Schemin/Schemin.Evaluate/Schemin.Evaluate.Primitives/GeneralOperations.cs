@@ -96,39 +96,6 @@ namespace Schemin.Evaluate.Primitives
 				return lam;
 			};
 
-			Newline = (list, env, eval) => {
-				ASCIIEncoding encoding = new ASCIIEncoding();
-				byte[] toWrite = encoding.GetBytes(System.Environment.NewLine);
-
-				eval.CurrentOutputPort.OutputStream.Write(toWrite, 0, toWrite.Length);
-				eval.CurrentOutputPort.OutputStream.Flush();
-
-				return ScheminList.EmptyList;
-			};
-
-			Display = (list, env, eval) => {
-				IScheminType toDisplay = list.Car();
-
-				byte[] toWrite;
-				ASCIIEncoding encoding = new ASCIIEncoding();
-				if (toDisplay.GetType() == typeof(ScheminString))
-				{
-					ScheminString temp = (ScheminString) toDisplay;
-
-					toWrite = encoding.GetBytes(temp.Value);
-					eval.CurrentOutputPort.OutputStream.Write(toWrite, 0, toWrite.Length);
-					eval.CurrentOutputPort.OutputStream.Flush();
-				}
-				else
-				{
-					toWrite = encoding.GetBytes(toDisplay.ToString());
-					eval.CurrentOutputPort.OutputStream.Write(toWrite, 0, toWrite.Length);
-					eval.CurrentOutputPort.OutputStream.Flush();
-				}
-
-				return ScheminList.EmptyList;
-			};
-
 			SetBang = (list, env, eval) => {
 				ScheminAtom symbol = (ScheminAtom) list.Car();
 				symbol.UnQuote();

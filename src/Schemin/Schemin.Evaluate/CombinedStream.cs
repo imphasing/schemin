@@ -25,63 +25,96 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.AST
+namespace Schemin.Evaluate
 {
 	using System;
-	using Schemin.Evaluate;
 	using System.IO;
-	using Environment = Schemin.Evaluate.Environment;
 
-	public class ScheminPort : IScheminType
+	public class CombinedStream : Stream
 	{
-		public enum PortType
+		private Stream InputStream;
+		private Stream OutputStream;
+
+		public CombinedStream(Stream inputStream, Stream outputStream)
 		{
-			InputPort,
-			OutputPort,
-			IOPort
+			this.InputStream = inputStream;
+			this.OutputStream = outputStream;
 		}
 
-		public Stream PortStream;
-		public PortType Type;
-		public bool Closed = false;
-
-		public ScheminPort(Stream portStream, ScheminPort.PortType type)
+		public override bool CanRead
 		{
-			this.Type = type;
-			this.PortStream = portStream;
-		}
-
-		public override string ToString()
-		{
-			return "<Port>";
-		}
-
-		public bool Quoted()
-		{
-			return false;
-		}
-
-		public void Quote()
-		{
-		}
-
-		public void UnQuote()
-		{
-		}
-
-		public bool Equals(IScheminType type)
-		{
-			if (this == type)
+			get
 			{
-				return true;
+				return InputStream.CanRead;
 			}
-
-			return false;
 		}
 
-		public ScheminBool BoolValue()
+		public override bool CanSeek
 		{
-			return ScheminBool.True;
+			get
+			{
+				return false;
+			}
+		}
+
+		public override bool CanWrite
+		{
+			get
+			{
+				return OutputStream.CanWrite;
+			}
+		}
+
+		public override long Position
+		{
+			get
+			{
+				throw new NotSupportedException();
+			}
+			set
+			{
+				throw new NotSupportedException();
+			}
+		}
+
+		public override long Length
+		{
+			get
+			{
+				throw new NotSupportedException();
+			}
+		}
+
+		public override int Read(byte[] buffer, int offset, int count)
+		{
+			return InputStream.Read(buffer, offset, count);
+		}
+
+		public override void Write(byte[] buffer, int offset, int count)
+		{
+			OutputStream.Write(buffer, offset, count);
+			return;
+		}
+
+		public override void Close()
+		{
+			OutputStream.Close();
+			InputStream.Close();
+		}
+
+		public override void Flush()
+		{
+			OutputStream.Flush();
+		}
+
+		public override long Seek(long offset, SeekOrigin origin)
+		{
+			throw new NotSupportedException();
+		}
+
+		public override void SetLength(long value)
+		{
+			throw new NotSupportedException();
 		}
 	}
 }
