@@ -146,7 +146,7 @@ namespace Schemin.Evaluate.Primitives
 
 				ScheminPort writeTo = eval.CurrentOutputPort;
 				
-				IScheminType port = list.Cdr().Car();
+				IScheminType port = list.Car();
 				if ((port as ScheminPort) != null)
 				{
 					writeTo = (ScheminPort) port;
