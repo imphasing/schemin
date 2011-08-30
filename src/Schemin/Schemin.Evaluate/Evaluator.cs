@@ -467,6 +467,7 @@ namespace Schemin.Evaluate
 			prebound.Add("read-line", PortOperations.ReadLine);
 			prebound.Add("write", PortOperations.Write);
 			prebound.Add("write-char", PortOperations.WriteChar);
+			prebound.Add("port-position", PortOperations.PortPosition);
 
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{

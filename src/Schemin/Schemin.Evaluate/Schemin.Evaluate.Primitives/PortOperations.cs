@@ -59,7 +59,6 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> ReadChar;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> ReadLine;
 
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> FlushOutput;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> PortPosition;
 
 		static PortOperations()
@@ -79,6 +78,30 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return ScheminBool.False;
+			};
+
+			PortPosition = (list, env, eval) => {
+				ScheminPort port = (ScheminPort) list.Car();
+				IScheminType set = list.Cdr().Car();
+				int setTo = 0;
+				bool setting = false;
+
+				if ((set as ScheminInteger) != null)
+				{
+					ScheminInteger temp = (ScheminInteger) set;
+					setTo = (int) temp.Value;
+					setting = true;
+				}
+
+				if (!setting)
+				{
+					return new ScheminInteger(port.PortStream.Position);
+				}
+				else
+				{
+					port.PortStream.Position = setTo;
+					return ScheminList.EmptyList;
+				}
 			};
 
 			CurrentInputPort = (list, env, eval) => {

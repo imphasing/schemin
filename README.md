@@ -2,7 +2,7 @@ Schemin
 =======
 
 
-Schemin is a scheme-ish interpreter, written in C#. This is a learning project to help me understand language design, so don't expect too much. Complete enough to run some simple sort routines and such, like this bubblesort:
+Schemin is a BSD-licensed scheme-ish interpreter, written in C#. Schemin is complete enough to run some simple scheme snippets, such as this example bubblesort routine:
 
     (define bubblesort (lambda (l)
       (define swap-pass (lambda (l)
@@ -18,7 +18,6 @@ Schemin is a scheme-ish interpreter, written in C#. This is a learning project t
             (swap-pass val)))))
 
 As well as some more complicated things, like this simple example of coroutines using call/cc:
-
 
     (define (superfluous-computation do-other-stuff) 
       (let loop () 
@@ -46,15 +45,18 @@ As well as some more complicated things, like this simple example of coroutines 
 
     (hefty-computation superfluous-computation)
 
+Check out the examples directory for more examples of what Schemin is capable of.
+
 
 Implemented featues:
 --------------------
 
 + First-class continuations and call/cc
++ IO Ports (File and console IO)
 + define and set!
 + lambdas with closures
-+ Let, named let, letrec
-+ Some flow control (if, and boolean primitives)
++ Let, named let, Let\*, and letrec
++ Some flow control (if, cond, and, or and boolean primitives)
 + A few list operations like map, filter, and foldl (as well as cons, cdr, car, etc)
 + Some basic numerical primitives and decimal support
 
@@ -63,6 +65,8 @@ To do:
 ------
 
 + Possibly implement a parser generator instead of our recursive parser
++ Implement character literals and their types, as well as primitives to work with them
++ Implement macros
 + Implement more common primitives
 
 
