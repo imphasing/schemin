@@ -49,7 +49,6 @@
     <Compile Include="Schemin.Evaluate\Environment.cs" />
     <Compile Include="Schemin.Evaluate\Evaluator.cs" />
     <Compile Include="Schemin.Evaluate\UnboundAtomException.cs" />
-    <Compile Include="Schemin.Evaluate\CombinedStream.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\GeneralOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\BooleanOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\ListOperations.cs" />
@@ -70,6 +69,7 @@
     <Compile Include="Schemin.AST\ScheminLambda.cs" />
     <Compile Include="Schemin.AST\ScheminPrimitive.cs" />
     <Compile Include="Schemin.AST\ScheminString.cs" />
+    <Compile Include="Schemin.AST\ScheminChar.cs" />
     <Compile Include="Schemin.AST\ScheminBool.cs" />
     <Compile Include="Schemin.AST\ScheminPort.cs" />
   </ItemGroup>

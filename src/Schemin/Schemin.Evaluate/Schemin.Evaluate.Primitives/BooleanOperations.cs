@@ -55,9 +55,11 @@ namespace Schemin.Evaluate.Primitives
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Pair;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Number;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> String;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> Char;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> Port;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> OutputPort;
 		public static Func<ScheminList, Environment, Evaluator, IScheminType> InputPort;
+		public static Func<ScheminList, Environment, Evaluator, IScheminType> EOFObject;
 
 		static BooleanOperations()
 		{
@@ -67,7 +69,7 @@ namespace Schemin.Evaluate.Primitives
 				if ((type as ScheminPort) != null)
 				{
 					ScheminPort port = (ScheminPort) type;
-					if (port.Type == ScheminPort.PortType.OutputPort || port.Type == ScheminPort.PortType.IOPort)
+					if (port.Type == ScheminPort.PortType.OutputPort)
 					{
 						return ScheminBool.True;
 					}
@@ -82,7 +84,22 @@ namespace Schemin.Evaluate.Primitives
 				if ((type as ScheminPort) != null)
 				{
 					ScheminPort port = (ScheminPort) type;
-					if (port.Type == ScheminPort.PortType.InputPort || port.Type == ScheminPort.PortType.IOPort)
+					if (port.Type == ScheminPort.PortType.InputPort)
+					{
+						return ScheminBool.True;
+					}
+				}
+
+				return ScheminBool.False;
+			};
+
+			EOFObject = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminChar) != null)
+				{
+					ScheminChar chr = (ScheminChar) type;
+					if (chr.EOF)
 					{
 						return ScheminBool.True;
 					}
@@ -165,6 +182,17 @@ namespace Schemin.Evaluate.Primitives
 				IScheminType type = list.Car();
 
 				if ((type as ScheminString) != null)
+				{
+					return ScheminBool.True;
+				}
+
+				return ScheminBool.False;
+			};
+
+			Char = (list, env, eval) => {
+				IScheminType type = list.Car();
+
+				if ((type as ScheminChar) != null)
 				{
 					return ScheminBool.True;
 				}

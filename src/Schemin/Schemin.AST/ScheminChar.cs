@@ -25,96 +25,105 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate
+namespace Schemin.AST
 {
 	using System;
-	using System.IO;
+	using System.Collections.Generic;
 
-	public class CombinedStream : Stream
+	public class ScheminChar : IScheminType
 	{
-		private Stream InputStream;
-		private Stream OutputStream;
+		public string Value;
+		public bool EOF = false;
 
-		public CombinedStream(Stream inputStream, Stream outputStream)
+		public ScheminChar(string value)
 		{
-			this.InputStream = inputStream;
-			this.OutputStream = outputStream;
-		}
-
-		public override bool CanRead
-		{
-			get
+			if (value.Length == 1)
 			{
-				return InputStream.CanRead;
+				this.Value = value; 
+			}
+			else
+			{
+				this.Value = MapNamedLiteral(value);
 			}
 		}
 
-		public override bool CanSeek
+		public ScheminChar(int value)
 		{
-			get
+			if (value == -1)
+			{
+				this.EOF = true;
+			}
+			else
+			{
+				this.Value = ((char) value).ToString();
+			}
+		}
+
+		private string MapNamedLiteral(string named)
+		{
+			Dictionary<string, string> mappings = new Dictionary<string, string>();
+			mappings.Add("newline", "\n");
+			mappings.Add("space", " ");
+
+			return mappings[named];
+		}
+
+		private string MapNamedValue(string value)
+		{
+			Dictionary<string, string> mappings = new Dictionary<string, string>();
+			mappings.Add("\n", "newline");
+			mappings.Add(" ", "space");
+
+			if (mappings.ContainsKey(value))
+			{
+				return mappings[value];
+			}
+			
+			return value;
+		}
+
+		public override string ToString()
+		{
+			if (this.EOF)
+			{
+				return "EOF";
+			}
+
+			return "#\\" + MapNamedValue(Value);
+		}
+
+		public bool Quoted()
+		{
+			return false;
+		}
+
+		public void Quote()
+		{
+		}
+
+		public void UnQuote()
+		{
+		}
+
+		public bool Equals(IScheminType type)
+		{
+			if (this.GetType() != type.GetType())
 			{
 				return false;
 			}
-		}
 
-		public override bool CanWrite
-		{
-			get
+			ScheminChar temp = (ScheminChar) type;
+			if (this.Value == temp.Value)
 			{
-				return OutputStream.CanWrite;
+				return true;
 			}
+
+			return false;
 		}
 
-		public override long Position
+		public ScheminBool BoolValue()
 		{
-			get
-			{
-				throw new NotSupportedException();
-			}
-			set
-			{
-				throw new NotSupportedException();
-			}
-		}
-
-		public override long Length
-		{
-			get
-			{
-				throw new NotSupportedException();
-			}
-		}
-
-		public override int Read(byte[] buffer, int offset, int count)
-		{
-			return InputStream.Read(buffer, offset, count);
-		}
-
-		public override void Write(byte[] buffer, int offset, int count)
-		{
-			OutputStream.Write(buffer, offset, count);
-			return;
-		}
-
-		public override void Close()
-		{
-			OutputStream.Close();
-			InputStream.Close();
-		}
-
-		public override void Flush()
-		{
-			OutputStream.Flush();
-		}
-
-		public override long Seek(long offset, SeekOrigin origin)
-		{
-			throw new NotSupportedException();
-		}
-
-		public override void SetLength(long value)
-		{
-			throw new NotSupportedException();
+			return ScheminBool.True;
 		}
 	}
 }

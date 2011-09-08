@@ -29,14 +29,12 @@ namespace Schemin
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Linq;
-	using System.Text;
-	using Schemin.Parse;
+	using System.IO;
+	using Mono.Options;
 	using Schemin.AST;
 	using Schemin.Evaluate;
+	using Schemin.Parse;
 	using Schemin.Tokenize;
-	using Mono.Options;
-	using System.IO;
 	using Environment = Schemin.Evaluate.Environment;
 
 	class Program
@@ -49,20 +47,20 @@ namespace Schemin
 			bool repl = false;
 
 			var p = new OptionSet () {
-				{ 
-					"file=", 
-					"Interpret a given file with Schemin.", 
-					v => { fileName = v; file = true; } 
+				{
+					"file=",
+					"Interpret a given file with Schemin.",
+					v => { fileName = v; file = true; }
 				},
-				{ 
+				{
 					"repl",
-					"Start up a read, eval, print loop (REPL) session.", 
-					v => {file = false; repl = v != null; } 
+					"Start up a read, eval, print loop (REPL) session.",
+					v => {file = false; repl = v != null; }
 				},
-				{ 
-					"h|?|help", 
-					"Display help.", 
-					v => {file = false; repl = false; help = v != null; } 
+				{
+					"h|?|help",
+					"Display help.",
+					v => {file = false; repl = false; help = v != null; }
 				}
 			};
 

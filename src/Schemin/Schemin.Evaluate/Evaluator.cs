@@ -55,9 +55,11 @@ namespace Schemin.Evaluate
 		public Evaluator()
 		{
 			Stack = new Stack<StackFrame>();
-			ConsoleIOPort = new ScheminPort(new CombinedStream(Console.OpenStandardInput(), Console.OpenStandardOutput()), ScheminPort.PortType.IOPort);
-			CurrentInputPort = ConsoleIOPort;
-			CurrentOutputPort = ConsoleIOPort;
+			var ConsoleInput = new ScheminPort(Console.OpenStandardInput(), ScheminPort.PortType.InputPort);
+			var ConsoleOutput = new ScheminPort(Console.OpenStandardOutput(), ScheminPort.PortType.OutputPort);
+
+			CurrentInputPort = ConsoleInput;
+			CurrentOutputPort = ConsoleOutput;
 		}
 
 		public IScheminType Evaluate(ScheminList ast, Environment env)
@@ -406,9 +408,6 @@ namespace Schemin.Evaluate
 
 		public void DefinePrimitives(Environment env)
 		{
-			// Add the console IO port as a default binding
-			env.AddBinding(new ScheminAtom("console-i/o-port"), this.ConsoleIOPort);
-
 			var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
 
 			prebound.Add("+", NumericOperations.Add);
@@ -442,9 +441,11 @@ namespace Schemin.Evaluate
 			prebound.Add("pair?", BooleanOperations.Pair);
 			prebound.Add("number?", BooleanOperations.Number);
 			prebound.Add("string?", BooleanOperations.String);
+			prebound.Add("char?", BooleanOperations.Char);
 			prebound.Add("port?", BooleanOperations.Port);
 			prebound.Add("input-port?", BooleanOperations.InputPort);
 			prebound.Add("output-port?", BooleanOperations.OutputPort);
+			prebound.Add("eof-object?", BooleanOperations.EOFObject);
 
 			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
 			prebound.Add("apply", GeneralOperations.Apply);
@@ -467,7 +468,6 @@ namespace Schemin.Evaluate
 			prebound.Add("read-line", PortOperations.ReadLine);
 			prebound.Add("write", PortOperations.Write);
 			prebound.Add("write-char", PortOperations.WriteChar);
-			prebound.Add("port-position", PortOperations.PortPosition);
 
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{

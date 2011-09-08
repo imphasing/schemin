@@ -113,6 +113,7 @@ namespace Schemin.Tokenize
 
 			var matchTokenTypes = new Dictionary<Regex, TokenType>();
 			matchTokenTypes.Add(new Regex("^#[f|t]"), TokenType.BoolLiteral);
+			matchTokenTypes.Add(new Regex("#\\.*"), TokenType.CharLiteral);
 			matchTokenTypes.Add(new Regex("^[-+]?[0-9]+$"), TokenType.IntegerLiteral);
 			matchTokenTypes.Add(new Regex("^([0-9]*)?(\\.[0-9]+)$"), TokenType.DecimalLiteral);
 			matchTokenTypes.Add(new Regex("[^\"\',()]+"), TokenType.Symbol);

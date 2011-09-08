@@ -65,7 +65,14 @@ namespace Schemin.Evaluate.Primitives
 		{
 			ClosePort = (list, env, eval) => {
 				ScheminPort toClose = (ScheminPort) list.Car();
-				toClose.PortStream.Close();
+				if (toClose.Type == ScheminPort.PortType.InputPort)
+				{
+					toClose.InputStream.Close();
+				}
+				else
+				{
+					toClose.OutputStream.Close();
+				}
 				toClose.Closed = true;
 				return ScheminList.EmptyList;
 			};
@@ -78,30 +85,6 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				return ScheminBool.False;
-			};
-
-			PortPosition = (list, env, eval) => {
-				ScheminPort port = (ScheminPort) list.Car();
-				IScheminType set = list.Cdr().Car();
-				int setTo = 0;
-				bool setting = false;
-
-				if ((set as ScheminInteger) != null)
-				{
-					ScheminInteger temp = (ScheminInteger) set;
-					setTo = (int) temp.Value;
-					setting = true;
-				}
-
-				if (!setting)
-				{
-					return new ScheminInteger(port.PortStream.Position);
-				}
-				else
-				{
-					port.PortStream.Position = setTo;
-					return ScheminList.EmptyList;
-				}
 			};
 
 			CurrentInputPort = (list, env, eval) => {
@@ -141,48 +124,36 @@ namespace Schemin.Evaluate.Primitives
 			};
 
 			Newline = (list, env, eval) => {
-				UTF8Encoding encoding = new UTF8Encoding();
-				byte[] toWrite = encoding.GetBytes(System.Environment.NewLine);
-
 				ScheminPort writeTo = eval.CurrentOutputPort;
-				
+
 				IScheminType port = list.Car();
 				if ((port as ScheminPort) != null)
 				{
 					writeTo = (ScheminPort) port;
 				}
 
-				writeTo.PortStream.Write(toWrite, 0, toWrite.Length);
-				writeTo.PortStream.Flush();
-
+				writeTo.OutputStream.Write(System.Environment.NewLine);
 				return ScheminList.EmptyList;
 			};
 
 			Display = (list, env, eval) => {
 				IScheminType toDisplay = list.Car();
 				ScheminPort writeTo = eval.CurrentOutputPort;
-				
+
 				IScheminType port = list.Cdr().Car();
 				if ((port as ScheminPort) != null)
 				{
 					writeTo = (ScheminPort) port;
 				}
 
-				byte[] toWrite;
-				UTF8Encoding encoding = new UTF8Encoding();
 				if (toDisplay.GetType() == typeof(ScheminString))
 				{
 					ScheminString temp = (ScheminString) toDisplay;
-
-					toWrite = encoding.GetBytes(temp.Value);
-					writeTo.PortStream.Write(toWrite, 0, toWrite.Length);
-					writeTo.PortStream.Flush();
+					writeTo.OutputStream.Write(temp.Value);
 				}
 				else
 				{
-					toWrite = encoding.GetBytes(toDisplay.ToString());
-					writeTo.PortStream.Write(toWrite, 0, toWrite.Length);
-					writeTo.PortStream.Flush();
+					writeTo.OutputStream.Write(toDisplay.ToString());
 				}
 
 				return ScheminList.EmptyList;
@@ -191,37 +162,29 @@ namespace Schemin.Evaluate.Primitives
 			Write = (list, env, eval) => {
 				IScheminType obj = list.Car();
 				ScheminPort writeTo = eval.CurrentOutputPort;
-				
+
 				IScheminType port = list.Cdr().Car();
 				if ((port as ScheminPort) != null)
 				{
 					writeTo = (ScheminPort) port;
 				}
 
-				byte[] toWrite;
-				UTF8Encoding encoding = new UTF8Encoding();
-				toWrite = encoding.GetBytes(obj.ToString());
-				writeTo.PortStream.Write(toWrite, 0, toWrite.Length);
-				writeTo.PortStream.Flush();
+				writeTo.OutputStream.Write(obj.ToString());
 
 				return ScheminList.EmptyList;
 			};
 
 			WriteChar = (list, env, eval) => {
-				ScheminString str = (ScheminString) list.Car();
+				ScheminChar chr = (ScheminChar) list.Car();
 				ScheminPort writeTo = eval.CurrentOutputPort;
-				
+
 				IScheminType port = list.Cdr().Car();
 				if ((port as ScheminPort) != null)
 				{
 					writeTo = (ScheminPort) port;
 				}
 
-				byte[] toWrite;
-				UTF8Encoding encoding = new UTF8Encoding();
-				toWrite = encoding.GetBytes(str.Value.ToString());
-				writeTo.PortStream.Write(toWrite, 0, toWrite.Length);
-				writeTo.PortStream.Flush();
+				writeTo.OutputStream.Write(chr.Value);
 
 				return ScheminList.EmptyList;
 			};
@@ -234,9 +197,15 @@ namespace Schemin.Evaluate.Primitives
 					readFrom = (ScheminPort) port;
 				}
 
-				BinaryReader br = new BinaryReader(readFrom.PortStream, Encoding.UTF8);
-				char read = br.ReadChar();
-				return new ScheminString(read.ToString());
+				int read = readFrom.InputStream.Read();
+
+				// Ditch the \r if we get one, because windows CR+LF newline is stupid
+				if ((char) readFrom.InputStream.Peek() == '\r')
+				{
+					readFrom.InputStream.Read();
+				}
+
+				return new ScheminChar(read);
 			};
 
 			ReadLine = (list, env, eval) => {
@@ -247,23 +216,15 @@ namespace Schemin.Evaluate.Primitives
 					readFrom = (ScheminPort) port;
 				}
 
-				BinaryReader br = new BinaryReader(readFrom.PortStream, Encoding.UTF8);
-
 				StringBuilder built = new StringBuilder();
 				char next;
 				bool emptyInput = true;
 				for (;;)
 				{
-					try
-					{
-						next = br.ReadChar();
-					}
-					catch
-					{
-						break;
-					}
+					int nextRead = readFrom.InputStream.Read();
+					next = (char) nextRead;
 
-					if (next == '\n' && !emptyInput)
+					if (nextRead == -1 || (next == '\n' && !emptyInput))
 					{
 						break;
 					}
@@ -296,7 +257,6 @@ namespace Schemin.Evaluate.Primitives
 				int closeParens = 0;
 
 				List<Token> partialInput = new List<Token>();
-				BinaryReader br = new BinaryReader(readFrom.PortStream, Encoding.UTF8);
 
 				while (completeInput != true)
 				{
@@ -304,20 +264,14 @@ namespace Schemin.Evaluate.Primitives
 					char next;
 					for (;;)
 					{
-						try
-						{
-							next = br.ReadChar();
-						}
-						catch
+						int nextRead = readFrom.InputStream.Read();
+						next = (char)nextRead;
+
+						if (nextRead == -1 || (next == '\n' && !emptyInput))
 						{
 							break;
 						}
 
-						if (next == '\n' && !emptyInput)
-						{
-							break;
-						}
-							
 						if (next != '\r')
 						{
 							built.Append(next);

@@ -30,6 +30,7 @@ namespace Schemin.AST
 	using System;
 	using Schemin.Evaluate;
 	using System.IO;
+	using System.Text;
 	using Environment = Schemin.Evaluate.Environment;
 
 	public class ScheminPort : IScheminType
@@ -37,18 +38,37 @@ namespace Schemin.AST
 		public enum PortType
 		{
 			InputPort,
-			OutputPort,
-			IOPort
+			OutputPort
 		}
 
-		public Stream PortStream;
+		public StreamReader InputStream;
+		public StreamWriter OutputStream;
 		public PortType Type;
 		public bool Closed = false;
 
-		public ScheminPort(Stream portStream, ScheminPort.PortType type)
+		public ScheminPort(StreamReader inputStream)
+		{
+			this.Type = PortType.InputPort;
+			this.InputStream = inputStream;
+		}
+
+		public ScheminPort(StreamWriter outputStream)
+		{
+			this.Type = PortType.OutputPort;
+			this.OutputStream = outputStream;
+		}
+
+		public ScheminPort(Stream stream, PortType type)
 		{
 			this.Type = type;
-			this.PortStream = portStream;
+			if (type == PortType.InputPort)
+			{
+				this.InputStream = new StreamReader(stream, Encoding.UTF8);
+			}
+			else
+			{
+				this.OutputStream = new StreamWriter(stream, Encoding.UTF8);
+			}
 		}
 
 		public override string ToString()

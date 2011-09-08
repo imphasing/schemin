@@ -34,6 +34,7 @@ namespace Schemin.Tokenize
 		DecimalLiteral,
 		StringLiteral,
 		BoolLiteral,
+		CharLiteral,
 		Quote,
 		OpenParen,
 		CloseParen
