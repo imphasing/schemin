@@ -133,6 +133,8 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				writeTo.OutputStream.Write(System.Environment.NewLine);
+				writeTo.OutputStream.Flush();
+
 				return ScheminList.EmptyList;
 			};
 
@@ -150,10 +152,12 @@ namespace Schemin.Evaluate.Primitives
 				{
 					ScheminString temp = (ScheminString) toDisplay;
 					writeTo.OutputStream.Write(temp.Value);
+					writeTo.OutputStream.Flush();
 				}
 				else
 				{
 					writeTo.OutputStream.Write(toDisplay.ToString());
+					writeTo.OutputStream.Flush();
 				}
 
 				return ScheminList.EmptyList;
@@ -170,6 +174,7 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				writeTo.OutputStream.Write(obj.ToString());
+				writeTo.OutputStream.Flush();
 
 				return ScheminList.EmptyList;
 			};
@@ -185,6 +190,7 @@ namespace Schemin.Evaluate.Primitives
 				}
 
 				writeTo.OutputStream.Write(chr.Value);
+				writeTo.OutputStream.Flush();
 
 				return ScheminList.EmptyList;
 			};

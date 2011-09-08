@@ -32,14 +32,14 @@ namespace Schemin.AST
 
 	public class ScheminChar : IScheminType
 	{
-		public string Value;
+		public char Value;
 		public bool EOF = false;
 
 		public ScheminChar(string value)
 		{
 			if (value.Length == 1)
 			{
-				this.Value = value; 
+				this.Value = Convert.ToChar(value); 
 			}
 			else
 			{
@@ -55,31 +55,31 @@ namespace Schemin.AST
 			}
 			else
 			{
-				this.Value = ((char) value).ToString();
+				this.Value = (char) value;
 			}
 		}
 
-		private string MapNamedLiteral(string named)
+		private char MapNamedLiteral(string named)
 		{
-			Dictionary<string, string> mappings = new Dictionary<string, string>();
-			mappings.Add("newline", "\n");
-			mappings.Add("space", " ");
+			Dictionary<string, char> mappings = new Dictionary<string, char>();
+			mappings.Add("newline", '\n');
+			mappings.Add("space", ' ');
 
 			return mappings[named];
 		}
 
-		private string MapNamedValue(string value)
+		private string MapNamedValue(char value)
 		{
-			Dictionary<string, string> mappings = new Dictionary<string, string>();
-			mappings.Add("\n", "newline");
-			mappings.Add(" ", "space");
+			Dictionary<char, string> mappings = new Dictionary<char, string>();
+			mappings.Add('\n', "newline");
+			mappings.Add(' ', "space");
 
 			if (mappings.ContainsKey(value))
 			{
 				return mappings[value];
 			}
 			
-			return value;
+			return value.ToString();
 		}
 
 		public override string ToString()

@@ -55,8 +55,8 @@ namespace Schemin.Evaluate
 		public Evaluator()
 		{
 			Stack = new Stack<StackFrame>();
-			var ConsoleInput = new ScheminPort(Console.OpenStandardInput(), ScheminPort.PortType.InputPort);
-			var ConsoleOutput = new ScheminPort(Console.OpenStandardOutput(), ScheminPort.PortType.OutputPort);
+			var ConsoleInput = new ScheminPort(Console.In);
+			var ConsoleOutput = new ScheminPort(Console.Out);
 
 			CurrentInputPort = ConsoleInput;
 			CurrentOutputPort = ConsoleOutput;

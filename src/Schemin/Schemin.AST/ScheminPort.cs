@@ -41,18 +41,18 @@ namespace Schemin.AST
 			OutputPort
 		}
 
-		public StreamReader InputStream;
-		public StreamWriter OutputStream;
+		public TextReader InputStream;
+		public TextWriter OutputStream;
 		public PortType Type;
 		public bool Closed = false;
 
-		public ScheminPort(StreamReader inputStream)
+		public ScheminPort(TextReader inputStream)
 		{
 			this.Type = PortType.InputPort;
 			this.InputStream = inputStream;
 		}
 
-		public ScheminPort(StreamWriter outputStream)
+		public ScheminPort(TextWriter outputStream)
 		{
 			this.Type = PortType.OutputPort;
 			this.OutputStream = outputStream;
