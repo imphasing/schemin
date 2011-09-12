@@ -469,6 +469,22 @@ namespace Schemin.Evaluate
 			prebound.Add("write", PortOperations.Write);
 			prebound.Add("write-char", PortOperations.WriteChar);
 
+			prebound.Add("char=?", CharOperations.CharEquals);
+			prebound.Add("char<?", CharOperations.CharGreaterThan);
+			prebound.Add("char>?", CharOperations.CharLessThan);
+			prebound.Add("char>=?", CharOperations.CharLessThanOr);
+			prebound.Add("char<=?", CharOperations.CharGreaterThanOr);
+
+			prebound.Add("char-alphabetic?", CharOperations.CharAlphabetic);
+			prebound.Add("char-numeric?", CharOperations.CharNumeric);
+			prebound.Add("char-whitespace?", CharOperations.CharWhitespace);
+			prebound.Add("char-upper-case?", CharOperations.CharUpperCase);
+			prebound.Add("char-lower-case?", CharOperations.CharLowerCase);
+			prebound.Add("char->integer", CharOperations.CharInteger);
+			prebound.Add("integer->char", CharOperations.IntegerChar);
+			prebound.Add("char-upcase", CharOperations.CharUpcase);
+			prebound.Add("char-downcase", CharOperations.CharDowncase);
+
 			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
 			{
 				var func = kvp.Value;

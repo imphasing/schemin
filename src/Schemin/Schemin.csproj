@@ -56,6 +56,7 @@
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\ScheminPrimitives.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\StringOperations.cs" />
     <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\PortOperations.cs" />
+    <Compile Include="Schemin.Evaluate\Schemin.Evaluate.Primitives\CharOperations.cs" />
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />
