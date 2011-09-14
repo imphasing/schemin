@@ -29,7 +29,6 @@ namespace Schemin.AST
 {
 	using System;
 	using Schemin.Evaluate;
-	using Schemin.Evaluate.Primitives;
 	using System.Collections.Generic;
 	using Environment = Schemin.Evaluate.Environment;
 

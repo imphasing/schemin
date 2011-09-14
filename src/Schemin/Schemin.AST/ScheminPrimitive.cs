@@ -29,19 +29,21 @@ namespace Schemin.AST
 {
 	using System;
 	using Schemin.Evaluate;
+	using Schemin.Primitives;
 	using Environment = Schemin.Evaluate.Environment;
 
 	public class ScheminPrimitive : IScheminType
 	{
-		public Func<ScheminList, Environment, Evaluator, IScheminType> Definition;
+		public Primitive Definition;
 		public string Name;
 
 		public ScheminPrimitive(string name)
 		{
+			this.Definition = PrimitiveFactory.Get(name);
 			this.Name = name;
 		}
 
-		public ScheminPrimitive(Func<ScheminList, Environment, Evaluator, IScheminType> definition, string name)
+		public ScheminPrimitive(Primitive definition, string name)
 		{
 			this.Definition = definition;
 			this.Name = name;
@@ -49,7 +51,7 @@ namespace Schemin.AST
 
 		public IScheminType Evaluate(ScheminList args, Environment env, Evaluator eval)
 		{
-			return Definition(args, env, eval);
+			return Definition.Execute(env, eval, args);
 		}
 
 		public override string ToString()

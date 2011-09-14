@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.PortOperations
 {
+	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class Newline : Primitive
 	{

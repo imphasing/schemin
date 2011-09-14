@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.NumericOperations
 {
+	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class Multiply : Primitive
 	{

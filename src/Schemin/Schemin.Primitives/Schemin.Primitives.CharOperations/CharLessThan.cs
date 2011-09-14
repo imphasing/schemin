@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.CharOperations
 {
+	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class CharLessThan : Primitive
 	{

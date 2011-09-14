@@ -33,7 +33,7 @@ namespace Schemin.Evaluate
 	using System.Collections.Generic;
 	using System.Linq;
 	using Schemin.AST;
-	using Schemin.Evaluate.Primitives;
+	using Schemin.Primitives;
 
 	public class Evaluator
 	{
@@ -408,90 +408,87 @@ namespace Schemin.Evaluate
 
 		public void DefinePrimitives(Environment env)
 		{
-			var prebound = new Dictionary<string, Func<ScheminList, Environment, Evaluator, IScheminType>>();
+			var prebound = new List<string>();
 
-			prebound.Add("+", NumericOperations.Add);
-			prebound.Add("-", NumericOperations.Subtract);
-			prebound.Add("*", NumericOperations.Multiply);
-			prebound.Add("/", NumericOperations.Divide);
-			prebound.Add("mod", NumericOperations.Mod);
+			prebound.Add("+");
+			prebound.Add("-");
+			prebound.Add("*");
+			prebound.Add("/");
+			prebound.Add("mod");
 
-			prebound.Add("car", ListOperations.Car);
-			prebound.Add("cons", ListOperations.Cons);
-			prebound.Add("cdr", ListOperations.Cdr);
-			prebound.Add("cadr", ListOperations.Cadr);
-			prebound.Add("cddr", ListOperations.Cddr);
-			prebound.Add("length", ListOperations.Length);
-			prebound.Add("list", ListOperations.List);
-			prebound.Add("append", ListOperations.Append);
+			prebound.Add("car");
+			prebound.Add("cons");
+			prebound.Add("cdr");
+			prebound.Add("cadr");
+			prebound.Add("cddr");
+			prebound.Add("length");
+			prebound.Add("list");
+			prebound.Add("append");
 
-			prebound.Add("null?", BooleanOperations.Null);
-			prebound.Add("=", BooleanOperations.Equal);
-			prebound.Add("eq?", BooleanOperations.Equal);
+			prebound.Add("null?");
+			prebound.Add("=");
+			prebound.Add("eq?");
 
-			prebound.Add(">", BooleanOperations.GreaterThan);
-			prebound.Add(">=", BooleanOperations.GreaterThanOr);
-			prebound.Add("<", BooleanOperations.LessThan);
-			prebound.Add("<=", BooleanOperations.LessThanOr);
-			prebound.Add("prime?", BooleanOperations.Prime);
+			prebound.Add(">");
+			prebound.Add(">=");
+			prebound.Add("<");
+			prebound.Add("<=");
+			prebound.Add("prime?");
 
-			prebound.Add("boolean?", BooleanOperations.Boolean);
-			prebound.Add("symbol?", BooleanOperations.Symbol);
-			prebound.Add("procedure?", BooleanOperations.Procedure);
-			prebound.Add("pair?", BooleanOperations.Pair);
-			prebound.Add("number?", BooleanOperations.Number);
-			prebound.Add("string?", BooleanOperations.String);
-			prebound.Add("char?", BooleanOperations.Char);
-			prebound.Add("port?", BooleanOperations.Port);
-			prebound.Add("input-port?", BooleanOperations.InputPort);
-			prebound.Add("output-port?", BooleanOperations.OutputPort);
-			prebound.Add("eof-object?", BooleanOperations.EOFObject);
+			prebound.Add("boolean?");
+			prebound.Add("symbol?");
+			prebound.Add("procedure?");
+			prebound.Add("pair?");
+			prebound.Add("number?");
+			prebound.Add("string?");
+			prebound.Add("char?");
+			prebound.Add("port?");
+			prebound.Add("input-port?");
+			prebound.Add("output-port?");
+			prebound.Add("eof-object?");
 
-			prebound.Add("dumpenv", GeneralOperations.DumpEnv);
-			prebound.Add("apply", GeneralOperations.Apply);
+			prebound.Add("dumpenv");
+			prebound.Add("apply");
 
-			prebound.Add("string-ref", StringOperations.StringRef);
-			prebound.Add("string-length", StringOperations.StringLength);
+			prebound.Add("string-ref");
+			prebound.Add("string-length");
 
-			prebound.Add("current-input-port", PortOperations.CurrentInputPort);
-			prebound.Add("current-output-port", PortOperations.CurrentOutputPort);
-			prebound.Add("set-current-output-port!", PortOperations.SetCurrentOutputPort);
-			prebound.Add("set-current-input-port!", PortOperations.SetCurrentInputPort);
-			prebound.Add("open-input-file", PortOperations.OpenInputFile);
-			prebound.Add("open-output-file", PortOperations.OpenOutputFile);
-			prebound.Add("close-port", PortOperations.ClosePort);
-			prebound.Add("port-closed?", PortOperations.PortClosed);
-			prebound.Add("display", PortOperations.Display);
-			prebound.Add("newline", PortOperations.Newline);
-			prebound.Add("read", PortOperations.Read);
-			prebound.Add("read-char", PortOperations.ReadChar);
-			prebound.Add("read-line", PortOperations.ReadLine);
-			prebound.Add("write", PortOperations.Write);
-			prebound.Add("write-char", PortOperations.WriteChar);
+			prebound.Add("current-input-port");
+			prebound.Add("current-output-port");
+			prebound.Add("set-current-output-port!");
+			prebound.Add("set-current-input-port!");
+			prebound.Add("open-input-file");
+			prebound.Add("open-output-file");
+			prebound.Add("close-port");
+			prebound.Add("port-closed?");
+			prebound.Add("display");
+			prebound.Add("newline");
+			prebound.Add("read");
+			prebound.Add("read-char");
+			prebound.Add("read-line");
+			prebound.Add("write");
+			prebound.Add("write-char");
 
-			prebound.Add("char=?", CharOperations.CharEquals);
-			prebound.Add("char<?", CharOperations.CharGreaterThan);
-			prebound.Add("char>?", CharOperations.CharLessThan);
-			prebound.Add("char>=?", CharOperations.CharLessThanOr);
-			prebound.Add("char<=?", CharOperations.CharGreaterThanOr);
+			prebound.Add("char=?");
+			prebound.Add("char<?");
+			prebound.Add("char>?");
+			prebound.Add("char>=?");
+			prebound.Add("char<=?");
 
-			prebound.Add("char-alphabetic?", CharOperations.CharAlphabetic);
-			prebound.Add("char-numeric?", CharOperations.CharNumeric);
-			prebound.Add("char-whitespace?", CharOperations.CharWhitespace);
-			prebound.Add("char-upper-case?", CharOperations.CharUpperCase);
-			prebound.Add("char-lower-case?", CharOperations.CharLowerCase);
-			prebound.Add("char->integer", CharOperations.CharInteger);
-			prebound.Add("integer->char", CharOperations.IntegerChar);
-			prebound.Add("char-upcase", CharOperations.CharUpcase);
-			prebound.Add("char-downcase", CharOperations.CharDowncase);
+			prebound.Add("char-alphabetic?");
+			prebound.Add("char-numeric?");
+			prebound.Add("char-whitespace?");
+			prebound.Add("char-upper-case?");
+			prebound.Add("char-lower-case?");
+			prebound.Add("char->integer");
+			prebound.Add("integer->char");
+			prebound.Add("char-upcase");
+			prebound.Add("char-downcase");
 
-			foreach (KeyValuePair<string, Func<ScheminList, Environment, Evaluator, IScheminType>> kvp in prebound)
+			foreach (string name in prebound)
 			{
-				var func = kvp.Value;
-				string symbolValue = kvp.Key;
-
-				ScheminAtom symbol = new ScheminAtom(symbolValue);
-				ScheminPrimitive prim = new ScheminPrimitive(func, symbolValue);
+				ScheminAtom symbol = new ScheminAtom(name);
+				ScheminPrimitive prim = new ScheminPrimitive(name);
 
 				env.AddBinding(symbol, prim);
 			}

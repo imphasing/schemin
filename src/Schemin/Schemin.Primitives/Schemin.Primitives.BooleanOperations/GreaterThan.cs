@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.BooleanOperations
 {
+	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class GreaterThan : Primitive
 	{

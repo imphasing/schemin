@@ -27,12 +27,13 @@
 
 namespace Schemin.Primitives.PortOperations
 {
+	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class SetCurrentInputPort : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			ScheminPort inputPort = (ScheminPort) list.Car();
+			ScheminPort inputPort = (ScheminPort) args.Car();
 			eval.CurrentInputPort = inputPort;
 			return ScheminList.EmptyList;
 		}

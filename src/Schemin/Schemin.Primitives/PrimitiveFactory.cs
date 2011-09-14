@@ -29,8 +29,8 @@ namespace Schemin.Primitives
 {
 	using System;
 	using System.Collections.Generic;
-	using Schemin.AST;
 	using Schemin.Evaluate;
+	using Schemin.AST;
 	using Environment = Schemin.Evaluate.Environment;
 
 	public static class PrimitiveFactory
@@ -129,7 +129,7 @@ namespace Schemin.Primitives
 			Primitives.Add("char-downcase", new CharOperations.CharDowncase());
 		}
 
-		static Primitive Get(string name)
+		public static Primitive Get(string name)
 		{
 			return Primitives[name];
 		}

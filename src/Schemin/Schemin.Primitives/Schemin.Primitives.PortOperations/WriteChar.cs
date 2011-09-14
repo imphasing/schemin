@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.PortOperations
 {
+	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class WriteChar : Primitive
 	{
@@ -35,7 +36,7 @@ namespace Schemin.Primitives.PortOperations
 			ScheminChar chr = (ScheminChar) args.Car();
 			ScheminPort writeTo = eval.CurrentOutputPort;
 
-			IScheminType port = list.Cdr().Car();
+			IScheminType port = args.Cdr().Car();
 			if ((port as ScheminPort) != null)
 			{
 				writeTo = (ScheminPort) port;

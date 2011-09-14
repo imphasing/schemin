@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.ListOperations
 {
+	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class Cdr : Primitive
 	{

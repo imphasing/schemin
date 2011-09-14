@@ -28,8 +28,8 @@
 namespace Schemin.Primitives
 {
 	using System;
-	using Schemin.AST;
 	using Schemin.Evaluate;
+	using Schemin.AST;
 	using Environment = Schemin.Evaluate.Environment;
 
 	public abstract class Primitive

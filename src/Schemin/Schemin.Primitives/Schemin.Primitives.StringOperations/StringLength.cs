@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.StringOperations
 {
+	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class StringLength : Primitive
 	{

@@ -29,7 +29,7 @@ namespace Schemin.AST
 {
 	using System;
 	using Schemin.Evaluate;
-	using Schemin.Evaluate.Primitives;
+	using Schemin.Primitives;
 
 	using Environment = Schemin.Evaluate.Environment;
 
@@ -49,7 +49,7 @@ namespace Schemin.AST
 			else
 			{
 				ScheminList def = definition.Cdr();
-				def.Cons(new ScheminPrimitive(GeneralOperations.Begin, "begin"));
+				def.Cons(new ScheminPrimitive("begin"));
 				this.Definition = def;
 			}
 

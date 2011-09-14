@@ -32,7 +32,7 @@ namespace Schemin.Parse
 	using Schemin.Tokenize;
 	using Schemin.AST;
 	using Schemin.Evaluate;
-	using Schemin.Evaluate.Primitives;
+	using Schemin.Primitives;
 
 	public class Parser
 	{
@@ -105,31 +105,31 @@ namespace Schemin.Parse
 			{
 				// these are special forms that can't be bound to symbols, they're always primitives
 				case "lambda":
-					return new ScheminPrimitive(GeneralOperations.Lambda, "lambda");
+					return new ScheminPrimitive("lambda");
 				case "define": 
-					return new ScheminPrimitive(GeneralOperations.Define, "define");
+					return new ScheminPrimitive("define");
 				case "quote":
-					return new ScheminPrimitive(GeneralOperations.Quote, "quote");
+					return new ScheminPrimitive("quote");
 				case "begin":
-					return new ScheminPrimitive(GeneralOperations.Begin, "begin");
+					return new ScheminPrimitive("begin");
 				case "if":
-					return new ScheminPrimitive(GeneralOperations.If, "if");
+					return new ScheminPrimitive("if");
 				case "or":
-					return new ScheminPrimitive(BooleanOperations.Or, "or");
+					return new ScheminPrimitive("or");
 				case "and":
-					return new ScheminPrimitive(BooleanOperations.And, "and");
+					return new ScheminPrimitive("and");
 				case "cond":
-					return new ScheminPrimitive(GeneralOperations.Cond, "cond");
+					return new ScheminPrimitive("cond");
 				case "let":
-					return new ScheminPrimitive(GeneralOperations.Let, "let");
+					return new ScheminPrimitive("let");
 				case "letrec":
-					return new ScheminPrimitive(GeneralOperations.LetRec, "letrec");
+					return new ScheminPrimitive("letrec");
 				case "let*":
-					return new ScheminPrimitive(GeneralOperations.LetStar, "let*");
+					return new ScheminPrimitive("let*");
 				case "set!":
-					return new ScheminPrimitive(GeneralOperations.SetBang, "set!");
+					return new ScheminPrimitive("set!");
 				case "call/cc":
-					return new ScheminPrimitive(GeneralOperations.CallCC, "call/cc");
+					return new ScheminPrimitive("call/cc");
 				default:
 					return atom;
 			}
@@ -149,7 +149,7 @@ namespace Schemin.Parse
 					if (atom.Name == "'")
 					{
 						// This pass replaces a list like (' a b) with ((quote a) b)
-						ScheminList newhead = new ScheminList(new ScheminPrimitive(GeneralOperations.Quote, "quote"));
+						ScheminList newhead = new ScheminList(new ScheminPrimitive("quote"));
 						newhead.Append(c.Rest.Head);
 
 						c.Head = newhead;
