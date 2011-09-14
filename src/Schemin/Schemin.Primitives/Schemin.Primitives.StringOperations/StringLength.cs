@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.StringOperations
 {
-	public class StringLength : ScheminPrimitive
+	public class StringLength : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

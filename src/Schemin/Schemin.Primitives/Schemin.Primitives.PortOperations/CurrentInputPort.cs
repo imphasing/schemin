@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.PortOperations
 {
-	public class CurrentInputPort : ScheminPrimitive
+	public class CurrentInputPort : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.NumericOperations
 {
-	public class Divide : ScheminPrimitive
+	public class Divide : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

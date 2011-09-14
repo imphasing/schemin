@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.PortOperations
 {
-	public class Write : ScheminPrimitive
+	public class Write : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.ListOperations
 {
-	public class Car : ScheminPrimitive
+	public class Car : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

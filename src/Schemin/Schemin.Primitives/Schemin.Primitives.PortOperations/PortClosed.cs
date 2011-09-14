@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.PortOperations
 {
-	public class PortClosed : ScheminPrimitive
+	public class PortClosed : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

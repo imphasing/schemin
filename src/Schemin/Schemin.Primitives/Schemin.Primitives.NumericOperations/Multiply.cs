@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.NumericOperations
 {
-	public class Multiply : ScheminPrimitive
+	public class Multiply : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.StringOperations
 {
-	public class StringRef : ScheminPrimitive
+	public class StringRef : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

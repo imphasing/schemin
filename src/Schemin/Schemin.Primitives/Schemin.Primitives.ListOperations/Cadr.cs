@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.ListOperations
 {
-	public class Cadr : ScheminPrimitive
+	public class Cadr : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

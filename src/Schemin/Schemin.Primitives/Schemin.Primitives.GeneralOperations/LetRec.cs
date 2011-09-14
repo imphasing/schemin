@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.GeneralOperations
 {
-	public class LetRec : ScheminPrimitive
+	public class LetRec : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

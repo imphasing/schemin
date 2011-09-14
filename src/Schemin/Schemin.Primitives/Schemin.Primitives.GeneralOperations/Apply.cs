@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.GeneralOperations
 {
-	public class Apply : ScheminPrimitive
+	public class Apply : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

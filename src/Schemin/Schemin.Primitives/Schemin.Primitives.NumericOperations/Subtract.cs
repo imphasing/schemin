@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.NumericOperations
 {
-	public class Subtract : ScheminPrimitive
+	public class Subtract : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

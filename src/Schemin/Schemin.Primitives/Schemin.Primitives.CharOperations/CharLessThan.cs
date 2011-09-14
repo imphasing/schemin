@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.CharOperations
 {
-	public class CharLessThan : ScheminPrimitive
+	public class CharLessThan : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.ListOperations
 {
-	public class Append : ScheminPrimitive
+	public class Append : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

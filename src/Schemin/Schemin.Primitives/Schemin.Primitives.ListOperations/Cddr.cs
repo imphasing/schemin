@@ -27,7 +27,7 @@
 
 namespace Schemin.Evaluate.Primitives.ListOperations
 {
-	public class Cddr : ScheminPrimitive
+	public class Cddr : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
