@@ -25,8 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate.Primitives.GeneralOperations
+namespace Schemin.Primitives.GeneralOperations
 {
+	using Schemin.AST;
 	public class Apply : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)

@@ -25,7 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate.Primitives
+namespace Schemin.Primitives
 {
 	using System;
 	using System.Collections.Generic;
@@ -39,94 +39,94 @@ namespace Schemin.Evaluate.Primitives
 
 		static PrimitiveFactory()
 		{
-			Primitives = new Dictionary<string, Primitive>();
-			Primitives.Add("+", NumericOperations.Add);
-			Primitives.Add("-", NumericOperations.Subtract);
-			Primitives.Add("*", NumericOperations.Multiply);
-			Primitives.Add("/", NumericOperations.Divide);
-			Primitives.Add("mod", NumericOperations.Mod);
+			Primitives = new Dictionary<string, Primitive>(());
+			Primitives.Add("+", new NumericOperations.Add());
+			Primitives.Add("-", new NumericOperations.Subtract());
+			Primitives.Add("*", new NumericOperations.Multiply());
+			Primitives.Add("/", new NumericOperations.Divide());
+			Primitives.Add("mod", new NumericOperations.Mod());
 
-			Primitives.Add("car", ListOperations.Car);
-			Primitives.Add("cons", ListOperations.Cons);
-			Primitives.Add("cdr", ListOperations.Cdr);
-			Primitives.Add("cadr", ListOperations.Cadr);
-			Primitives.Add("cddr", ListOperations.Cddr);
-			Primitives.Add("length", ListOperations.Length);
-			Primitives.Add("list", ListOperations.List);
-			Primitives.Add("append", ListOperations.Append);
+			Primitives.Add("car", new ListOperations.Car());
+			Primitives.Add("cons", new ListOperations.Cons());
+			Primitives.Add("cdr", new ListOperations.Cdr());
+			Primitives.Add("cadr", new ListOperations.Cadr());
+			Primitives.Add("cddr", new ListOperations.Cddr());
+			Primitives.Add("length", new ListOperations.Length());
+			Primitives.Add("list", new ListOperations.List());
+			Primitives.Add("append", new ListOperations.Append());
 
-			Primitives.Add("null?", BooleanOperations.Null);
-			Primitives.Add("=", BooleanOperations.Equal);
-			Primitives.Add("eq?", BooleanOperations.Equal);
+			Primitives.Add("null?", new BooleanOperations.Null());
+			Primitives.Add("=", new BooleanOperations.Equal());
+			Primitives.Add("eq?", new BooleanOperations.Equal());
 
-			Primitives.Add(">", BooleanOperations.GreaterThan);
-			Primitives.Add(">=", BooleanOperations.GreaterThanOr);
-			Primitives.Add("<", BooleanOperations.LessThan);
-			Primitives.Add("<=", BooleanOperations.LessThanOr);
-			Primitives.Add("prime?", BooleanOperations.Prime);
-			Primitives.Add("or", BooleanOperations.Or);
-			Primitives.Add("and", BooleanOperations.And);
+			Primitives.Add(">", new BooleanOperations.GreaterThan());
+			Primitives.Add(">=", new BooleanOperations.GreaterThanOr());
+			Primitives.Add("<", new BooleanOperations.LessThan());
+			Primitives.Add("<=", new BooleanOperations.LessThanOr());
+			Primitives.Add("prime?", new BooleanOperations.Prime());
+			Primitives.Add("or", new BooleanOperations.Or());
+			Primitives.Add("and", new BooleanOperations.And());
 
-			Primitives.Add("boolean?", BooleanOperations.Boolean);
-			Primitives.Add("symbol?", BooleanOperations.Symbol);
-			Primitives.Add("procedure?", BooleanOperations.Procedure);
-			Primitives.Add("pair?", BooleanOperations.Pair);
-			Primitives.Add("number?", BooleanOperations.Number);
-			Primitives.Add("string?", BooleanOperations.String);
-			Primitives.Add("char?", BooleanOperations.Char);
-			Primitives.Add("port?", BooleanOperations.Port);
-			Primitives.Add("input-port?", BooleanOperations.InputPort);
-			Primitives.Add("output-port?", BooleanOperations.OutputPort);
-			Primitives.Add("eof-object?", BooleanOperations.EOFObject);
+			Primitives.Add("boolean?", new BooleanOperations.Boolean());
+			Primitives.Add("symbol?", new BooleanOperations.Symbol());
+			Primitives.Add("procedure?", new BooleanOperations.Procedure());
+			Primitives.Add("pair?", new BooleanOperations.Pair());
+			Primitives.Add("number?", new BooleanOperations.Number());
+			Primitives.Add("string?", new BooleanOperations.String());
+			Primitives.Add("char?", new BooleanOperations.Char());
+			Primitives.Add("port?", new BooleanOperations.Port());
+			Primitives.Add("input-port?", new BooleanOperations.InputPort());
+			Primitives.Add("output-port?", new BooleanOperations.OutputPort());
+			Primitives.Add("eof-object?", new BooleanOperations.EOFObject());
 
-			Primitives.Add("dumpenv", GeneralOperations.DumpEnv);
-			Primitives.Add("apply", GeneralOperations.Apply);
-			Primitives.Add("lambda", GeneralOperations.Lambda);
-			Primitives.Add("define", GeneralOperations.Define);
-			Primitives.Add("quote", GeneralOperations.Quote);
-			Primitives.Add("begin", GeneralOperations.Begin);
-			Primitives.Add("if", GeneralOperations.If);
-			Primitives.Add("cond", GeneralOperations.Cond);
-			Primitives.Add("let", GeneralOperations.Let);
-			Primitives.Add("letrec", GeneralOperations.LetRec);
-			Primitives.Add("let*", GeneralOperations.LetStar);
-			Primitives.Add("set!", GeneralOperations.SetBang);
-			Primitives.Add("call/cc", GeneralOperations.CallCC);
+			Primitives.Add("dumpenv", new GeneralOperations.DumpEnv());
+			Primitives.Add("apply", new GeneralOperations.Apply());
+			Primitives.Add("lambda", new GeneralOperations.Lambda());
+			Primitives.Add("define", new GeneralOperations.Define());
+			Primitives.Add("quote", new GeneralOperations.Quote());
+			Primitives.Add("begin", new GeneralOperations.Begin());
+			Primitives.Add("if", new GeneralOperations.If());
+			Primitives.Add("cond", new GeneralOperations.Cond());
+			Primitives.Add("let", new GeneralOperations.Let());
+			Primitives.Add("letrec", new GeneralOperations.LetRec());
+			Primitives.Add("let*", new GeneralOperations.LetStar());
+			Primitives.Add("set!", new GeneralOperations.SetBang());
+			Primitives.Add("call/cc", new GeneralOperations.CallCC());
 
-			Primitives.Add("string-ref", StringOperations.StringRef);
-			Primitives.Add("string-length", StringOperations.StringLength);
+			Primitives.Add("string-ref", new StringOperations.StringRef());
+			Primitives.Add("string-length", new StringOperations.StringLength());
 
-			Primitives.Add("current-input-port", PortOperations.CurrentInputPort);
-			Primitives.Add("current-output-port", PortOperations.CurrentOutputPort);
-			Primitives.Add("set-current-output-port!", PortOperations.SetCurrentOutputPort);
-			Primitives.Add("set-current-input-port!", PortOperations.SetCurrentInputPort);
-			Primitives.Add("open-input-file", PortOperations.OpenInputFile);
-			Primitives.Add("open-output-file", PortOperations.OpenOutputFile);
-			Primitives.Add("close-port", PortOperations.ClosePort);
-			Primitives.Add("port-closed?", PortOperations.PortClosed);
-			Primitives.Add("display", PortOperations.Display);
-			Primitives.Add("newline", PortOperations.Newline);
-			Primitives.Add("read", PortOperations.Read);
-			Primitives.Add("read-char", PortOperations.ReadChar);
-			Primitives.Add("read-line", PortOperations.ReadLine);
-			Primitives.Add("write", PortOperations.Write);
-			Primitives.Add("write-char", PortOperations.WriteChar);
+			Primitives.Add("current-input-port", new PortOperations.CurrentInputPort());
+			Primitives.Add("current-output-port", new PortOperations.CurrentOutputPort());
+			Primitives.Add("set-current-output-port!", new PortOperations.SetCurrentOutputPort());
+			Primitives.Add("set-current-input-port!", new PortOperations.SetCurrentInputPort());
+			Primitives.Add("open-input-file", new PortOperations.OpenInputFile());
+			Primitives.Add("open-output-file", new PortOperations.OpenOutputFile());
+			Primitives.Add("close-port", new PortOperations.ClosePort());
+			Primitives.Add("port-closed?", new PortOperations.PortClosed());
+			Primitives.Add("display", new PortOperations.Display());
+			Primitives.Add("newline", new PortOperations.Newline());
+			Primitives.Add("read", new PortOperations.Read());
+			Primitives.Add("read-char", new PortOperations.ReadChar());
+			Primitives.Add("read-line", new PortOperations.ReadLine());
+			Primitives.Add("write", new PortOperations.Write());
+			Primitives.Add("write-char", new PortOperations.WriteChar());
 
-			Primitives.Add("char=?", CharOperations.CharEquals);
-			Primitives.Add("char<?", CharOperations.CharGreaterThan);
-			Primitives.Add("char>?", CharOperations.CharLessThan);
-			Primitives.Add("char>=?", CharOperations.CharLessThanOr);
-			Primitives.Add("char<=?", CharOperations.CharGreaterThanOr);
+			Primitives.Add("char=?", new CharOperations.CharEquals());
+			Primitives.Add("char<?", new CharOperations.CharGreaterThan());
+			Primitives.Add("char>?", new CharOperations.CharLessThan());
+			Primitives.Add("char>=?", new CharOperations.CharLessThanOr());
+			Primitives.Add("char<=?", new CharOperations.CharGreaterThanOr());
 
-			Primitives.Add("char-alphabetic?", CharOperations.CharAlphabetic);
-			Primitives.Add("char-numeric?", CharOperations.CharNumeric);
-			Primitives.Add("char-whitespace?", CharOperations.CharWhitespace);
-			Primitives.Add("char-upper-case?", CharOperations.CharUpperCase);
-			Primitives.Add("char-lower-case?", CharOperations.CharLowerCase);
-			Primitives.Add("char->integer", CharOperations.CharInteger);
-			Primitives.Add("integer->char", CharOperations.IntegerChar);
-			Primitives.Add("char-upcase", CharOperations.CharUpcase);
-			Primitives.Add("char-downcase", CharOperations.CharDowncase);
+			Primitives.Add("char-alphabetic?", new CharOperations.CharAlphabetic());
+			Primitives.Add("char-numeric?", new CharOperations.CharNumeric());
+			Primitives.Add("char-whitespace?", new CharOperations.CharWhitespace());
+			Primitives.Add("char-upper-case?", new CharOperations.CharUpperCase());
+			Primitives.Add("char-lower-case?", new CharOperations.CharLowerCase());
+			Primitives.Add("char->integer", new CharOperations.CharInteger());
+			Primitives.Add("integer->char", new CharOperations.IntegerChar());
+			Primitives.Add("char-upcase", new CharOperations.CharUpcase());
+			Primitives.Add("char-downcase", new CharOperations.CharDowncase());
 		}
 
 		static Primitive Get(string name)

@@ -25,8 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate.Primitives.PortOperations
+namespace Schemin.Primitives.PortOperations
 {
+	using Schemin.AST;
 	public class ReadChar : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)

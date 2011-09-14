@@ -25,8 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate.Primitives.CharOperations
+namespace Schemin.Primitives.CharOperations
 {
+	using Schemin.AST;
 	public class CharAlphabetic : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)

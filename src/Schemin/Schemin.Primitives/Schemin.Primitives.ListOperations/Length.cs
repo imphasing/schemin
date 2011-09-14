@@ -25,8 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate.Primitives.ListOperations
+namespace Schemin.Primitives.ListOperations
 {
+	using Schemin.AST;
 	public class Length : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)

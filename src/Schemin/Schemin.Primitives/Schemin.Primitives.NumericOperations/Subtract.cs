@@ -25,8 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate.Primitives.NumericOperations
+namespace Schemin.Primitives.NumericOperations
 {
+	using Schemin.AST;
 	public class Subtract : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)

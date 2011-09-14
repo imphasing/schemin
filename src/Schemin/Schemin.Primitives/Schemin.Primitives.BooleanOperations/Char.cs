@@ -25,8 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate.Primitives.BooleanOperations
+namespace Schemin.Primitives.BooleanOperations
 {
+	using Schemin.AST;
 	public class Char : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
