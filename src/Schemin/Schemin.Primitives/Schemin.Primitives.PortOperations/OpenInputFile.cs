@@ -27,6 +27,9 @@
 
 namespace Schemin.Primitives.PortOperations
 {
+	using System;
+       using Environment = Schemin.Evaluate.Environment;
+	using System.IO;
 	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class OpenInputFile : Primitive

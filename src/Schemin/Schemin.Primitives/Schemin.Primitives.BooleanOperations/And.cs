@@ -35,7 +35,7 @@ namespace Schemin.Primitives.BooleanOperations
 		{
 			ScheminList nextCycle = new ScheminList();
 			nextCycle.UnQuote();
-			nextCycle.Append(new ScheminPrimitive(Primitives.BooleanOperations.And, "and"));
+			nextCycle.Append(new ScheminPrimitive("and"));
 
 			if (args.Car().BoolValue() == ScheminBool.False)
 			{

@@ -50,24 +50,24 @@ namespace Schemin.Primitives.GeneralOperations
 				if (atom.Name == "else")
 				{
 					ScheminList elseClause = firstCondition.Cdr();
-					elseClause.Cons(new ScheminPrimitive(GeneralOperations.Begin, "begin"));
+					elseClause.Cons(new ScheminPrimitive("begin"));
 
 					return elseClause;
 				}
 			}
 
-			builtIf.Append(new ScheminPrimitive(GeneralOperations.If, "if"));
+			builtIf.Append(new ScheminPrimitive("if"));
 			builtIf.Append(firstCondition.Car());
 
 			ScheminList beginExpression = firstCondition.Cdr();
-			beginExpression.Cons(new ScheminPrimitive(GeneralOperations.Begin, "begin"));
+			beginExpression.Cons(new ScheminPrimitive("begin"));
 
 			builtIf.Append(beginExpression);
 
 			if (conditions.Cdr().Length > 0)
 			{
 				ScheminList nextConditions = conditions.Cdr();
-				nextConditions.Cons(new ScheminPrimitive(GeneralOperations.Cond, "cond"));
+				nextConditions.Cons(new ScheminPrimitive("cond"));
 
 				builtIf.Append(nextConditions);
 			}

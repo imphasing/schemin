@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.PortOperations
 {
+	using System.Text;
 	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class ReadLine : Primitive

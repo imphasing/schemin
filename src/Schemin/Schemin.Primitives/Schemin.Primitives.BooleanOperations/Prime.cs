@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.BooleanOperations
 {
+	using System.Numerics;
 	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class Prime : Primitive

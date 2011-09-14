@@ -27,6 +27,7 @@
 
 namespace Schemin.Primitives.GeneralOperations
 {
+	using System.Linq;
 	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class Begin : Primitive

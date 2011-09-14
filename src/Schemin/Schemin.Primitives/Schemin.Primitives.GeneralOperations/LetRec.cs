@@ -63,7 +63,7 @@ namespace Schemin.Primitives.GeneralOperations
 				IScheminType symbol = next.Head;
 				IScheminType exp = nextExp.Head;
 
-				ScheminList setExp = new ScheminList(new ScheminPrimitive(GeneralOperations.SetBang, "set!"));
+				ScheminList setExp = new ScheminList(new ScheminPrimitive("set!"));
 				setExp.UnQuote();
 				setExp.Append(symbol);
 				setExp.Append(exp);

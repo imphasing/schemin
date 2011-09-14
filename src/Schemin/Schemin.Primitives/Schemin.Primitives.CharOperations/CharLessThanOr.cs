@@ -29,7 +29,7 @@ namespace Schemin.Primitives.CharOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
-	public class CharLessThanOrThan : Primitive
+	public class CharLessThanOr : Primitive
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{

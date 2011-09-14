@@ -33,7 +33,7 @@ namespace Schemin.Primitives.ListOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			ScheminList listArg = (ScheminList) list.Car();
+			ScheminList listArg = (ScheminList) args.Car();
 			return listArg.Cdr().Cdr();
 		}
 	}

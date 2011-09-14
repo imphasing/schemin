@@ -39,7 +39,7 @@ namespace Schemin.Primitives
 
 		static PrimitiveFactory()
 		{
-			Primitives = new Dictionary<string, Primitive>(());
+			Primitives = new Dictionary<string, Primitive>();
 			Primitives.Add("+", new NumericOperations.Add());
 			Primitives.Add("-", new NumericOperations.Subtract());
 			Primitives.Add("*", new NumericOperations.Multiply());

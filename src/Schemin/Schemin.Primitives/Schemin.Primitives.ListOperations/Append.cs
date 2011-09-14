@@ -27,6 +27,8 @@
 
 namespace Schemin.Primitives.ListOperations
 {
+	using System;
+       using Environment = Schemin.Evaluate.Environment;
 	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class Append : Primitive

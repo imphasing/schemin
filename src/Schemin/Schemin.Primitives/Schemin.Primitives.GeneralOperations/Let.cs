@@ -89,7 +89,7 @@ namespace Schemin.Primitives.GeneralOperations
 
 				if (isNamed)
 				{
-					ScheminAtom name = (ScheminAtom)list.Car();
+					ScheminAtom name = (ScheminAtom) args.Car();
 					closure.AddBinding(name, lam);
 				}
 

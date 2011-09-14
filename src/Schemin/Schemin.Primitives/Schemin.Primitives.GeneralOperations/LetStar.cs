@@ -46,7 +46,7 @@ namespace Schemin.Primitives.GeneralOperations
 			ScheminList firstBinding = new ScheminList(bindings.Car());
 			first.UnQuote();
 
-			first.Append(new ScheminPrimitive(GeneralOperations.Let, "let"));
+			first.Append(new ScheminPrimitive("let"));
 			first.Append(firstBinding);
 
 			if (bindings.Cdr().Length > 0)
@@ -54,7 +54,7 @@ namespace Schemin.Primitives.GeneralOperations
 				ScheminList nextLet = new ScheminList(bindings.Cdr());
 				nextLet.UnQuote();
 
-				nextLet.Cons(new ScheminPrimitive(GeneralOperations.LetStar, "let*"));
+				nextLet.Cons(new ScheminPrimitive("let*"));
 				nextLet.Append(expression);
 
 				first.Append(nextLet);
