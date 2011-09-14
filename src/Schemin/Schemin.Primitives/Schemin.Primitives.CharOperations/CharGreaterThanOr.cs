@@ -25,38 +25,23 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Evaluate.Primitives
+namespace Schemin.Evaluate.Primitives.CharOperations
 {
-	using System;
-	using System.Text;
-	using System.Collections.Generic;
-	using System.Numerics;
-	using System.Linq;
-	using Schemin.AST;
-	using Schemin.Evaluate;
-	using Environment = Schemin.Evaluate.Environment;
-
-	public static class StringOperations
+	public class CharGreaterThanOr : Primitive
 	{
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> StringRef;
-		public static Func<ScheminList, Environment, Evaluator, IScheminType> StringLength;
-
-		static StringOperations()
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			StringRef = (list, env, eval) => {
-				ScheminString str = (ScheminString) list.Car();
-				ScheminInteger pos = (ScheminInteger) list.Cdr().Car();
+			ScheminChar first = (ScheminChar) args.Car();
+			ScheminChar second = (ScheminChar) args.Cdr().Car();
 
-				// convert the bingint to a string, then parse it... uck :|
-				ScheminString chr = new ScheminString(str.Value[int.Parse(pos.Value.ToString())].ToString());
-				return chr;
-			};
+			int result = first.Value.CompareTo(second.Value);
 
-			StringLength = (list, env, eval) => {
-				ScheminString str = (ScheminString) list.Car();
-				ScheminInteger len = new ScheminInteger(str.Value.Length);
-				return len;
-			};
+			if (result <= 0)
+			{
+				return ScheminBool.True;
+			}
+
+			return ScheminBool.False;
 		}
 	}
 }
