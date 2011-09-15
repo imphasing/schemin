@@ -81,6 +81,15 @@ namespace Schemin.AST
 
 		public bool Equals(IScheminType type)
 		{
+			if ((type as ScheminPrimitive) != null)
+			{
+				ScheminPrimitive prim = (ScheminPrimitive) type;
+				if (prim.Definition == this.Definition)
+				{
+					return true;
+				}
+			}
+
 			return false;
 		}
 

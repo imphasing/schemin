@@ -28,6 +28,7 @@
 namespace Schemin.Primitives.GeneralOperations
 {
 	using System;
+	using System.Collections.Generic;
 	using Environment = Schemin.Evaluate.Environment;
 	using Schemin.Evaluate;
 	using Schemin.AST;
@@ -35,8 +36,17 @@ namespace Schemin.Primitives.GeneralOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			Console.WriteLine(env.ToString());
-			return ScheminList.EmptyList;
+			ScheminList bindings = new ScheminList();
+
+			foreach (KeyValuePair<string, IScheminType> kvp in env.bindings)
+			{
+				var binding = new ScheminList(new ScheminAtom(kvp.Key));
+				binding.Append(kvp.Value);
+
+				bindings.Append(binding);
+			}
+
+			return bindings;
 		}
 	}
 }

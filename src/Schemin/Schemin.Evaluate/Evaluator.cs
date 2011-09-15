@@ -408,87 +408,10 @@ namespace Schemin.Evaluate
 
 		public void DefinePrimitives(Environment env)
 		{
-			var prebound = new List<string>();
-
-			prebound.Add("+");
-			prebound.Add("-");
-			prebound.Add("*");
-			prebound.Add("/");
-			prebound.Add("mod");
-
-			prebound.Add("car");
-			prebound.Add("cons");
-			prebound.Add("cdr");
-			prebound.Add("cadr");
-			prebound.Add("cddr");
-			prebound.Add("length");
-			prebound.Add("list");
-			prebound.Add("append");
-
-			prebound.Add("null?");
-			prebound.Add("=");
-			prebound.Add("eq?");
-
-			prebound.Add(">");
-			prebound.Add(">=");
-			prebound.Add("<");
-			prebound.Add("<=");
-			prebound.Add("prime?");
-
-			prebound.Add("boolean?");
-			prebound.Add("symbol?");
-			prebound.Add("procedure?");
-			prebound.Add("pair?");
-			prebound.Add("number?");
-			prebound.Add("string?");
-			prebound.Add("char?");
-			prebound.Add("port?");
-			prebound.Add("input-port?");
-			prebound.Add("output-port?");
-			prebound.Add("eof-object?");
-
-			prebound.Add("dumpenv");
-			prebound.Add("apply");
-
-			prebound.Add("string-ref");
-			prebound.Add("string-length");
-
-			prebound.Add("current-input-port");
-			prebound.Add("current-output-port");
-			prebound.Add("set-current-output-port!");
-			prebound.Add("set-current-input-port!");
-			prebound.Add("open-input-file");
-			prebound.Add("open-output-file");
-			prebound.Add("close-port");
-			prebound.Add("port-closed?");
-			prebound.Add("display");
-			prebound.Add("newline");
-			prebound.Add("read");
-			prebound.Add("read-char");
-			prebound.Add("read-line");
-			prebound.Add("write");
-			prebound.Add("write-char");
-
-			prebound.Add("char=?");
-			prebound.Add("char<?");
-			prebound.Add("char>?");
-			prebound.Add("char>=?");
-			prebound.Add("char<=?");
-
-			prebound.Add("char-alphabetic?");
-			prebound.Add("char-numeric?");
-			prebound.Add("char-whitespace?");
-			prebound.Add("char-upper-case?");
-			prebound.Add("char-lower-case?");
-			prebound.Add("char->integer");
-			prebound.Add("integer->char");
-			prebound.Add("char-upcase");
-			prebound.Add("char-downcase");
-
-			foreach (string name in prebound)
+			foreach (KeyValuePair<string, Primitive> kvp in PrimitiveFactory.Primitives)
 			{
-				ScheminAtom symbol = new ScheminAtom(name);
-				ScheminPrimitive prim = new ScheminPrimitive(name);
+				ScheminAtom symbol = new ScheminAtom(kvp.Key);
+				ScheminPrimitive prim = new ScheminPrimitive(kvp.Key);
 
 				env.AddBinding(symbol, prim);
 			}

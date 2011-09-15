@@ -35,7 +35,7 @@ namespace Schemin.Primitives
 
 	public static class PrimitiveFactory
 	{
-		private static Dictionary<string, Primitive> Primitives;
+		public static Dictionary<string, Primitive> Primitives;
 
 		static PrimitiveFactory()
 		{
