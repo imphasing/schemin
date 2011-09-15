@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Assembly\AssemblyInfo.cs" />
     <Compile Include="ScheminTests.PrimitiveTests\StringOperationTests.cs" />
+    <Compile Include="ScheminTests.PrimitiveTests\NumericOperationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Schemin\Schemin.csproj">
