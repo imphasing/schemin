@@ -37,4 +37,3 @@ namespace Schemin.Primitives
 		public abstract IScheminType Execute(Environment env, Evaluator eval, ScheminList args);
 	}
 }
-

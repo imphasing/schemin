@@ -79,4 +79,3 @@ namespace Schemin.Primitives
 		public static string Error = "(define error display)";
 	}
 }
-
