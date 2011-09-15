@@ -28,8 +28,8 @@
 namespace Schemin.Primitives.PortOperations
 {
 	using System;
-       using Environment = Schemin.Evaluate.Environment;
-        using System.IO;
+	using Environment = Schemin.Evaluate.Environment;
+	using System.IO;
 	using System.Collections.Generic;
 	using System.Text;
 	using Schemin.Tokenize;
