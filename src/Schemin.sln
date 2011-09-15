@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schemin", "Schemin\Schemin.csproj", "{FEA08E52-2E71-4F05-8B98-F58FC8E5E64D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScheminTests", "ScheminTests\ScheminTests.csproj", "{4BE3BDE5-81D7-42EA-8315-F12C00883AB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AnyCPU = Debug|AnyCPU
@@ -12,6 +14,9 @@ Global
 		{FEA08E52-2E71-4F05-8B98-F58FC8E5E64D}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
 		{FEA08E52-2E71-4F05-8B98-F58FC8E5E64D}.Debug|AnyCPU.Build.0 = Debug|Any CPU
 		{FEA08E52-2E71-4F05-8B98-F58FC8E5E64D}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{4BE3BDE5-81D7-42EA-8315-F12C00883AB3}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{4BE3BDE5-81D7-42EA-8315-F12C00883AB3}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{4BE3BDE5-81D7-42EA-8315-F12C00883AB3}.Release|AnyCPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
