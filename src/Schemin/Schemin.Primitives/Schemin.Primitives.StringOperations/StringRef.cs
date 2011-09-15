@@ -27,6 +27,8 @@
 
 namespace Schemin.Primitives.StringOperations
 {
+	using System;
+	using Environment = Schemin.Evaluate.Environment;
 	using Schemin.Evaluate;
 	using Schemin.AST;
 	public class StringRef : Primitive
@@ -36,8 +38,8 @@ namespace Schemin.Primitives.StringOperations
 			ScheminString str = (ScheminString) args.Car();
 			ScheminInteger pos = (ScheminInteger) args.Cdr().Car();
 
-			// convert the bingint to a string, then parse it... uck :|
-			ScheminString chr = new ScheminString(str.Value[int.Parse(pos.Value.ToString())].ToString());
+			int pos_int = (int) pos.IntegerValue();
+			ScheminChar chr = new ScheminChar(str.Value[pos_int]);
 			return chr;
 		}
 	}

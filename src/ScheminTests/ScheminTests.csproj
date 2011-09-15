@@ -49,7 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembly\AssemblyInfo.cs" />
-    <Compile Include="Test.cs" />
+    <Compile Include="ScheminTests.PrimitiveTests\StringOperationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Schemin\Schemin.csproj">

@@ -25,18 +25,40 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace ScheminTests
+namespace ScheminTests.PrimitiveTests
 {
 	using System;
 	using NUnit.Framework;
+	using Schemin.Primitives;
+	using Schemin.AST;
 
 	[TestFixture]
-	public class Program
+	public class StringOperationTests
 	{
 		[Test]
-		public void TestTest()
+		public void TestStringLength()
 		{
-			Assert.AreEqual(1, 1);
+			var prim = PrimitiveFactory.Get("string-length");
+			ScheminString test = new ScheminString("test");
+			ScheminInteger result = (ScheminInteger) prim.Execute(null, null, new ScheminList(test));
+			ScheminInteger expected = new ScheminInteger(4);
+
+			Assert.AreEqual(result.IntegerValue(), expected.IntegerValue());
+		}
+
+		[Test]
+		public void TestStringRef()
+		{
+			var prim = PrimitiveFactory.Get("string-ref");
+			ScheminString test = new ScheminString("test");
+
+			ScheminList args = new ScheminList(test);
+			args.Append(new ScheminInteger(0));
+
+			ScheminChar result = (ScheminChar) prim.Execute(null, null, args);
+			char expected = 't';
+
+			Assert.AreEqual(result.Value, expected);
 		}
 	}
 }
