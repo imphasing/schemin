@@ -36,12 +36,13 @@ namespace Schemin.AST
 	public class ScheminLambda : IScheminType
 	{
 		public IScheminType Definition;
-		public ScheminList Arguments;
+		public IScheminType Arguments;
 		public Environment Closure;
 
 		public ScheminLambda(ScheminList definition, Environment closure)
 		{
-			this.Arguments = (ScheminList) definition.Car();
+			this.Arguments = definition.Car();
+
 			if (definition.Cdr().Length == 1)
 			{
 				this.Definition = definition.Cdr().Car();
@@ -58,34 +59,55 @@ namespace Schemin.AST
 
 		public Environment MakeEnvironment(ScheminList values, Evaluator eval)
 		{
-			IScheminType first = Arguments.Car();
-			ScheminList rest = Arguments.Cdr();
-			IScheminType firstArg = values.Car();
-			ScheminList restArgs = values.Cdr();
-
-			Environment args = new Environment();
-			args.parent = this.Closure;
-
-			for (; ;)
+			if ((this.Arguments as ScheminList) != null)
 			{
-				if (first.GetType() == typeof(ScheminList))
+				ScheminList argslist = (ScheminList) this.Arguments;
+				IScheminType first = argslist.Car();
+				ScheminList rest = argslist.Cdr();
+				IScheminType firstArg = values.Car();
+				ScheminList restArgs = values.Cdr();
+
+				Environment args = new Environment();
+				args.parent = this.Closure;
+
+				for (; ;)
 				{
-					ScheminList tempFirst = (ScheminList) first;
-					if (tempFirst.Empty)
+					if (first.GetType() == typeof(ScheminList))
 					{
+						ScheminList tempFirst = (ScheminList) first;
+						if (tempFirst.Empty)
+						{
+							break;
+						}
+					}
+
+					ScheminAtom atom = (ScheminAtom) first;
+					if (atom.Name == ".")
+					{
+						restArgs.Cons(firstArg);
+						restArgs.Quote();
+						args.AddBinding((ScheminAtom) rest.Car(), restArgs);
 						break;
 					}
+
+					args.AddBinding((ScheminAtom) first, firstArg);
+
+					first = rest.Car();
+					firstArg = restArgs.Car();
+					rest = rest.Cdr();
+					restArgs = restArgs.Cdr();
 				}
 
-				args.AddBinding((ScheminAtom) first, firstArg);
-
-				first = rest.Car();
-				firstArg = restArgs.Car();
-				rest = rest.Cdr();
-				restArgs = restArgs.Cdr();
+				return args;
 			}
-
-			return args;
+			else
+			{
+				Environment args = new Environment();
+				args.parent = this.Closure;
+				values.Quote();
+				args.AddBinding((ScheminAtom) this.Arguments, values);
+				return args;
+			}
 		}
 
 		public override string ToString()
