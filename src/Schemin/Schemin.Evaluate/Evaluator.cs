@@ -55,6 +55,8 @@ namespace Schemin.Evaluate
 		public Evaluator()
 		{
 			Stack = new Stack<StackFrame>();
+			this.GlobalEnv = new Environment();
+			DefinePrimitives(this.GlobalEnv);
 			var ConsoleInput = new ScheminPort(Console.In);
 			var ConsoleOutput = new ScheminPort(Console.Out);
 
@@ -62,14 +64,20 @@ namespace Schemin.Evaluate
 			CurrentOutputPort = ConsoleOutput;
 		}
 
-		public IScheminType Evaluate(ScheminList ast, Environment env)
+		public IScheminType Evaluate(ScheminList ast)
 		{
-			this.GlobalEnv = env;
 			IScheminType last = null;
 
-			foreach (IScheminType type in ast)
+			try
 			{
-				last = EvaluateInternal(type);
+				foreach (IScheminType type in ast)
+				{
+					last = EvaluateInternal(type);
+				}
+			}
+			catch (Exception e)
+			{
+				CurrentOutputPort.OutputStream.WriteLine("error: " + e.Message);
 			}
 
 			return last;
@@ -264,11 +272,11 @@ namespace Schemin.Evaluate
 			throw new InvalidOperationException("Control escaped list evaluator...");
 		}
 
-		public IScheminType EvalAtom(IScheminType ast, Environment env)
+		private IScheminType EvalAtom(IScheminType ast, Environment env)
 		{
 			ScheminAtom temp = (ScheminAtom) ast;
 
-			IScheminType bound = GetEnvValue(temp, env);
+			IScheminType bound = env.GetValue(temp);
 			if (bound == null)
 			{
 				throw new UnboundAtomException(string.Format("Unbound atom: {0}", temp));
@@ -277,7 +285,7 @@ namespace Schemin.Evaluate
 			return bound;
 		}
 
-		public ScheminList CombineStackFrame(ScheminList before, ScheminList after, IScheminType result)
+		private ScheminList CombineStackFrame(ScheminList before, ScheminList after, IScheminType result)
 		{
 			ScheminList complete = new ScheminList();
 			complete.UnQuote();
@@ -312,7 +320,7 @@ namespace Schemin.Evaluate
 			return complete;
 		}
 
-		public bool IsEmptyList(IScheminType type)
+		private bool IsEmptyList(IScheminType type)
 		{
 			if (type.GetType() == typeof(ScheminList))
 			{
@@ -326,26 +334,7 @@ namespace Schemin.Evaluate
 			return false;
 		}
 
-		public IScheminType GetEnvValue(ScheminAtom symbol, Environment env)
-		{
-			Environment parent = env;
-			while (parent != null)
-			{
-				IScheminType value;
-				parent.bindings.TryGetValue(symbol.Name, out value);
-
-				if (value != null)
-				{
-					return parent.bindings[symbol.Name];
-				}
-
-				parent = parent.parent;
-			}
-
-			return null;
-		}
-
-		public void QuoteAST(ScheminPrimitive prim, ScheminList args)
+		private void QuoteAST(ScheminPrimitive prim, ScheminList args)
 		{
 			switch (prim.Name)
 			{
@@ -406,7 +395,7 @@ namespace Schemin.Evaluate
 			}
 		}
 
-		public void DefinePrimitives(Environment env)
+		private void DefinePrimitives(Environment env)
 		{
 			foreach (KeyValuePair<string, Primitive> kvp in PrimitiveFactory.Primitives)
 			{
@@ -444,7 +433,7 @@ namespace Schemin.Evaluate
 			{
 				var tokens = t.Tokenize(primitive);
 				var ast = p.Parse(tokens, false);
-				Evaluate(ast, env);
+				Evaluate(ast);
 			}
 		}
 	}

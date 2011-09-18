@@ -28,6 +28,7 @@
 namespace ScheminTests.PrimitiveTests
 {
 	using System;
+	using System.Numerics;
 	using NUnit.Framework;
 	using Schemin.Primitives;
 	using Schemin.AST;
@@ -57,9 +58,9 @@ namespace ScheminTests.PrimitiveTests
 
 			ScheminInteger expected = new ScheminInteger(4);
 
-			Assert.AreEqual(decimal_result.DecimalValue(), 3.0m);
-			Assert.AreEqual(int_result.IntegerValue(), expected.IntegerValue());
-			Assert.AreEqual(mixed_result.DecimalValue(), 3.5m);
+			Assert.AreEqual(3.0m, decimal_result.DecimalValue());
+			Assert.AreEqual(expected.IntegerValue(), int_result.IntegerValue());
+			Assert.AreEqual(3.5m, mixed_result.DecimalValue());
 		}
 
 		[Test]
@@ -86,9 +87,105 @@ namespace ScheminTests.PrimitiveTests
 
 			ScheminInteger expected = new ScheminInteger(1);
 
-			Assert.AreEqual(decimal_result.DecimalValue(), 1.5m);
-			Assert.AreEqual(int_result.IntegerValue(), expected.IntegerValue());
-			Assert.AreEqual(mixed_result.DecimalValue(), 1.5m);
+			Assert.AreEqual(1.5m, decimal_result.DecimalValue());
+			Assert.AreEqual(expected.IntegerValue(), int_result.IntegerValue());
+			Assert.AreEqual(1.5m, mixed_result.DecimalValue());
+		}
+
+		[Test]
+		public void TestMod()
+		{
+			var prim = PrimitiveFactory.Get("mod");
+			ScheminDecimal test_decimal = new ScheminDecimal(1.5m);
+			ScheminInteger test_integer = new ScheminInteger(2);
+			ScheminInteger test_mod_int = new ScheminInteger(1);
+			ScheminDecimal test_mod_decimal = new ScheminDecimal(0.8m);
+
+			ScheminList decimal_args = new ScheminList(test_decimal);
+			decimal_args.Append(test_mod_decimal);
+
+			ScheminList int_args = new ScheminList(test_integer);
+			int_args.Append(test_mod_int);
+
+			ScheminList mixed_args = new ScheminList(test_integer);
+			mixed_args.Append(test_mod_decimal);
+
+			ScheminDecimal decimal_result = (ScheminDecimal) prim.Execute(null, null, decimal_args);
+			ScheminInteger int_result = (ScheminInteger) prim.Execute(null, null, int_args);
+			ScheminDecimal mixed_result = (ScheminDecimal) prim.Execute(null, null, mixed_args);
+
+			ScheminInteger expected = new ScheminInteger(0);
+
+			Assert.AreEqual(0.7m, decimal_result.DecimalValue());
+			Assert.AreEqual(expected.IntegerValue(), int_result.IntegerValue());
+			Assert.AreEqual(0.4m, mixed_result.DecimalValue());
+		}
+
+		[Test]
+		public void TestMultiply()
+		{
+			var prim = PrimitiveFactory.Get("*");
+			ScheminDecimal test_decimal = new ScheminDecimal(1.5m);
+			ScheminInteger test_integer = new ScheminInteger(2);
+			ScheminInteger test_mult_int = new ScheminInteger(6);
+			ScheminDecimal test_mult_decimal = new ScheminDecimal(0.8m);
+			ScheminInteger test_large = new ScheminInteger(BigInteger.Parse("100000000000000000000000000000000"));
+			ScheminInteger test_large_2nd = new ScheminInteger(BigInteger.Parse("400000000000000000000"));
+
+
+			ScheminList decimal_args = new ScheminList(test_decimal);
+			decimal_args.Append(test_mult_decimal);
+
+			ScheminList int_args = new ScheminList(test_integer);
+			int_args.Append(test_mult_int);
+
+			ScheminList mixed_args = new ScheminList(test_integer);
+			mixed_args.Append(test_mult_decimal);
+
+			ScheminList large_args = new ScheminList(test_large);
+			large_args.Append(test_large_2nd);
+
+			ScheminDecimal decimal_result = (ScheminDecimal) prim.Execute(null, null, decimal_args);
+			ScheminInteger int_result = (ScheminInteger) prim.Execute(null, null, int_args);
+			ScheminDecimal mixed_result = (ScheminDecimal) prim.Execute(null, null, mixed_args);
+			ScheminInteger large_result = (ScheminInteger) prim.Execute(null, null, large_args);
+
+			ScheminInteger expected = new ScheminInteger(12);
+			ScheminInteger exp_large = new ScheminInteger(BigInteger.Parse("40000000000000000000000000000000000000000000000000000"));
+
+			Assert.AreEqual(1.2m, decimal_result.DecimalValue());
+			Assert.AreEqual(expected.IntegerValue(), int_result.IntegerValue());
+			Assert.AreEqual(1.6m, mixed_result.DecimalValue());
+			Assert.AreEqual(exp_large.IntegerValue(), large_result.IntegerValue());
+		}
+
+		[Test]
+		public void TestSubtract()
+		{
+			var prim = PrimitiveFactory.Get("-");
+			ScheminDecimal test_decimal = new ScheminDecimal(8.5m);
+			ScheminInteger test_integer = new ScheminInteger(20);
+			ScheminDecimal test_decimal_2 = new ScheminDecimal(4.1m);
+			ScheminInteger test_integer_2 = new ScheminInteger(6);
+
+			ScheminList decimal_args = new ScheminList(test_decimal);
+			decimal_args.Append(test_decimal_2);
+
+			ScheminList int_args = new ScheminList(test_integer);
+			int_args.Append(test_integer_2);
+
+			ScheminList mixed_args = new ScheminList(test_integer);
+			mixed_args.Append(test_decimal);
+
+			ScheminDecimal decimal_result = (ScheminDecimal) prim.Execute(null, null, decimal_args);
+			ScheminInteger int_result = (ScheminInteger) prim.Execute(null, null, int_args);
+			ScheminDecimal mixed_result = (ScheminDecimal) prim.Execute(null, null, mixed_args);
+
+			ScheminInteger expected = new ScheminInteger(14);
+
+			Assert.AreEqual(4.4m, decimal_result.DecimalValue());
+			Assert.AreEqual(expected.IntegerValue(), int_result.IntegerValue());
+			Assert.AreEqual(11.5m, mixed_result.DecimalValue());
 		}
 	}
 }

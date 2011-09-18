@@ -97,14 +97,13 @@ namespace Schemin
 			Tokenizer t = new Tokenizer();
 			Parser p = new Parser();
 			Evaluator eval = new Evaluator();
-			Environment global = new Environment();
-			eval.DefinePrimitives(global);
 
 			string contents = File.ReadAllText(filename);
 			var tokens = t.Tokenize(contents);
 			var parsed = p.Parse(tokens, false);
-			IScheminType returnType = eval.Evaluate(parsed, global);
-			Console.WriteLine(returnType.ToString());
+
+			IScheminType returnType = eval.Evaluate(parsed);
+			Console.WriteLine(returnType);
 		}
 
 		static void ReplPrompt()
@@ -112,8 +111,6 @@ namespace Schemin
 			Tokenizer t = new Tokenizer();
 			Parser p = new Parser();
 			Evaluator eval = new Evaluator();
-			Environment global = new Environment();
-			eval.DefinePrimitives(global);
 
 			for (; ;)
 			{
@@ -164,25 +161,14 @@ namespace Schemin
 					}
 				}
 
-				try
+				if (partialInput.Count < 1)
 				{
-					if (partialInput.Count < 1)
-					{
-						continue;
-					}
+					continue;
+				}
 
-					var parsed = p.Parse(partialInput, false);
-					IScheminType returnType = eval.Evaluate(parsed, global);
-					Console.WriteLine(returnType.ToString());
-				}
-				catch (UnboundAtomException unbound)
-				{
-					Console.WriteLine("Error: " + unbound.Message.ToString());
-				}
-				catch (InvalidOperationException invalid)
-				{
-					Console.WriteLine("Error: " + invalid.Message.ToString());
-				}
+				var parsed = p.Parse(partialInput, false);
+				IScheminType returnType = eval.Evaluate(parsed);
+				Console.WriteLine(returnType);
 			}
 		}
 	}

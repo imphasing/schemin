@@ -62,6 +62,25 @@ namespace Schemin.Evaluate
 			}
 		}
 
+		public IScheminType GetValue(ScheminAtom symbol)
+		{
+			Environment parent = this;
+			while (parent != null)
+			{
+				IScheminType value;
+				parent.bindings.TryGetValue(symbol.Name, out value);
+
+				if (value != null)
+				{
+					return parent.bindings[symbol.Name];
+				}
+
+				parent = parent.parent;
+			}
+
+			return null;
+		}
+
 		public override string ToString()
 		{
 			StringBuilder builder = new StringBuilder();

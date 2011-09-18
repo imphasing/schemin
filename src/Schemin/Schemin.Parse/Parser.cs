@@ -29,6 +29,7 @@ namespace Schemin.Parse
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Numerics;
 	using Schemin.Tokenize;
 	using Schemin.AST;
 	using Schemin.Evaluate;
@@ -85,7 +86,7 @@ namespace Schemin.Parse
 				case TokenType.Symbol:
 					return ConvertAtom(new ScheminAtom(token.Value));
 				case TokenType.IntegerLiteral:
-					return new ScheminInteger(int.Parse(token.Value));
+					return new ScheminInteger(BigInteger.Parse(token.Value));
 				case TokenType.DecimalLiteral:
 					return new ScheminDecimal(decimal.Parse(token.Value));
 				case TokenType.StringLiteral:
