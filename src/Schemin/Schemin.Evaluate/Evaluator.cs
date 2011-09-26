@@ -425,6 +425,11 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.Even);
 			prebound_schemin.Add(ScheminPrimitives.CallWithCC);
 			prebound_schemin.Add(ScheminPrimitives.Error);
+			prebound_schemin.Add(ScheminPrimitives.List);
+			prebound_schemin.Add(ScheminPrimitives.Sum);
+			prebound_schemin.Add(ScheminPrimitives.Product);
+			prebound_schemin.Add(ScheminPrimitives.Max);
+			prebound_schemin.Add(ScheminPrimitives.Min);
 
 			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
 			Schemin.Parse.Parser p = new Parse.Parser();

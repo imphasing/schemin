@@ -77,5 +77,15 @@ namespace Schemin.Primitives
 		public static string CallWithCC = "(define call-with-current-continuation call/cc)";
 
 		public static string Error = "(define error display)";
+
+		public static string List = "(define (list . objs) objs)";
+
+		public static string Sum = "(define (sum . lst) (fold + 0 lst))";
+
+		public static string Product = "(define (product . lst) (fold * 1 lst))";
+
+		public static string Max = "(define (max first . num-list) (fold (lambda (old new) (if (> old new) old new)) first num-list))";
+
+		public static string Min = "(define (min first . num-list) (fold (lambda (old new) (if (< old new) old new)) first num-list))";
 	}
 }

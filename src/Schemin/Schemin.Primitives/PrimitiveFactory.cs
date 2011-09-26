@@ -52,7 +52,6 @@ namespace Schemin.Primitives
 			Primitives.Add("cadr", new ListOperations.Cadr());
 			Primitives.Add("cddr", new ListOperations.Cddr());
 			Primitives.Add("length", new ListOperations.Length());
-			Primitives.Add("list", new ListOperations.List());
 			Primitives.Add("append", new ListOperations.Append());
 
 			Primitives.Add("null?", new BooleanOperations.Null());

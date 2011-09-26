@@ -112,7 +112,6 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Cdr.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Cons.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Length.cs" />
-    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\List.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Add.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Divide.cs" />
