@@ -425,7 +425,6 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.Even);
 			prebound_schemin.Add(ScheminPrimitives.CallWithCC);
 			prebound_schemin.Add(ScheminPrimitives.Error);
-			prebound_schemin.Add(ScheminPrimitives.List);
 			prebound_schemin.Add(ScheminPrimitives.Sum);
 			prebound_schemin.Add(ScheminPrimitives.Product);
 			prebound_schemin.Add(ScheminPrimitives.Max);

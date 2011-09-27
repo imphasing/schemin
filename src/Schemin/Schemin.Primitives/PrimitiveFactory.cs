@@ -53,6 +53,7 @@ namespace Schemin.Primitives
 			Primitives.Add("cddr", new ListOperations.Cddr());
 			Primitives.Add("length", new ListOperations.Length());
 			Primitives.Add("append", new ListOperations.Append());
+			Primitives.Add("list", new ListOperations.List());
 
 			Primitives.Add("null?", new BooleanOperations.Null());
 			Primitives.Add("=", new BooleanOperations.Equal());
