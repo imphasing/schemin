@@ -36,18 +36,17 @@ namespace Schemin.AST
 	{
 		public IScheminType Head = null;
 		public ScheminList Rest = null;
-		public bool Empty = true;
+		public bool Empty = false;
 
 		private bool quoted = true;
 
 		public static bool QuoteLists = true;
-		public static ScheminList EmptyList;
+		public static readonly ScheminList EmptyList;
 
 		static ScheminList()
 		{
-			ScheminList emptyList = new ScheminList();
-			emptyList.quoted = true;
-			EmptyList = emptyList;
+			EmptyList = new ScheminList();
+			EmptyList.quoted = true;
 		}
 
 		public int Length
@@ -99,7 +98,6 @@ namespace Schemin.AST
 			}
 
 			this.Head = head;
-			this.Empty = false;
 		}
 
 		public ScheminList(IScheminType head, ScheminList rest)
@@ -111,7 +109,6 @@ namespace Schemin.AST
 
 			this.Head = head;
 			this.Rest = rest;
-			this.Empty = false;
 		}
 
 		public IScheminType Car()
@@ -145,7 +142,6 @@ namespace Schemin.AST
 			this.Head = type;
 			this.Rest = new ScheminList(oldHead, this.Rest);
 			this.Rest.quoted = quoted;
-			this.Empty = false;
 
 			return this;
 		}
