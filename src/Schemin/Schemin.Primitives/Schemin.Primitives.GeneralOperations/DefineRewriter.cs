@@ -25,21 +25,30 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Tokenize
+namespace Schemin.Primitives.GeneralOperations
 {
-	public enum TokenType
+	using Schemin.Evaluate;
+	using Schemin.AST;
+	public class DefineRewriter : Primitive
 	{
-		Symbol,
-		IntegerLiteral,
-		DecimalLiteral,
-		StringLiteral,
-		BoolLiteral,
-		CharLiteral,
-		Quote,
-		BackQuote,
-		Comma,
-		AtComma,
-		OpenParen,
-		CloseParen
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		{
+			ScheminAtom symbol = (ScheminAtom) args.Car();
+			ScheminLambda definition = (ScheminLambda) args.Cdr().Car();
+
+			ScheminRewriter rewriter = new ScheminRewriter(definition);
+
+			if (env.bindings.ContainsKey(symbol.Name))
+			{
+				env.RemoveBinding(symbol);
+				env.AddBinding(symbol, rewriter);
+			}
+			else
+			{
+				env.AddBinding(symbol, rewriter);
+			}
+
+			return ScheminList.EmptyList;
+		}
 	}
 }

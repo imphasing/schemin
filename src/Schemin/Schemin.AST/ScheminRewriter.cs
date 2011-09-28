@@ -25,21 +25,73 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Tokenize
+namespace Schemin.AST
 {
-	public enum TokenType
+	using System;
+	using Schemin.Evaluate;
+	using Schemin.Primitives;
+
+	using Environment = Schemin.Evaluate.Environment;
+
+	public class ScheminRewriter : IScheminType
 	{
-		Symbol,
-		IntegerLiteral,
-		DecimalLiteral,
-		StringLiteral,
-		BoolLiteral,
-		CharLiteral,
-		Quote,
-		BackQuote,
-		Comma,
-		AtComma,
-		OpenParen,
-		CloseParen
+		public ScheminLambda Rewriter;
+
+		public ScheminRewriter(ScheminLambda rewriter)
+		{
+			this.Rewriter = rewriter;
+		}
+
+		public IScheminType Rewrite(ScheminList values, Evaluator eval)
+		{
+			ScheminList call = new ScheminList(Rewriter);
+			call.UnQuote();
+
+			foreach (IScheminType type in values)
+			{
+				call.Append(type);
+			}
+
+			IScheminType result = eval.EvaluateInternal(call);
+			result.UnQuote();
+
+			return result;
+		}
+
+		public override string ToString()
+		{
+			return "<Rewriter>";
+		}
+
+		public bool Quoted()
+		{
+			return false;
+		}
+
+		public void Quote()
+		{
+		}
+
+		public void UnQuote()
+		{
+		}
+
+		public bool Equals(IScheminType type)
+		{
+			if ((type as ScheminRewriter) != null)
+			{
+				if (type == this)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public ScheminBool BoolValue()
+		{
+			return ScheminBool.True;
+		}
 	}
 }

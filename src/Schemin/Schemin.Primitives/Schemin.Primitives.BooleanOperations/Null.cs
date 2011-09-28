@@ -33,8 +33,12 @@ namespace Schemin.Primitives.BooleanOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			ScheminList listArg = (ScheminList) args.Car();
+			if ((args.Car() as ScheminList) == null)
+			{
+				return ScheminBool.False;
+			}
 
+			ScheminList listArg = (ScheminList) args.Car();
 			if (listArg.Empty)
 			{
 				return ScheminBool.True;

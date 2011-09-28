@@ -36,6 +36,7 @@ namespace Schemin.AST
 	{
 		public Primitive Definition;
 		public string Name;
+		private bool quoted = false;
 
 		public ScheminPrimitive(string name)
 		{
@@ -68,15 +69,17 @@ namespace Schemin.AST
 
 		public bool Quoted()
 		{
-			return false;
+			return quoted;
 		}
 
 		public void Quote()
 		{
+			quoted = true;
 		}
 
 		public void UnQuote()
 		{
+			quoted = false;
 		}
 
 		public bool Equals(IScheminType type)

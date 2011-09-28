@@ -83,7 +83,11 @@ namespace Schemin.Primitives
 			Primitives.Add("apply", new GeneralOperations.Apply());
 			Primitives.Add("lambda", new GeneralOperations.Lambda());
 			Primitives.Add("define", new GeneralOperations.Define());
+			Primitives.Add("define-rewriter", new GeneralOperations.DefineRewriter());
 			Primitives.Add("quote", new GeneralOperations.Quote());
+			Primitives.Add("quasiquote", new GeneralOperations.QuasiQuote());
+			Primitives.Add("unquote", new GeneralOperations.Unquote());
+			Primitives.Add("unquote-splicing", new GeneralOperations.UnquoteSplicing());
 			Primitives.Add("begin", new GeneralOperations.Begin());
 			Primitives.Add("if", new GeneralOperations.If());
 			Primitives.Add("cond", new GeneralOperations.Cond());

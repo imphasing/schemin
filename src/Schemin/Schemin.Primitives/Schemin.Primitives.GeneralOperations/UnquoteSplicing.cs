@@ -25,21 +25,22 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Tokenize
+namespace Schemin.Primitives.GeneralOperations
 {
-	public enum TokenType
+	using Schemin.Evaluate;
+	using Schemin.AST;
+	public class UnquoteSplicing : Primitive
 	{
-		Symbol,
-		IntegerLiteral,
-		DecimalLiteral,
-		StringLiteral,
-		BoolLiteral,
-		CharLiteral,
-		Quote,
-		BackQuote,
-		Comma,
-		AtComma,
-		OpenParen,
-		CloseParen
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		{
+			ScheminList arg = (ScheminList) args.Car();
+			if (arg.Empty)
+			{
+				return ScheminList.EmptyList;
+			}
+
+			arg.UnQuote();
+			return arg;
+		}
 	}
 }

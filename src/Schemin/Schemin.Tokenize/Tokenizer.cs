@@ -118,6 +118,9 @@ namespace Schemin.Tokenize
 			matchTokenTypes.Add(new Regex("^([0-9]*)?(\\.[0-9]+)$"), TokenType.DecimalLiteral);
 			matchTokenTypes.Add(new Regex("[^\"\',()]+"), TokenType.Symbol);
 			matchTokenTypes.Add(new Regex("[']"), TokenType.Quote);
+			matchTokenTypes.Add(new Regex("[`]"), TokenType.BackQuote);
+			matchTokenTypes.Add(new Regex(",@"), TokenType.Comma);
+			matchTokenTypes.Add(new Regex("[,]"), TokenType.Comma);
 			matchTokenTypes.Add(new Regex("[(]"), TokenType.OpenParen);
 			matchTokenTypes.Add(new Regex("[)]"), TokenType.CloseParen);
 
@@ -132,6 +135,24 @@ namespace Schemin.Tokenize
 				{
 					string quoted = token.Substring(1, token.Length - 1);
 					tokens.Add(new Token(TokenType.Quote, "'"));
+					working = quoted;
+				}
+				else if (working.StartsWith("`") && working != "`")
+				{
+					string quoted = token.Substring(1, token.Length - 1);
+					tokens.Add(new Token(TokenType.BackQuote, "`"));
+					working = quoted;
+				}
+				else if (working.StartsWith(",@") && working != ",@")
+				{
+					string quoted = token.Substring(2, token.Length - 2);
+					tokens.Add(new Token(TokenType.AtComma, ",@"));
+					working = quoted;
+				}
+				else if (working.StartsWith(",") && working != "," && working != ",@")
+				{
+					string quoted = token.Substring(1, token.Length - 1);
+					tokens.Add(new Token(TokenType.Comma, ","));
 					working = quoted;
 				}
 

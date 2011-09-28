@@ -96,6 +96,7 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\CallCC.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Cond.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Define.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\DefineRewriter.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\DumpEnv.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\If.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Lambda.cs" />
@@ -103,6 +104,9 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\LetRec.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\LetStar.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Quote.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\QuasiQuote.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Unquote.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\UnquoteSplicing.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\SetBang.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Append.cs" />
@@ -150,6 +154,7 @@
     <Compile Include="Schemin.AST\ScheminDecimal.cs" />
     <Compile Include="Schemin.AST\ScheminList.cs" />
     <Compile Include="Schemin.AST\ScheminLambda.cs" />
+    <Compile Include="Schemin.AST\ScheminRewriter.cs" />
     <Compile Include="Schemin.AST\ScheminPrimitive.cs" />
     <Compile Include="Schemin.AST\ScheminString.cs" />
     <Compile Include="Schemin.AST\ScheminChar.cs" />

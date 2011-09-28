@@ -42,6 +42,7 @@ namespace Schemin.Primitives.GeneralOperations
 				}
 			}
 
+			arg.Quote();
 			return arg;
 		}
 	}

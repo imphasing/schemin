@@ -183,14 +183,30 @@ namespace Schemin.Evaluate
 						else
 						{
 							IScheminType atomResult = EvalAtom(type, CurrentEnv);
-							pendingBefore.Append(atomResult);
+							if ((atomResult as ScheminRewriter) != null)
+							{
+								// if we get a quoted rewriter here, we're going to apply it :(
+								pendingBefore.Append(atomResult);
+								QuoteAll(rest.Cdr());
+							}
+							else
+							{
+								pendingBefore.Append(atomResult);
+							}
 						}
 					}
 					else if ((type as ScheminPrimitive) != null)
 					{
-						ScheminPrimitive prim = (ScheminPrimitive)type;
-						QuoteAST(prim, rest.Cdr());
-						pendingBefore.Append(prim);
+						if (type.Quoted())
+						{
+							pendingBefore.Append(type);
+						}
+						else
+						{
+							ScheminPrimitive prim = (ScheminPrimitive)type;
+							QuoteAST(prim, rest.Cdr());
+							pendingBefore.Append(prim);
+						}
 					}
 					else if ((type as ScheminList) != null)
 					{
@@ -261,6 +277,21 @@ namespace Schemin.Evaluate
 					ScheminContinuation con = (ScheminContinuation) functionPosition;
 					this.Stack = new Stack<StackFrame>(con.PreviousStack);
 					this.Stack.Peek().WaitingOn = functionArgs.Car();
+					continue;
+				}
+				else if ((functionPosition as ScheminRewriter) != null)
+				{
+					ScheminRewriter rewriter = (ScheminRewriter) functionPosition;
+
+					QuoteAll(functionArgs);
+					IScheminType result = rewriter.Rewrite(functionArgs, this);
+
+					completeFrame.Before = before;
+					completeFrame.After = after;
+					completeFrame.WaitingOn = result;
+					completeFrame.CurrentEnv = CurrentEnv;
+
+					this.Stack.Push(completeFrame);
 					continue;
 				}
 				else
@@ -349,10 +380,19 @@ namespace Schemin.Evaluate
 						args.Car().Quote();
 					}
 					break;
+				case "define-rewriter":
+					args.Car().Quote();
+					break;
 				case "lambda":
 					QuoteAll(args);
 					break;
 				case "quote":
+					args.Car().Quote();
+					break;
+				case "unquote":
+					args.Car().Quote();
+					break;
+				case "quasiquote":
 					args.Car().Quote();
 					break;
 				case "let":
@@ -429,6 +469,7 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.Product);
 			prebound_schemin.Add(ScheminPrimitives.Max);
 			prebound_schemin.Add(ScheminPrimitives.Min);
+			prebound_schemin.Add(ScheminPrimitives.Caddr);
 
 			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
 			Schemin.Parse.Parser p = new Parse.Parser();

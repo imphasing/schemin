@@ -85,5 +85,7 @@ namespace Schemin.Primitives
 		public static string Max = "(define (max first . num-list) (fold (lambda (old new) (if (> old new) old new)) first num-list))";
 
 		public static string Min = "(define (min first . num-list) (fold (lambda (old new) (if (< old new) old new)) first num-list))";
+
+		public static string Caddr = "(define (caddr list) (car (cdr (cdr list))))";
 	}
 }
