@@ -36,7 +36,7 @@ namespace Schemin.Primitives.GeneralOperations
 			ScheminList arg = (ScheminList) args.Car();
 			if (arg.Empty)
 			{
-				return ScheminList.EmptyList;
+				return new ScheminList(false);
 			}
 
 			arg.UnQuote();

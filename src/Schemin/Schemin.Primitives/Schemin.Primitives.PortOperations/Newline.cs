@@ -44,7 +44,7 @@ namespace Schemin.Primitives.PortOperations
 			writeTo.OutputStream.Write(System.Environment.NewLine);
 			writeTo.OutputStream.Flush();
 
-			return ScheminList.EmptyList;
+			return new ScheminList(false);
 		}
 	}
 }

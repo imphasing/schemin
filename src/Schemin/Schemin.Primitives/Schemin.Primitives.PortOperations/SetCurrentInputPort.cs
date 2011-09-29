@@ -35,7 +35,7 @@ namespace Schemin.Primitives.PortOperations
 		{
 			ScheminPort inputPort = (ScheminPort) args.Car();
 			eval.CurrentInputPort = inputPort;
-			return ScheminList.EmptyList;
+			return new ScheminList(false);
 		}
 	}
 }

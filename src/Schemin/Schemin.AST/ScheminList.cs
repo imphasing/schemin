@@ -36,44 +36,18 @@ namespace Schemin.AST
 	{
 		public IScheminType Head = null;
 		public ScheminList Rest = null;
-		public bool Empty = false;
-
+		public bool Empty = true;
 		private bool quoted = true;
-
 		public static bool QuoteLists = true;
-		public static readonly ScheminList EmptyList;
-
-		static ScheminList()
-		{
-			EmptyList = new ScheminList();
-			EmptyList.quoted = true;
-		}
 
 		public int Length
 		{
 			get
 			{
-				if (Empty)
-				{
-					return 0;
-				}
-
 				int count = 0;
 				foreach (IScheminType type in this)
 				{
-					if (type != null)
-					{
-						if (type.GetType() == typeof(ScheminList))
-						{
-							ScheminList temp = (ScheminList) type;
-							if (!temp.Empty || temp.Quoted())
-								count++;
-						}
-						else
-						{
-							count++;
-						}
-					}
+					count++;
 				}
 
 				return count;
@@ -90,6 +64,12 @@ namespace Schemin.AST
 			this.Empty = true;
 		}
 
+		public ScheminList(bool quoted)
+		{
+			this.Empty = true;
+			this.quoted = quoted;
+		}
+
 		public ScheminList(IScheminType head)
 		{
 			if (!QuoteLists)
@@ -98,6 +78,7 @@ namespace Schemin.AST
 			}
 
 			this.Head = head;
+			this.Empty = false;
 		}
 
 		public ScheminList(IScheminType head, ScheminList rest)
@@ -109,13 +90,17 @@ namespace Schemin.AST
 
 			this.Head = head;
 			this.Rest = rest;
+			this.Empty = false;
 		}
 
 		public IScheminType Car()
 		{
 			if (this.Head == null)
 			{
-				return EmptyList;
+				ScheminList empty = new ScheminList();
+				empty.Quote();
+
+				return empty;
 			}
 
 			return this.Head;
@@ -126,7 +111,10 @@ namespace Schemin.AST
 			ScheminList ret;
 			if (this.Rest == null)
 			{
-				return EmptyList;
+				ScheminList empty = new ScheminList();
+				empty.UnQuote();
+
+				return empty;
 			}
 
 			ret = this.Rest;
@@ -140,8 +128,14 @@ namespace Schemin.AST
 			IScheminType oldHead = this.Head;
 
 			this.Head = type;
-			this.Rest = new ScheminList(oldHead, this.Rest);
-			this.Rest.quoted = quoted;
+
+			if (!this.Empty)
+			{
+				this.Rest = new ScheminList(oldHead, this.Rest);
+				this.Rest.quoted = quoted;
+			}
+
+			this.Empty = false;
 
 			return this;
 		}
@@ -158,6 +152,7 @@ namespace Schemin.AST
 			if (this.Rest == null)
 			{
 				this.Rest = new ScheminList(type);
+				this.Rest.quoted = quoted;
 				return this;
 			}
 
@@ -175,6 +170,7 @@ namespace Schemin.AST
 			else
 			{
 				rest.Rest = new ScheminList(type);
+				rest.Rest.quoted = quoted;
 				return this;
 			}
 		}
@@ -187,9 +183,12 @@ namespace Schemin.AST
 		public IEnumerator<IScheminType> GetEnumerator ()
 		{
 			var c = Cdr();
-			yield return Car();
+
+			if (!this.Empty)
+				yield return Car();
+
 			c = Cdr();
-			while (!c.Empty) {
+			while (!c.Empty || c.quoted) {
 				yield return c.Car();
 				c = c.Cdr();
 			}

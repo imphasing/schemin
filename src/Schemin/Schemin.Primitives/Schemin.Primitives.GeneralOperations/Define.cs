@@ -55,7 +55,7 @@ namespace Schemin.Primitives.GeneralOperations
 					env.AddBinding(symbol, definition);
 				}
 
-				return ScheminList.EmptyList;
+				return new ScheminList(false);
 			}
 			else
 			{
@@ -85,7 +85,7 @@ namespace Schemin.Primitives.GeneralOperations
 					env.AddBinding(name, lam);
 				}
 
-				return ScheminList.EmptyList;
+				return new ScheminList(false);
 			}
 		}
 	}

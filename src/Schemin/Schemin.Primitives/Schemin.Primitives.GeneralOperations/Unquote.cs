@@ -38,7 +38,7 @@ namespace Schemin.Primitives.GeneralOperations
 			{
 				if (((ScheminList) arg).Empty)
 				{
-					return ScheminList.EmptyList;
+					return new ScheminList(false);
 				}
 			}
             

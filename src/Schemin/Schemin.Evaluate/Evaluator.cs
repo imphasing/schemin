@@ -467,6 +467,7 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.Max);
 			prebound_schemin.Add(ScheminPrimitives.Min);
 			prebound_schemin.Add(ScheminPrimitives.Caddr);
+			prebound_schemin.Add(ScheminPrimitives.DefineMacro);
 
 			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
 			Schemin.Parse.Parser p = new Parse.Parser();

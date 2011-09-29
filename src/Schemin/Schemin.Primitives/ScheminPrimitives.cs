@@ -87,5 +87,9 @@ namespace Schemin.Primitives
 		public static string Min = "(define (min first . num-list) (fold (lambda (old new) (if (< old new) old new)) first num-list))";
 
 		public static string Caddr = "(define (caddr list) (car (cdr (cdr list))))";
+
+		public static string DefineMacro = @"(define-rewriter define-macro
+						      (lambda args
+						        `(define-rewriter ,(car (car args)) (lambda ,(cdr (car args)) ,(car (cdr args))))))";
 	}
 }

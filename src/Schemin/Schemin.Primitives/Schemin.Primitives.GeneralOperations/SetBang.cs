@@ -48,7 +48,7 @@ namespace Schemin.Primitives.GeneralOperations
 
 					parent.RemoveBinding(symbol);
 					parent.AddBinding(symbol, definition);
-					return ScheminList.EmptyList;
+					return new ScheminList(false);
 				}
 
 				parent = parent.parent;

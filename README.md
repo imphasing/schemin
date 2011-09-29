@@ -46,11 +46,9 @@ As well as some more complicated things, like this simple example of coroutines 
     (hefty-computation superfluous-computation)
 
 
-Or this basic macro rewriter, which makes a list of the arguments given to it, using a quasiquoting template:
+Or this basic macro, which adds the arguments given to it, using a quasiquoting template:
 
-    (define-rewriter simple
-      (lambda args
-        `(list ,@args)))
+    (define-macro (testadd . toadd) `(fold (lambda (acc x) (+ acc x)) 0 (list ,@toadd)))
 
 Check out the examples directory for more examples of what Schemin is capable of.
 

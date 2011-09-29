@@ -91,7 +91,7 @@ namespace Schemin.Primitives.GeneralOperations
 
 			foreach (IScheminType arg in argExps)
 			{
-				toEvaluate.Append(ScheminList.EmptyList);
+				toEvaluate.Append(new ScheminList(true));
 			}
 
 			return toEvaluate;

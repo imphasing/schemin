@@ -43,7 +43,7 @@ namespace Schemin.Primitives.PortOperations
 				toClose.OutputStream.Close();
 			}
 			toClose.Closed = true;
-			return ScheminList.EmptyList;
+			return new ScheminList(false);
 		}
 	}
 }

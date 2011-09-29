@@ -48,7 +48,7 @@ namespace Schemin.Primitives.GeneralOperations
 				env.AddBinding(symbol, rewriter);
 			}
 
-			return ScheminList.EmptyList;
+			return new ScheminList(false);
 		}
 	}
 }
