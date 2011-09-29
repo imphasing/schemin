@@ -42,9 +42,12 @@ namespace Schemin.AST
 			this.Rewriter = rewriter;
 		}
 
-		public IScheminType Rewrite(ScheminList values, Evaluator eval)
+		public IScheminType Rewrite(ScheminList values)
 		{
+			Evaluator eval = new Evaluator();
 			ScheminList call = new ScheminList(Rewriter);
+			ScheminList unquote = new ScheminList(new ScheminPrimitive("unquote"));
+			unquote.UnQuote();
 			call.UnQuote();
 
 			foreach (IScheminType type in values)
@@ -52,10 +55,9 @@ namespace Schemin.AST
 				call.Append(type);
 			}
 
-			IScheminType result = eval.EvaluateInternal(call);
-			result.UnQuote();
+			unquote.Append(call);
 
-			return result;
+			return unquote;
 		}
 
 		public override string ToString()

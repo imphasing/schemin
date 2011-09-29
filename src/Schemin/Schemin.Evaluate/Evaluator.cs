@@ -284,7 +284,7 @@ namespace Schemin.Evaluate
 					ScheminRewriter rewriter = (ScheminRewriter) functionPosition;
 
 					QuoteAll(functionArgs);
-					IScheminType result = rewriter.Rewrite(functionArgs, this);
+					IScheminType result = rewriter.Rewrite(functionArgs);
 
 					completeFrame.Before = before;
 					completeFrame.After = after;
@@ -387,9 +387,6 @@ namespace Schemin.Evaluate
 					QuoteAll(args);
 					break;
 				case "quote":
-					args.Car().Quote();
-					break;
-				case "unquote":
 					args.Car().Quote();
 					break;
 				case "quasiquote":
