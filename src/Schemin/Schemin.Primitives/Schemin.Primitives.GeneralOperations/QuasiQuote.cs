@@ -55,9 +55,11 @@ namespace Schemin.Primitives.GeneralOperations
 				if ((type as ScheminList) != null)
 				{
 					ScheminList typeList = (ScheminList) type;
-					if ((typeList.Car() as ScheminPrimitive) != null)
+					ScheminPrimitive first = typeList.Car() as ScheminPrimitive;
+
+					if (first != null)
 					{
-						if (((ScheminPrimitive) typeList.Car()).Name == "unquote")
+						if (first.Name == "unquote")
 						{
 							typeList.UnQuote();
 							ScheminList wrapper = new ScheminList(new ScheminPrimitive("list"));
@@ -67,33 +69,21 @@ namespace Schemin.Primitives.GeneralOperations
 							quoted.Append(wrapper);
 							continue;
 						}
-						else if (((ScheminPrimitive)typeList.Car()).Name == "unquote-splicing")
+						else if (first.Name == "unquote-splicing")
 						{
 							typeList.UnQuote();
 							quoted.Append(typeList.Cdr().Car());
 							continue;
 						}
-						else
-						{
-							ScheminList rewritten = RewriteRecursive(typeList);
-							ScheminList quotedRewrite = new ScheminList(new ScheminPrimitive("list"));
-							quotedRewrite.UnQuote();
-
-							quotedRewrite.Append(rewritten);
-							quoted.Append(quotedRewrite);
-							continue;
-						}
 					}
-					else
-					{
-						ScheminList rewritten = RewriteRecursive(typeList);
-						ScheminList quotedRewrite = new ScheminList(new ScheminPrimitive("list"));
-						quotedRewrite.UnQuote();
 
-						quotedRewrite.Append(rewritten);
-						quoted.Append(quotedRewrite);
-						continue;
-					}
+					ScheminList rewritten = RewriteRecursive(typeList);
+					ScheminList quotedRewrite = new ScheminList(new ScheminPrimitive("list"));
+					quotedRewrite.UnQuote();
+
+					quotedRewrite.Append(rewritten);
+					quoted.Append(quotedRewrite);
+					continue;
 				}
 
 				ScheminList quotedSub = new ScheminList(new ScheminPrimitive("quote"));

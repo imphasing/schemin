@@ -45,12 +45,21 @@ As well as some more complicated things, like this simple example of coroutines 
 
     (hefty-computation superfluous-computation)
 
+
+Or this basic macro rewriter, which makes a list of the arguments given to it, using a quasiquoting template:
+
+    (define-rewriter simple
+      (lambda args
+        `(list ,@args)))
+
 Check out the examples directory for more examples of what Schemin is capable of.
 
 
 Implemented featues:
 --------------------
 
++ Basic unhygenic macros, using define-rewriter paired with quasiquoting.
++ All primitive types in r5rs besides vectors
 + First-class continuations and call/cc
 + IO Ports (File and console IO)
 + define and set!
@@ -65,13 +74,4 @@ To do:
 ------
 
 + Possibly implement a parser generator instead of our recursive parser
-+ Implement character literals and their types, as well as primitives to work with them
-+ Implement macros
 + Implement more common primitives
-
-
-
-
-
-
-

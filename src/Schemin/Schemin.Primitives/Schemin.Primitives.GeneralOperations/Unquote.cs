@@ -41,7 +41,7 @@ namespace Schemin.Primitives.GeneralOperations
 					return ScheminList.EmptyList;
 				}
 			}
-
+            
 			arg.UnQuote();
 			return arg;
 		}

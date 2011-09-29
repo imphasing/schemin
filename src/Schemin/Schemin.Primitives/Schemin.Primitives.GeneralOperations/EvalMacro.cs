@@ -25,88 +25,35 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.AST
+namespace Schemin.Primitives.GeneralOperations
 {
-	using System;
 	using Schemin.Evaluate;
-	using Schemin.Primitives;
-
-	using Environment = Schemin.Evaluate.Environment;
-
-	public class ScheminRewriter : IScheminType
+	using Schemin.AST;
+	public class EvalMacro : Primitive
 	{
-		public ScheminLambda Rewriter;
-
-		public ScheminRewriter(ScheminLambda rewriter)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			this.Rewriter = rewriter;
+			IScheminType rewritten = args.Car();
+			UnquoteAllRecursive(rewritten);
+			return rewritten;
 		}
 
-		public IScheminType Rewrite(ScheminList values)
+		private void UnquoteAllRecursive(IScheminType values)
 		{
-			QuoteAllRecursive(values);
-			ScheminList call = new ScheminList(Rewriter);
-			ScheminList unquote = new ScheminList(new ScheminPrimitive("eval-macro"));
-			unquote.UnQuote();
-			call.UnQuote();
-
-			foreach (IScheminType type in values)
+			if ((values as ScheminList) != null)
 			{
-				call.Append(type);
-			}
-
-			unquote.Append(call);
-			return unquote;
-		}
-
-		private void QuoteAllRecursive(ScheminList values)
-		{
-			foreach (IScheminType type in values)
-			{
-				if ((type as ScheminList) != null)
+				foreach (IScheminType type in (ScheminList) values)
 				{
-					QuoteAllRecursive((ScheminList)type);
-				}
+					if ((type as ScheminList) != null)
+					{
+						UnquoteAllRecursive((ScheminList) type);
+					}
 
-				type.Quote();
-			}
-		}
-
-
-		public override string ToString()
-		{
-			return "<Rewriter>";
-		}
-
-		public bool Quoted()
-		{
-			return false;
-		}
-
-		public void Quote()
-		{
-		}
-
-		public void UnQuote()
-		{
-		}
-
-		public bool Equals(IScheminType type)
-		{
-			if ((type as ScheminRewriter) != null)
-			{
-				if (type == this)
-				{
-					return true;
+					type.UnQuote();
 				}
 			}
-
-			return false;
-		}
-
-		public ScheminBool BoolValue()
-		{
-			return ScheminBool.True;
+            
+            values.UnQuote();
 		}
 	}
 }

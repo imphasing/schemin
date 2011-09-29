@@ -88,6 +88,7 @@ namespace Schemin.Primitives
 			Primitives.Add("quasiquote", new GeneralOperations.QuasiQuote());
 			Primitives.Add("unquote", new GeneralOperations.Unquote());
 			Primitives.Add("unquote-splicing", new GeneralOperations.UnquoteSplicing());
+			Primitives.Add("eval-macro", new GeneralOperations.EvalMacro());
 			Primitives.Add("begin", new GeneralOperations.Begin());
 			Primitives.Add("if", new GeneralOperations.If());
 			Primitives.Add("cond", new GeneralOperations.Cond());
