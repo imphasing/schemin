@@ -52,6 +52,8 @@
         (for (- times 1)(swap-pass val))
         (swap-pass val)))))
 
+(bubblesort '(2 1))
+
 
 (let ((x 10) (y 20)) (+ x y))
 
@@ -61,7 +63,7 @@
 
 (map (lambda (number) (+ 1 number)) (quote (1 2 3 4)))
 
-(foldl cons (quote ()) (quote (1 2 3 4)))
+(foldr cons (quote ()) (quote (1 2 3 4)))
 
 
 (define quicksort (lambda (items) (if (null? items) (quote ()) (let ((pivot (car items))) (let ((less (filter (lambda (x) (< x pivot)) items)) (same (filter (lambda (x) (= x pivot)) items)) (more (filter (lambda (x) (> x pivot)) items))) (append (quicksort less) same (quicksort more)))))))

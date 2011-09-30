@@ -17,4 +17,4 @@
              (lambda (c) (fibc (pred (pred x)) c)))
             c))))
 
-(fibc 30 id)
+(fibc 20 id)

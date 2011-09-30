@@ -39,7 +39,22 @@ namespace Schemin.Primitives.ListOperations
 			if (rest.GetType() == typeof(ScheminList))
 			{
 				ScheminList temp = (ScheminList) rest;
-				return new ScheminList(head, temp);
+
+				if (temp.Empty)
+				{
+					return new ScheminList(head);
+				}
+				else
+				{
+					ScheminList consd = new ScheminList(head);
+
+					foreach (IScheminType type in temp)
+					{
+						consd.Append(type);
+					}
+					
+					return consd;
+				}
 			}
 
 			var append = new ScheminList(head);
