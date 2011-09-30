@@ -171,7 +171,10 @@ namespace Schemin.Parse
 					if (atom.Name == "'")
 					{
 						// This pass replaces a list like (' a b) with ((quote a) b)
+						// and ''a with (quote (quote a))
 						ScheminList newhead = new ScheminList(new ScheminPrimitive("quote"));
+						TransformQuotes(c.Rest);
+
 						newhead.Append(c.Rest.Head);
 
 						c.Head = newhead;
@@ -189,6 +192,9 @@ namespace Schemin.Parse
 
 		private void TransformQuasiQuotes(ScheminList ast)
 		{
+			// this horrible code transforms quasiquoted literals into their expanded form
+			// eg: `(a ,b) becomes (quasiquote a (unquote b))
+
 			ScheminList c = ast;
 
 			while (c != null)
@@ -200,8 +206,8 @@ namespace Schemin.Parse
 					ScheminAtom atom = (ScheminAtom) type;
 					if (atom.Name == "`")
 					{
-						// This pass replaces a list like (' a b) with ((quote a) b)
 						ScheminList newhead = new ScheminList(new ScheminPrimitive("quasiquote"));
+						TransformQuasiQuotes(c.Rest);
 						newhead.Append(c.Rest.Head);
 
 						c.Head = newhead;
@@ -210,8 +216,8 @@ namespace Schemin.Parse
 					}
 					else if (atom.Name == ",@")
 					{
-						// This pass replaces a list like (' a b) with ((quote a) b)
 						ScheminList newhead = new ScheminList(new ScheminPrimitive("unquote-splicing"));
+						TransformQuasiQuotes(c.Rest);
 						newhead.Append(c.Rest.Head);
 
 						c.Head = newhead;
@@ -219,8 +225,8 @@ namespace Schemin.Parse
 					}
 					else if (atom.Name == ",")
 					{
-						// This pass replaces a list like (' a b) with ((quote a) b)
 						ScheminList newhead = new ScheminList(new ScheminPrimitive("unquote"));
+						TransformQuasiQuotes(c.Rest);
 						newhead.Append(c.Rest.Head);
 
 						c.Head = newhead;
@@ -235,6 +241,5 @@ namespace Schemin.Parse
 				c = c.Rest;
 			}
 		}
-
 	}
 }
