@@ -87,6 +87,45 @@ namespace Schemin.Tokenize
 			return leading.Remove(leading.Length - 1, 1);
 		}
 
+		private string BreakSugaredQuotes(string token, List<Token> tokens)
+		{
+			// Since we replace ( with ' ( ', a leading quote like '(1 2) will automatically be interpreted
+			// as two tokens, but for atoms, ints, etc, there's no spaces added so we need to split the token apart here
+
+			string quoted = token;
+			if (token.StartsWith("'") && token != "'")
+			{
+				quoted = token.Substring(1, token.Length - 1);
+				tokens.Add(new Token(TokenType.Quote, "'"));
+
+				quoted = BreakSugaredQuotes(quoted, tokens);
+			}
+			else if (token.StartsWith("`") && token != "`")
+			{
+				quoted = token.Substring(1, token.Length - 1);
+				tokens.Add(new Token(TokenType.BackQuote, "`"));
+
+				quoted = BreakSugaredQuotes(quoted, tokens);
+			}
+			else if (token.StartsWith(",@") && token != ",@")
+			{
+				quoted = token.Substring(2, token.Length - 2);
+				tokens.Add(new Token(TokenType.AtComma, ",@"));
+
+				quoted = BreakSugaredQuotes(quoted, tokens);
+			}
+			else if (token.StartsWith(",") && token != "," && token != ",@")
+			{
+				quoted = token.Substring(1, token.Length - 1);
+				tokens.Add(new Token(TokenType.Comma, ","));
+
+				quoted = BreakSugaredQuotes(quoted, tokens);
+			}
+
+			return quoted;
+		}
+
+
 		public List<Token> Tokenize(string input)
 		{
 			var tokens = new List<Token>();
@@ -128,33 +167,7 @@ namespace Schemin.Tokenize
 			{
 				string working = token;
 				bool goodToken = false;
-
-				// Since we replace ( with ' ( ', a leading quote like '(1 2) will automatically be interpreted
-				// as two tokens, but for atoms, ints, etc, there's no spaces added so we need to split the token apart here
-				if (working.StartsWith("'") && working != "'")
-				{
-					string quoted = token.Substring(1, token.Length - 1);
-					tokens.Add(new Token(TokenType.Quote, "'"));
-					working = quoted;
-				}
-				else if (working.StartsWith("`") && working != "`")
-				{
-					string quoted = token.Substring(1, token.Length - 1);
-					tokens.Add(new Token(TokenType.BackQuote, "`"));
-					working = quoted;
-				}
-				else if (working.StartsWith(",@") && working != ",@")
-				{
-					string quoted = token.Substring(2, token.Length - 2);
-					tokens.Add(new Token(TokenType.AtComma, ",@"));
-					working = quoted;
-				}
-				else if (working.StartsWith(",") && working != "," && working != ",@")
-				{
-					string quoted = token.Substring(1, token.Length - 1);
-					tokens.Add(new Token(TokenType.Comma, ","));
-					working = quoted;
-				}
+				working = BreakSugaredQuotes(working, tokens);
 
 				if (working.Contains("###STRING_LITERAL_"))
 				{
