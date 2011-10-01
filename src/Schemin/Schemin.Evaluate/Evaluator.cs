@@ -166,13 +166,37 @@ namespace Schemin.Evaluate
 					continue;
 				}
 
+				StackFrame completeFrame = new StackFrame();
+				ScheminPrimitive currentPrimitive = null;
+
 				ScheminList rest = (ScheminList) WaitingOn;
 				ScheminList pendingBefore = new ScheminList();
 				pendingBefore.UnQuote();
 
+				if ((rest.Car() as ScheminPrimitive) != null)
+				{
+					if (rest.Car().Quoted() == false)
+					{
+						currentPrimitive = (ScheminPrimitive) rest.Car();
+					}
+				}
+
+				int currentArg = 0;
+
 				while (!rest.Empty)
 				{
 					IScheminType type = rest.Car();
+
+					if (currentPrimitive != null)
+					{
+						if (!EvaluateNextArg(currentPrimitive, currentArg, ((ScheminList) WaitingOn).Cdr()))
+						{
+							pendingBefore.Append(type);
+							rest = rest.Cdr();
+							currentArg++;
+							continue;
+						}
+					}
 
 					if ((type as ScheminAtom) != null)
 					{
@@ -195,19 +219,6 @@ namespace Schemin.Evaluate
 							}
 						}
 					}
-					else if ((type as ScheminPrimitive) != null)
-					{
-						if (type.Quoted())
-						{
-							pendingBefore.Append(type);
-						}
-						else
-						{
-							ScheminPrimitive prim = (ScheminPrimitive)type;
-							QuoteAST(prim, rest.Cdr());
-							pendingBefore.Append(prim);
-						}
-					}
 					else if ((type as ScheminList) != null)
 					{
 						ScheminList tempList = (ScheminList) type;
@@ -216,6 +227,7 @@ namespace Schemin.Evaluate
 						{
 							pendingBefore.Append(type);
 							rest = rest.Cdr();
+							currentArg++;
 							continue;
 						}
 
@@ -236,12 +248,12 @@ namespace Schemin.Evaluate
 					}
 
 					rest = rest.Cdr();
+					currentArg++;
 				}
 
 				IScheminType functionPosition = pendingBefore.Car();
 				ScheminList functionArgs = pendingBefore.Cdr();
 
-				StackFrame completeFrame = new StackFrame();
 
 				if ((functionPosition as ScheminPrimitive) != null)
 				{
@@ -365,63 +377,67 @@ namespace Schemin.Evaluate
 			return false;
 		}
 
-		private void QuoteAST(ScheminPrimitive prim, ScheminList args)
+		private bool EvaluateNextArg(ScheminPrimitive currentPrimitive, int currentArg, ScheminList args)
 		{
-			switch (prim.Name)
+			if (currentPrimitive != null)
 			{
-				case "define":
-					if ((args.Car() as ScheminList) != null)
-					{
-						args.Car().Quote();
-						QuoteAll(args.Cdr());
-					}
-					else
-					{
-						args.Car().Quote();
-					}
-					break;
-				case "define-rewriter":
-					args.Car().Quote();
-					break;
-				case "lambda":
-					QuoteAll(args);
-					break;
-				case "quote":
-					args.Car().Quote();
-					break;
-				case "quasiquote":
-					args.Car().Quote();
-					break;
-				case "let":
-					QuoteAll(args);
-					break;
-				case "letrec":
-					QuoteAll(args);
-					break;
-				case "let*":
-					QuoteAll(args);
-					break;
-				case "begin":
-					break;
-				case "if":
-					args.Cdr().Car().Quote();
-					args.Cdr().Cdr().Car().Quote();
-					break;
-				case "cond":
-					QuoteAll(args);
-					break;
-				case "and":
-					QuoteAll(args);
-					args.Car().UnQuote();
-					break;
-				case "or":
-					QuoteAll(args);
-					args.Car().UnQuote();
-					break;
-				case "set!":
-					args.Car().Quote();
-					break;
+				switch (currentPrimitive.Name)
+				{
+					case "define":
+						if ((args.Car() as ScheminList) != null)
+						{
+							return false;
+						}
+						else
+						{
+							if (currentArg == 1)
+								return false;
+						}
+						break;
+					case "define-rewriter":
+						if (currentArg == 1)
+							return false;
+						break;
+					case "lambda":
+						return false;
+					case "quote":
+						if (currentArg == 1)
+							return false;
+						break;
+					case "quasiquote":
+						if (currentArg == 1)
+							return false;
+						break;
+					case "let":
+						return false;
+					case "letrec":
+						return false;
+					case "let*":
+						return false;
+					case "if":
+						if (currentArg == 2)
+							return false; 
+						if (currentArg == 3)
+							return false;
+						break;
+					case "cond":
+						return false;
+					case "and":
+						if (currentArg != 1)
+							return false;
+						break;
+					case "or":
+						if (currentArg != 1)
+							return false;
+						break;
+					case "set!":
+						if (currentArg == 1)
+							return false;
+						break;
+				}
 			}
+
+			return true;
 		}
 
 		private void QuoteAll(ScheminList list)
