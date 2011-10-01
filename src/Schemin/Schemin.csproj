@@ -97,6 +97,7 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Cond.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Define.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\DefineRewriter.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\GenSym.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\DumpEnv.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\If.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Lambda.cs" />

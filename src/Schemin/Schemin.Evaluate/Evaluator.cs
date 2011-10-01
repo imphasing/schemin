@@ -51,6 +51,8 @@ namespace Schemin.Evaluate
 		public ScheminPort ConsoleIOPort;
 		public ScheminPort CurrentInputPort;
 		public ScheminPort CurrentOutputPort; 
+		public int GenSymSeed = 0;
+		public string GenSymPrefix = "GENERATED_";
 
 		public Evaluator()
 		{

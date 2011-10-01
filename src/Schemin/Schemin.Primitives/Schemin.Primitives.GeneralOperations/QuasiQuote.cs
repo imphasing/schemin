@@ -36,7 +36,7 @@ namespace Schemin.Primitives.GeneralOperations
 			IScheminType arg = args.Car();
 			if ((arg as ScheminList) != null)
 			{
-				return RewriteRecursive((ScheminList) arg);
+				return RewriteRecursive((ScheminList) arg, 0);
 			}
 			else
 			{
@@ -45,7 +45,7 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 		}
 
-		private ScheminList RewriteRecursive(ScheminList rewrite)
+		private ScheminList RewriteRecursive(ScheminList rewrite, int currentLevel)
 		{
 			ScheminList quoted = new ScheminList(new ScheminPrimitive("append"));
 			quoted.UnQuote();
@@ -54,48 +54,96 @@ namespace Schemin.Primitives.GeneralOperations
 			{
 				if ((type as ScheminList) != null)
 				{
-					ScheminList typeList = (ScheminList) type;
+					ScheminList typeList = (ScheminList)type;
 					ScheminPrimitive first = typeList.Car() as ScheminPrimitive;
 
 					if (first != null)
 					{
-						if (first.Name == "unquote")
+						if (currentLevel == 0)
 						{
-							typeList.UnQuote();
-							ScheminList wrapper = new ScheminList(new ScheminPrimitive("list"));
-							wrapper.UnQuote();
-							wrapper.Append(typeList.Cdr().Car());
+							if (first.Name == "unquote")
+							{
+								typeList.UnQuote();
+								ScheminList wrapper = new ScheminList(new ScheminPrimitive("list"));
+								wrapper.UnQuote();
+								wrapper.Append(typeList.Cdr().Car());
+								quoted.Append(wrapper);
+								continue;
+							}
+							else if (first.Name == "unquote-splicing")
+							{
+								typeList.UnQuote();
+								quoted.Append(typeList.Cdr().Car());
+								continue;
+							}
+						}
 
-							quoted.Append(wrapper);
-							continue;
-						}
-						else if (first.Name == "unquote-splicing")
-						{
-							typeList.UnQuote();
-							quoted.Append(typeList.Cdr().Car());
-							continue;
-						}
+						currentLevel = AdjustLevelEnter(first, currentLevel);
 					}
 
-					ScheminList rewritten = RewriteRecursive(typeList);
+					ScheminList rewritten = RewriteRecursive(typeList, currentLevel);
+					currentLevel = AdjustLevelLeave(first, currentLevel);
+
 					ScheminList quotedRewrite = new ScheminList(new ScheminPrimitive("list"));
 					quotedRewrite.UnQuote();
 
 					quotedRewrite.Append(rewritten);
 					quoted.Append(quotedRewrite);
-					continue;
 				}
-
-				ScheminList quotedSub = new ScheminList(new ScheminPrimitive("quote"));
-				ScheminList wrappedElem = new ScheminList(type);
-				wrappedElem.UnQuote();
-				quotedSub.UnQuote();
-				quotedSub.Append(wrappedElem);
-				quoted.Append(quotedSub);
+				else
+				{
+					ScheminList quotedSub = new ScheminList(new ScheminPrimitive("quote"));
+					ScheminList wrappedElem = new ScheminList(type);
+					wrappedElem.UnQuote();
+					quotedSub.UnQuote();
+					quotedSub.Append(wrappedElem);
+					quoted.Append(quotedSub);
+				}
 			}
 
 			return quoted;
 		}
-	}
 
+		private int AdjustLevelEnter(ScheminPrimitive first, int currentLevel)
+		{
+			if (first != null)
+			{
+				if (first.Name == "quasiquote")
+				{
+					currentLevel++;
+				}
+				else if (first.Name == "unquote")
+				{
+					currentLevel--;
+				}
+				else if (first.Name == "unquote-splicing")
+				{
+					currentLevel--;
+				}
+			}
+
+			return currentLevel;
+		}
+
+		private int AdjustLevelLeave(ScheminPrimitive first, int currentLevel)
+		{
+			if (first != null)
+			{
+				if (first.Name == "quasiquote")
+				{
+					currentLevel--;
+				}
+				else if (first.Name == "unquote")
+				{
+					currentLevel++;
+				}
+				else if (first.Name == "unquote-splicing")
+				{
+					currentLevel++;
+				}
+			}
+
+			return currentLevel;
+		}
+	}
 }

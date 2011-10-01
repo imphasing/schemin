@@ -38,25 +38,7 @@
   (fib-aux 1 0 0 1 n))
 
 
-(define bubblesort (lambda (l)
-  (define swap-pass (lambda (l)
-    (if (eq? (length l) 1) 
-        l
-        (let ((fst (car l))(snd (cadr l))(rest (cddr l)))
-          (if (> fst snd) 
-              (cons snd (swap-pass (cons fst rest)))
-              (cons fst (swap-pass (cons snd rest))))))))
-  (let for ((times (length l))
-            (val l))
-    (if (> times 1)
-        (for (- times 1)(swap-pass val))
-        (swap-pass val)))))
-
-(bubblesort '(2 1))
-
-
 (let ((x 10) (y 20)) (+ x y))
-
 
 (define x (lambda (x y) (x y 1)))
 (x (lambda (x y) (+ x y)) 2)
@@ -65,21 +47,11 @@
 
 (foldr cons (quote ()) (quote (1 2 3 4)))
 
-
-(define quicksort (lambda (items) (if (null? items) (quote ()) (let ((pivot (car items))) (let ((less (filter (lambda (x) (< x pivot)) items)) (same (filter (lambda (x) (= x pivot)) items)) (more (filter (lambda (x) (> x pivot)) items))) (append (quicksort less) same (quicksort more)))))))
-
-
-(define qs (lambda (l) (if (null? l) (quote ()) (append (qs (filter (lambda (x) (<= x (car l))) (cdr l))) (cons (car l) (qs (filter (lambda (x) (> x (car l))) (cdr l))) )))))
-
-(qs (quote (23 5342 234 44 322 6654 44 223 44 11 3 1 23 4 1 3 55 2)))
-
 (let loop ((i 0))
   (if (not (= i 10))
      (begin
         (display i)(display " squared = ")(display (* i i))(newline)
         (loop (+ i 1)))))
-
-
 
 (letrec ((factorial
 	(lambda (n)
