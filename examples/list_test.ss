@@ -33,15 +33,45 @@
                 (cons E          ; otherwise E, then E interleaved with rest of list
                       (interleave E (cdr L)))))))
 
-(define test_list '(9 8 7 6 5 4 3 2 1))
-(define sorted_list (sel-sort test_list))
-(define interleaved_list (interleave 'TEST test_list))
+
+(define bubblesort (lambda (l)
+  (define swap-pass (lambda (l)
+    (if (eq? (length l) 1) 
+        l
+        (let ((fst (car l))(snd (cadr l))(rest (cddr l)))
+          (if (> fst snd) 
+              (cons snd (swap-pass (cons fst rest)))
+              (cons fst (swap-pass (cons snd rest))))))))
+  (let for ((times (length l))
+            (val l))
+    (if (> times 1)
+        (for (- times 1)(swap-pass val))
+        (swap-pass val)))))
+
+(define qs 
+  (lambda (l) 
+    (if (null? l) 
+      (quote ()) 
+      (append (qs (filter (lambda (x) (<= x (car l))) (cdr l))) (cons (car l) (qs (filter (lambda (x) (> x (car l))) (cdr l))))))))
+
+
+(define test_list '(23 5342 234 44 322 6654 44 223 44 11 3 1 23 4 1 3 55 2))
+(define sel_sorted_list (sel-sort test_list))
+(define bubble_sorted_list (bubblesort test_list))
+(define qs_sorted_list (qs test_list))
+(define interleaved_list (interleave 'I test_list))
 
 (display "Test list: ")
 (display test_list)
 (newline)
-(display "Sorted list: ")
-(display sorted_list)
+(display "Selection Sorted list: ")
+(display sel_sorted_list)
+(newline)
+(display "Bubble sorted list: ")
+(display bubble_sorted_list)
+(newline)
+(display "Quicksorted list: ")
+(display qs_sorted_list)
 (newline)
 (display "Interleaved list: ")
 (display interleaved_list)

@@ -41,8 +41,8 @@ namespace Schemin.Parse
 		{
 			ScheminList.QuoteLists = quoteLists;
 			KeyValuePair<ScheminList, int> parsed = ParseInternal(tokens, 0);
+			TransformQuasiQuotes((ScheminList)parsed.Key);
 			TransformQuotes((ScheminList) parsed.Key);
-			TransformQuasiQuotes((ScheminList) parsed.Key);
 			ScheminList.QuoteLists = true;
 			return (ScheminList) parsed.Key;
 		}
