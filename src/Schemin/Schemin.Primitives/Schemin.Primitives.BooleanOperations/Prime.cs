@@ -56,7 +56,25 @@ namespace Schemin.Primitives.BooleanOperations
 					return ScheminBool.False;
 				}
 			}
+
 			return ScheminBool.GetValue(candidate != 1);
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+
+			if (args.Length != 1)
+			{
+				throw new BadArgumentsException("expected 1 argument");
+			}
+
+			if ((first as IScheminNumeric) == null)
+			{
+				throw new BadArgumentsException("argument must be numeric");
+			}
+
+			return;
 		}
 	}
 }

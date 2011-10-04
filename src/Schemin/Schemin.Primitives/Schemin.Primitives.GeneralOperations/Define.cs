@@ -62,11 +62,6 @@ namespace Schemin.Primitives.GeneralOperations
 				ScheminList arguments = (ScheminList) args.Car();
 				ScheminList expression = args.Cdr();
 
-				foreach (IScheminType type in expression)
-				{
-					type.UnQuote();
-				}
-
 				ScheminAtom name = (ScheminAtom) arguments.Car();
 				ScheminList argSymbols = arguments.Cdr();
 
@@ -86,6 +81,41 @@ namespace Schemin.Primitives.GeneralOperations
 				}
 
 				return new ScheminList(false);
+			}
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+
+			if ((first as ScheminList) == null)
+			{
+				if (args.Length != 2)
+				{
+					throw new BadArgumentsException("expected 2 arguments");
+				}
+
+				if ((first as ScheminAtom) == null)
+				{
+					throw new BadArgumentsException("first argument must be a symbol");
+				}		
+			}
+			else
+			{
+				ScheminList arguments = (ScheminList) args.Car();
+				IScheminType name = arguments.Car();
+
+				if (args.Length != 2)
+				{
+					throw new BadArgumentsException("expected 2 arguments");
+				}
+
+				if ((name as ScheminAtom) == null)
+				{
+					throw new BadArgumentsException("must supply a symbol for definition");
+				}
+
+				return;
 			}
 		}
 	}

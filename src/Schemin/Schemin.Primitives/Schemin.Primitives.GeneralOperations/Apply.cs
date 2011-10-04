@@ -56,5 +56,24 @@ namespace Schemin.Primitives.GeneralOperations
 
 			return list;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+			IScheminType last = args.Cdr().Last();
+
+			if ((first as ScheminPrimitive) == null && (first as ScheminLambda) == null 
+			&& (first as ScheminContinuation) == null && (first as ScheminRewriter) == null)
+			{
+				throw new BadArgumentsException("first argument must be a procedure");
+			}
+
+			if ((last as ScheminList) == null)
+			{
+				throw new BadArgumentsException("last argument must be a list");
+			}
+
+			return;
+		}
 	}
 }

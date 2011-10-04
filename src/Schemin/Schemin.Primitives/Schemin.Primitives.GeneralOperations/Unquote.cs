@@ -45,5 +45,15 @@ namespace Schemin.Primitives.GeneralOperations
 			arg.UnQuote();
 			return arg;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 1)
+			{
+				throw new BadArgumentsException("expected 1 or 0 arguments");
+			}
+
+			return;
+		}
 	}
 }

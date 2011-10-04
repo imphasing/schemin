@@ -41,5 +41,15 @@ namespace Schemin.Primitives.BooleanOperations
 			}
 			return ScheminBool.False;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 1)
+			{
+				throw new BadArgumentsException("expected 1 argument");
+			}
+
+			return;
+		}
 	}
 }

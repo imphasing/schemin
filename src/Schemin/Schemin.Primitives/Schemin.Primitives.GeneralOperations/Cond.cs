@@ -33,13 +33,7 @@ namespace Schemin.Primitives.GeneralOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			foreach (IScheminType type in args)
-			{
-				type.UnQuote();
-			}
-
 			ScheminList conditions = (ScheminList) args;
-
 			ScheminList builtIf = new ScheminList();
 			builtIf.UnQuote();
 

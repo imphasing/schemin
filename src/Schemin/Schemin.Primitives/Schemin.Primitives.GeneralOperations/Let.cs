@@ -33,13 +33,8 @@ namespace Schemin.Primitives.GeneralOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-				foreach (IScheminType type in args)
-				{
-					type.UnQuote();
-				}
-
 				bool isNamed = false;
-				if (args.Car().GetType() == typeof(ScheminAtom))
+				if ((args.Car() as ScheminAtom) != null)
 				{
 					isNamed = true;
 				}
@@ -102,6 +97,33 @@ namespace Schemin.Primitives.GeneralOperations
 				}
 
 				return toEvaluate;
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+
+			if ((first as ScheminList) != null)
+			{
+				if (args.Length != 2)
+				{
+					throw new BadArgumentsException("expected 2 arguments");
+				}
+			}
+			else
+			{
+				if (args.Length != 3)
+				{
+					throw new BadArgumentsException("expected 3 arguments");
+				}
+
+				if ((first as ScheminAtom) == null)
+				{
+					throw new BadArgumentsException("first argument must be a symbol");
+				}
+			}
+
+			return;
 		}
 	}
 }

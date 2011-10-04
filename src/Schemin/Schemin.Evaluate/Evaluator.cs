@@ -77,6 +77,10 @@ namespace Schemin.Evaluate
 					last = EvaluateInternal(type);
 				}
 			}
+			catch (BadArgumentsException b)
+			{
+				CurrentOutputPort.OutputStream.WriteLine("bad arguments: " + b.Message);
+			}
 			catch (Exception e)
 			{
 				CurrentOutputPort.OutputStream.WriteLine("error: " + e.Message);

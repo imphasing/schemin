@@ -48,5 +48,15 @@ namespace Schemin.Primitives.GeneralOperations
 
 			return bindings;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 0)
+			{
+				throw new BadArgumentsException("expected 0 arguments");
+			}
+
+			return;
+		}
 	}
 }

@@ -41,5 +41,23 @@ namespace Schemin.Primitives.GeneralOperations
 
 			return applied;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+
+			if (args.Length != 1)
+			{
+				throw new BadArgumentsException("expected 1 argument");
+			}
+
+			if ((first as ScheminPrimitive) == null && (first as ScheminLambda) == null 
+			&& (first as ScheminContinuation) == null && (first as ScheminRewriter) == null)
+			{
+				throw new BadArgumentsException("first argument must be a procedure");
+			}
+
+			return;
+		}
 	}
 }

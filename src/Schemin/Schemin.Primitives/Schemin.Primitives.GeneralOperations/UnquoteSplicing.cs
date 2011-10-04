@@ -42,5 +42,22 @@ namespace Schemin.Primitives.GeneralOperations
 			arg.UnQuote();
 			return arg;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+
+			if (args.Length != 1)
+			{
+				throw new BadArgumentsException("expected 1 or 0 arguments");
+			}
+
+			if ((first as ScheminList) == null)
+			{
+				throw new BadArgumentsException("first argument must be a list");
+			}
+
+			return;
+		}
 	}
 }

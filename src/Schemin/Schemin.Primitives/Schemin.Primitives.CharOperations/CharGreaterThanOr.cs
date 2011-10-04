@@ -45,5 +45,23 @@ namespace Schemin.Primitives.CharOperations
 
 			return ScheminBool.False;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+			IScheminType second = args.Cdr().Car();
+
+			if (args.Length != 2)
+			{
+				throw new BadArgumentsException("expected 2 arguments");
+			}
+
+			if ((first as ScheminChar) == null || (second as ScheminChar) == null)
+			{
+				throw new BadArgumentsException("arguments must be chars");
+			}
+
+			return;
+		}
 	}
 }

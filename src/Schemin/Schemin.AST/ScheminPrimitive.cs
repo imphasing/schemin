@@ -52,6 +52,7 @@ namespace Schemin.AST
 
 		public IScheminType Evaluate(ScheminList args, Environment env, Evaluator eval)
 		{
+			Definition.CheckArguments(args);
 			return Definition.Execute(env, eval, args);
 		}
 

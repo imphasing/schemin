@@ -35,5 +35,9 @@ namespace Schemin.Primitives
 	public abstract class Primitive
 	{
 		public abstract IScheminType Execute(Environment env, Evaluator eval, ScheminList args);
+
+		public virtual void CheckArguments(ScheminList args)
+		{
+		}
 	}
 }

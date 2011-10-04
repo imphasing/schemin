@@ -33,11 +33,6 @@ namespace Schemin.Primitives.GeneralOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			foreach (IScheminType type in args)
-			{
-				type.UnQuote();
-			}
-
 			ScheminList bindings = (ScheminList) args.Car();
 			IScheminType expression = args.Cdr().Car();
 
@@ -65,6 +60,16 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 
 			return first;
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 2)
+			{
+				throw new BadArgumentsException("expected 2 arguments");
+			}
+
+			return;
 		}
 	}
 }

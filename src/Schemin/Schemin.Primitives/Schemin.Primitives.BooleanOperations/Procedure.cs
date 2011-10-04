@@ -35,12 +35,23 @@ namespace Schemin.Primitives.BooleanOperations
 		{
 			IScheminType type = args.Car();
 
-			if ((type as ScheminPrimitive) != null || (type as ScheminLambda) != null || (type as ScheminContinuation) != null)
+			if ((type as ScheminPrimitive) != null || (type as ScheminLambda) != null 
+			|| (type as ScheminContinuation) != null || (type as ScheminRewriter) != null)
 			{
 				return ScheminBool.True;
 			}
 
 			return ScheminBool.False;
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 1)
+			{
+				throw new BadArgumentsException("expected 1 argument");
+			}
+
+			return;
 		}
 	}
 }

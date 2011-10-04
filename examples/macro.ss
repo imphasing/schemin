@@ -1,4 +1,4 @@
-; basic variable-arity or defined as a lambda which rewrites the AST
+; basic variable-arity or defined as a lambda which rewrites the AST.
 (define-macro (or-ar . args)
   (if (null? args)
     #f
@@ -6,9 +6,9 @@
       (car args)
       (let ((next-arg (gensym)))
        `(let ((,next-arg ,(car args)))
-	  (if ,next-arg)
+	  (if ,next-arg
 	  ,next-arg
-	  (or-ar ,@(cdr args)))))))
+	  (or-ar ,@(cdr args))))))))
 
 
 ; this is broken. temp-name is the same *C#* object in the if statement, which means it quotes the 2nd argument

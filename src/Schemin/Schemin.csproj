@@ -53,6 +53,7 @@
     <Compile Include="Schemin.Primitives\ScheminPrimitives.cs" />
 
     <Compile Include="Schemin.Primitives\Primitive.cs" />
+    <Compile Include="Schemin.Primitives\BadArgumentsException.cs" />
     <Compile Include="Schemin.Primitives\PrimitiveFactory.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\And.cs" />

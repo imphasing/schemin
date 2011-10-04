@@ -34,7 +34,6 @@ namespace Schemin.Primitives.GeneralOperations
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
 			ScheminAtom symbol = (ScheminAtom) args.Car();
-			symbol.UnQuote();
 			IScheminType definition = args.Cdr().Car();
 
 			Environment parent = env;
@@ -55,6 +54,23 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 
 			throw new UnboundAtomException(string.Format("Unbound atom: {0}", symbol));
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+
+			if (args.Length != 2)
+			{
+				throw new BadArgumentsException("expected 2 arguments");
+			}
+
+			if ((first as ScheminAtom) == null)
+			{
+				throw new BadArgumentsException("first argument must be a symbol");
+			}		
+
+			return;
 		}
 	}
 }

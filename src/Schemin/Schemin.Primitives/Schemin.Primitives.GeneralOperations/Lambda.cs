@@ -33,13 +33,18 @@ namespace Schemin.Primitives.GeneralOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			foreach (IScheminType type in args)
-			{
-				type.UnQuote();
-			}
-
 			ScheminLambda lam = new ScheminLambda(args, env);
 			return lam;
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 2) 
+			{
+				throw new BadArgumentsException("expected 2 arguments");
+			}
+
+			return;
 		}
 	}
 }

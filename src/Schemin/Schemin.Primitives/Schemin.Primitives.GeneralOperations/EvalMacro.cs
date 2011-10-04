@@ -52,8 +52,18 @@ namespace Schemin.Primitives.GeneralOperations
 					type.UnQuote();
 				}
 			}
-            
-            values.UnQuote();
+
+			values.UnQuote();
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 1)
+			{
+				throw new BadArgumentsException("expected 1 argument");
+			}
+
+			return;
 		}
 	}
 }

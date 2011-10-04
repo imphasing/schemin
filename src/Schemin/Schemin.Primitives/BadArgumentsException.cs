@@ -25,36 +25,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Primitives.BooleanOperations
+namespace Schemin.Primitives
 {
-	using Schemin.Evaluate;
-	using Schemin.AST;
-	public class Pair : Primitive
+	using System;
+
+	public class BadArgumentsException : Exception
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
-		{
-			IScheminType type = args.Car();
-
-			if ((type as ScheminList) != null)
-			{
-				ScheminList temp = (ScheminList) type;
-				if (!temp.Empty)
-				{
-					return ScheminBool.True;
-				}
-			}
-
-			return ScheminBool.False;
-		}
-
-		public override void CheckArguments(ScheminList args)
-		{
-			if (args.Length != 1)
-			{
-				throw new BadArgumentsException("expected 1 argument");
-			}
-
-			return;
-		}
+		public BadArgumentsException() : base() { }
+		public BadArgumentsException(string message) : base(message) { }
+		public BadArgumentsException(string message, System.Exception inner) : base(message, inner) { }
 	}
 }

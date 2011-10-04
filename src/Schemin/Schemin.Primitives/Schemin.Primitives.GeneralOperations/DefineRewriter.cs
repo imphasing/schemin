@@ -50,5 +50,20 @@ namespace Schemin.Primitives.GeneralOperations
 
 			return new ScheminList(false);
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+
+			if (args.Length != 2)
+			{
+				throw new BadArgumentsException("expected 2 arguments");
+			}
+
+			if ((first as ScheminAtom) == null)
+			{
+				throw new BadArgumentsException("first argument must be a symbol");
+			}		
+		}
 	}
 }

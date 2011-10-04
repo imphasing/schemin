@@ -45,12 +45,22 @@ namespace Schemin.Primitives.GeneralOperations
 				eval.GenSymPrefix = newPrefix.Value;
 			}
 
-			eval.GenSymSeed++;
 			string symbolName = eval.GenSymPrefix + eval.GenSymSeed.ToString();
+			eval.GenSymSeed++;
 
 			ScheminAtom gen = new ScheminAtom(symbolName);
 			gen.Quote();
 			return gen;
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length > 1)
+			{
+				throw new BadArgumentsException("expected 1 or 0 arguments");
+			}
+
+			return;
 		}
 	}
 }

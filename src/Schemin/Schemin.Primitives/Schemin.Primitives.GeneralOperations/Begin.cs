@@ -34,7 +34,14 @@ namespace Schemin.Primitives.GeneralOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
 		{
-			return args.Last();
+			if (args.Length > 0)
+			{
+				return args.Last();
+			}
+			else
+			{
+				return new ScheminList(true);
+			}
 		}
 	}
 }

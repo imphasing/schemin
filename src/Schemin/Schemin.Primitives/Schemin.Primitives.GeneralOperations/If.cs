@@ -39,14 +39,22 @@ namespace Schemin.Primitives.GeneralOperations
 
 			if (condition.Value)
 			{
-				then.UnQuote();
 				return then;
 			}
 			else
 			{
-				otherwise.UnQuote();
 				return otherwise;
 			}
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length < 2 || args.Length > 3)
+			{
+				throw new BadArgumentsException("expected 2 or 3 arguments");
+			}
+
+			return;
 		}
 	}
 }
