@@ -58,12 +58,13 @@ namespace Schemin.Evaluate
 		{
 			Stack = new Stack<StackFrame>();
 			this.GlobalEnv = new Environment();
-			DefinePrimitives(this.GlobalEnv);
+
 			var ConsoleInput = new ScheminPort(Console.In);
 			var ConsoleOutput = new ScheminPort(Console.Out);
 
 			CurrentInputPort = ConsoleInput;
 			CurrentOutputPort = ConsoleOutput;
+			DefinePrimitives(this.GlobalEnv);
 		}
 
 		public IScheminType Evaluate(ScheminList ast)
@@ -268,9 +269,17 @@ namespace Schemin.Evaluate
 					completeFrame.After = after;
 
 					// Need to pass push the previous frame back on so we can get access to the current continuation via the evaluator's Stack field.
-					Stack.Push(current);
-					completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
-					Stack.Pop();
+					// also adding the primitive's name to the exception if it gets thrown.
+					try
+					{
+						Stack.Push(current);
+						completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
+						Stack.Pop();
+					}
+					catch (BadArgumentsException ba)
+					{
+						throw new BadArgumentsException(prim.ToString() + " " + ba.Message);
+					}
 
 					completeFrame.CurrentEnv = CurrentEnv;
 

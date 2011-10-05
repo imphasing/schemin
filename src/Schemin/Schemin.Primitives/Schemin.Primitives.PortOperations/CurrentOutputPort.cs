@@ -35,5 +35,15 @@ namespace Schemin.Primitives.PortOperations
 		{
 			return eval.CurrentOutputPort;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 0)
+			{
+				throw new BadArgumentsException("expected 0 arguments");
+			}
+
+			return;
+		}
 	}
 }

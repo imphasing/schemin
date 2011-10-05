@@ -47,5 +47,30 @@ namespace Schemin.Primitives.PortOperations
 
 			return new ScheminList(false);
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+			if (args.Length < 1 || args.Length > 2)
+			{
+				throw new BadArgumentsException("expected 1 or 2 arguments");
+			}
+
+			if (args.Length == 2)
+			{
+				IScheminType port = args.Cdr().Car();
+				if ((port as ScheminPort) == null)
+				{
+					throw new BadArgumentsException("second argument must be a port");
+				}
+			}
+
+			if ((first as ScheminChar) == null)
+			{
+				throw new BadArgumentsException("first argument must be a char");
+			}
+
+			return;
+		}
 	}
 }

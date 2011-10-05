@@ -61,15 +61,5 @@ namespace Schemin.Primitives.GeneralOperations
 
 			return first;
 		}
-
-		public override void CheckArguments(ScheminList args)
-		{
-			if (args.Length != 2)
-			{
-				throw new BadArgumentsException("expected 2 arguments");
-			}
-
-			return;
-		}
 	}
 }

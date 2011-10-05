@@ -103,20 +103,8 @@ namespace Schemin.Primitives.GeneralOperations
 		{
 			IScheminType first = args.Car();
 
-			if ((first as ScheminList) != null)
+			if ((first as ScheminList) == null)
 			{
-				if (args.Length != 2)
-				{
-					throw new BadArgumentsException("expected 2 arguments");
-				}
-			}
-			else
-			{
-				if (args.Length != 3)
-				{
-					throw new BadArgumentsException("expected 3 arguments");
-				}
-
 				if ((first as ScheminAtom) == null)
 				{
 					throw new BadArgumentsException("first argument must be a symbol");

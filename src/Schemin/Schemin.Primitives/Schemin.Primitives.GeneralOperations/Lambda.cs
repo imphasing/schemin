@@ -39,9 +39,9 @@ namespace Schemin.Primitives.GeneralOperations
 
 		public override void CheckArguments(ScheminList args)
 		{
-			if (args.Length != 2) 
+			if (args.Length < 2) 
 			{
-				throw new BadArgumentsException("expected 2 arguments");
+				throw new BadArgumentsException("expected at least 2 arguments");
 			}
 
 			return;

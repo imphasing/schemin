@@ -36,7 +36,7 @@ namespace Schemin.Primitives.ListOperations
 			IScheminType head = args.Car();
 			IScheminType rest = args.Cdr().Car();
 
-			if (rest.GetType() == typeof(ScheminList))
+			if ((rest as ScheminList) != null)
 			{
 				ScheminList temp = (ScheminList) rest;
 
@@ -60,6 +60,16 @@ namespace Schemin.Primitives.ListOperations
 			var append = new ScheminList(head);
 			append.Append(rest);
 			return append; 
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			if (args.Length != 2)
+			{
+				throw new BadArgumentsException("expected 2 arguments");
+			}
+
+			return;
 		}
 	}
 }

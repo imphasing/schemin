@@ -37,5 +37,22 @@ namespace Schemin.Primitives.StringOperations
 			ScheminInteger len = new ScheminInteger(str.Value.Length);
 			return len;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+			
+			if (args.Length != 1)
+			{
+				throw new BadArgumentsException("expected 1 argument");
+			}
+
+			if ((first as ScheminString) == null)
+			{
+				throw new BadArgumentsException("first argument must be a string");
+			}
+
+			return;
+		}
 	}
 }

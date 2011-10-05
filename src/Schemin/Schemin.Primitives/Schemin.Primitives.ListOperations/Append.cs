@@ -55,7 +55,7 @@ namespace Schemin.Primitives.ListOperations
 				}
 				else
 				{
-					throw new InvalidOperationException(string.Format("Non-list argument given to append: {0}", type));
+					throw new BadArgumentsException("all arguments must be lists");
 				}
 			}
 

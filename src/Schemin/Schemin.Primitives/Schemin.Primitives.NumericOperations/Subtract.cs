@@ -81,5 +81,18 @@ namespace Schemin.Primitives.NumericOperations
 
 			return (IScheminType) result;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			foreach (IScheminType type in args)
+			{
+				if ((type as IScheminNumeric) == null)
+				{
+					throw new BadArgumentsException("arguments must be numeric");	
+				}
+			}
+
+			return;
+		}
 	}
 }

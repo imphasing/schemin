@@ -42,5 +42,28 @@ namespace Schemin.Primitives.StringOperations
 			ScheminChar chr = new ScheminChar(str.Value[pos_int]);
 			return chr;
 		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+			IScheminType second = args.Cdr().Car();
+			
+			if (args.Length != 2)
+			{
+				throw new BadArgumentsException("expected 2 arguments");
+			}
+
+			if ((first as ScheminString) == null)
+			{
+				throw new BadArgumentsException("first argument must be a string");
+			}
+
+			if ((second as ScheminInteger) == null)
+			{
+				throw new BadArgumentsException("second argument must be an integer");
+			}
+
+			return;
+		}
 	}
 }
