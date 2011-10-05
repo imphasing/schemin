@@ -56,7 +56,7 @@ Check out the examples directory for more examples of what Schemin is capable of
 Implemented featues:
 --------------------
 
-+ Basic unhygenic macros, using define-rewriter paired with quasiquoting.
++ Basic unhygenic macros, using define-macro paired with quasiquoting.
 + All primitive types in r5rs besides vectors
 + First-class continuations and call/cc
 + IO Ports (File and console IO)
@@ -73,3 +73,5 @@ To do:
 
 + Possibly implement a parser generator instead of our recursive parser
 + Implement more common primitives
++ Implement vectors
++ Implement hygenic macros
