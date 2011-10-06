@@ -25,22 +25,42 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Tokenize
+namespace Schemin.Primitives.VectorOperations
 {
-	public enum TokenType
+	using Schemin.Evaluate;
+	using Schemin.AST;
+	public class VectorRef : Primitive
 	{
-		Symbol,
-		IntegerLiteral,
-		DecimalLiteral,
-		StringLiteral,
-		BoolLiteral,
-		CharLiteral,
-		VectorLiteral,
-		Quote,
-		BackQuote,
-		Comma,
-		AtComma,
-		OpenParen,
-		CloseParen
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		{
+			ScheminVector vec = (ScheminVector) args.Car();
+			ScheminInteger pos = (ScheminInteger) args.Cdr().Car();
+
+			int pos_int = (int) pos.IntegerValue();
+			return vec.List[pos_int];
+		}
+
+		public override void CheckArguments(ScheminList args)
+		{
+			IScheminType first = args.Car();
+			IScheminType second = args.Cdr().Car();
+			
+			if (args.Length != 2)
+			{
+				throw new BadArgumentsException("expected 2 arguments");
+			}
+
+			if ((first as ScheminVector) == null)
+			{
+				throw new BadArgumentsException("first argument must be a vector");
+			}
+
+			if ((second as ScheminInteger) == null)
+			{
+				throw new BadArgumentsException("second argument must be an integer");
+			}
+
+			return;
+		}
 	}
 }

@@ -210,16 +210,23 @@ namespace Schemin.AST
 			else
 			{
 				builder.Append("(");
+				int index = 0;
 				foreach (var type in list)
 				{
 					if (type.GetType() == typeof(ScheminList))
 					{
 						builder.Append(ToStringInternal((ScheminList) type));
 					}
-					else
+					else if (index < list.Length - 1)
 					{
 						builder.Append(type.ToString() + " ");
 					}
+					else
+					{
+						builder.Append(type.ToString());
+					}
+
+					index++;
 				}
 				builder.Append(")");
 			}

@@ -152,14 +152,15 @@ namespace Schemin.Tokenize
 
 			var matchTokenTypes = new Dictionary<Regex, TokenType>();
 			matchTokenTypes.Add(new Regex("^#[f|t]"), TokenType.BoolLiteral);
-			matchTokenTypes.Add(new Regex("#\\.*"), TokenType.CharLiteral);
+			matchTokenTypes.Add(new Regex("#\\\\.*"), TokenType.CharLiteral);
 			matchTokenTypes.Add(new Regex("^[-+]?[0-9]+$"), TokenType.IntegerLiteral);
 			matchTokenTypes.Add(new Regex("^([0-9]*)?(\\.[0-9]+)$"), TokenType.DecimalLiteral);
-			matchTokenTypes.Add(new Regex("[^\"\',()]+"), TokenType.Symbol);
+			matchTokenTypes.Add(new Regex("[#]"), TokenType.VectorLiteral);
 			matchTokenTypes.Add(new Regex("[']"), TokenType.Quote);
 			matchTokenTypes.Add(new Regex("[`]"), TokenType.BackQuote);
-			matchTokenTypes.Add(new Regex(",@"), TokenType.Comma);
+			matchTokenTypes.Add(new Regex(",@"), TokenType.AtComma);
 			matchTokenTypes.Add(new Regex("[,]"), TokenType.Comma);
+			matchTokenTypes.Add(new Regex("[^\"\',()]+"), TokenType.Symbol);
 			matchTokenTypes.Add(new Regex("[(]"), TokenType.OpenParen);
 			matchTokenTypes.Add(new Regex("[)]"), TokenType.CloseParen);
 

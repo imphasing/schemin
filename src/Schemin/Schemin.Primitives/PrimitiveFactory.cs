@@ -55,6 +55,15 @@ namespace Schemin.Primitives
 			Primitives.Add("append", new ListOperations.Append());
 			Primitives.Add("list", new ListOperations.List());
 
+			Primitives.Add("vector", new VectorOperations.Vector());
+			Primitives.Add("make-vector", new VectorOperations.MakeVector());
+			Primitives.Add("vector-length", new VectorOperations.VectorLength());
+			Primitives.Add("vector-ref", new VectorOperations.VectorRef());
+			Primitives.Add("vector-set!", new VectorOperations.VectorSet());
+			Primitives.Add("vector-fill!", new VectorOperations.VectorFill());
+			Primitives.Add("list->vector", new VectorOperations.ListVector());
+			Primitives.Add("vector->list", new VectorOperations.VectorList());
+
 			Primitives.Add("null?", new BooleanOperations.Null());
 			Primitives.Add("=", new BooleanOperations.Equal());
 			Primitives.Add("eq?", new BooleanOperations.Equal());
@@ -71,6 +80,7 @@ namespace Schemin.Primitives
 			Primitives.Add("symbol?", new BooleanOperations.Symbol());
 			Primitives.Add("procedure?", new BooleanOperations.Procedure());
 			Primitives.Add("pair?", new BooleanOperations.Pair());
+			Primitives.Add("vector?", new BooleanOperations.Vector());
 			Primitives.Add("number?", new BooleanOperations.Number());
 			Primitives.Add("string?", new BooleanOperations.String());
 			Primitives.Add("char?", new BooleanOperations.Char());

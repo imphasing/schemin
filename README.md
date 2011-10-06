@@ -57,7 +57,7 @@ Implemented featues:
 --------------------
 
 + Basic unhygenic macros, using define-macro paired with quasiquoting.
-+ All primitive types in r5rs besides vectors
++ All primitive types in r5rs, except the full numerical tower.
 + First-class continuations and call/cc
 + IO Ports (File and console IO)
 + define and set!
@@ -73,5 +73,4 @@ To do:
 
 + Possibly implement a parser generator instead of our recursive parser
 + Implement more common primitives
-+ Implement vectors
 + Implement hygenic macros

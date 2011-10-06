@@ -25,22 +25,30 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Tokenize
+namespace Schemin.Primitives.VectorOperations
 {
-	public enum TokenType
+	using Schemin.Evaluate;
+	using Schemin.AST;
+	public class Vector : Primitive
 	{
-		Symbol,
-		IntegerLiteral,
-		DecimalLiteral,
-		StringLiteral,
-		BoolLiteral,
-		CharLiteral,
-		VectorLiteral,
-		Quote,
-		BackQuote,
-		Comma,
-		AtComma,
-		OpenParen,
-		CloseParen
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		{
+			ScheminVector vec = new ScheminVector();
+
+			if ((args as ScheminList) != null)
+			{
+				ScheminList temp = (ScheminList) args;
+				foreach (IScheminType type in temp)
+				{
+					vec.List.Add(type);
+				}
+			}
+			else
+			{
+				vec.List.Add(args);
+			}
+
+			return vec;
+		}
 	}
 }

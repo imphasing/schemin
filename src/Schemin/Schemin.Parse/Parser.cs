@@ -53,7 +53,24 @@ namespace Schemin.Parse
 
 			while (startIndex < tokens.Count)
 			{
-				if (tokens[startIndex].Type == TokenType.OpenParen)
+				if (tokens[startIndex].Type == TokenType.VectorLiteral)
+				{
+					if (tokens[startIndex + 1].Type == TokenType.OpenParen)
+					{
+						KeyValuePair<ScheminList, int> descended = ParseInternal(tokens, startIndex + 2);
+						ScheminVector vec = new ScheminVector();
+						foreach (IScheminType type in descended.Key)
+						{
+							type.Quote();
+							vec.List.Add(type);
+						}
+						
+						parsed.Append(vec);
+						startIndex = descended.Value;
+					}
+
+				}
+				else if (tokens[startIndex].Type == TokenType.OpenParen)
 				{
 					KeyValuePair<ScheminList, int> descended = ParseInternal(tokens, startIndex + 1);
 					parsed.Append(descended.Key);
