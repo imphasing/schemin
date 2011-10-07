@@ -52,7 +52,15 @@ namespace Schemin.Tokenize
 
 			return tokenList;
 		}
-
+		
+		private KeyValuePair<Token, int> newTokenPair(TokenType type, String tok, char[] input, int position1, int position2)
+		{
+			Token currentToken = new Token(type, tok);
+			currentToken.LineNumber = GetLineNumber(input, position1);
+			currentToken.ColNumber = GetColNumber(input, position1);
+			return new KeyValuePair<Token, int>(currentToken, position2);
+		}
+		
 		private KeyValuePair<Token, int> GetNextToken(char[] input, int position)
 		{
 			int i = position;
@@ -74,42 +82,25 @@ namespace Schemin.Tokenize
 			// get the next token
 			if (i < input.Length)
 			{
-				if (input[i] == '#')
+				switch(input[i])
 				{
-					return VectorOrBooleanOrChar(input, i);
+				case '#': return VectorOrBooleanOrChar(input, i);
+				case '"': return StringLiteral(input, i);
+				case '-':
+				case '+': 
+				{
+					if(NumericalPart(input[i + 1]) || NumericalPart(input[i]))
+						return NumberLiteral(input, i);
+					else
+						return Symbol(input, i);
 				}
-				else if (input[i] == '"')
-				{
-					return StringLiteral(input, i);
-				}
-				else if (((input[i] == '-' || input[i] == '+') && NumericalPart(input[i + 1])) || Numerical(input[i]))
-				{
-					// only a number literal if the starting char is numerical, or if the starting char is a - or +
-					// AND the next char is part of a number.
-					return NumberLiteral(input, i);
-				}
-				else if (input[i] == '\'' || input[i] == '`' || input[i] == ',')
-				{
+				case '\'':
+				case '`':
+				case ',':
 					return QuoteSugar(input, i);
-				}
-				else if (input[i] == '(')
-				{
-					Token current = new Token(TokenType.OpenParen, new String(input, i, 1));
-					current.LineNumber = GetLineNumber(input, i);
-					current.ColNumber = GetColNumber(input, i);
-					return new KeyValuePair<Token, int>(current, i + 1);
-				}
-				else if (input[i] == ')')
-				{
-					Token current = new Token(TokenType.CloseParen, new String(input, i, 1));
-					current.LineNumber = GetLineNumber(input, i);
-					current.ColNumber = GetColNumber(input, i);
-
-					return new KeyValuePair<Token, int>(current, i + 1);
-				}
-				else
-				{
-					return Symbol(input, i);
+				case '(': return newTokenPair(TokenType.OpenParen, new String(input, i, 1), input, i, i + 1);
+				case ')': return newTokenPair(TokenType.CloseParen, new String(input, i, 1), input, i, i + 1);
+				default: return Symbol(input, i);
 				}
 			}
 			else
@@ -125,7 +116,6 @@ namespace Schemin.Tokenize
 			int originalPosition = position;
 			position++;
 			TokenType type = TokenType.StringLiteral;
-			Token currentToken;
 			StringBuilder sb = new StringBuilder();
 			int newPosition = position;
 			bool matchingQuotes = false;
@@ -158,19 +148,14 @@ namespace Schemin.Tokenize
 				throw new Exception("Tokenizing error: Unmatched quotes in string literal");
 			}
 
-			currentToken = new Token(type, sb.ToString());
-			currentToken.LineNumber = GetLineNumber(input, originalPosition);
-			currentToken.ColNumber = GetColNumber(input, originalPosition);
-
-			return new KeyValuePair<Token, int>(currentToken, newPosition);
+			return newTokenPair(type, sb.ToString(), input, originalPosition, newPosition);
 		}
-
+	
 		// retrieve a symbol token and advance our position
 		private KeyValuePair<Token, int> Symbol(char[] input, int position)
 		{
 			int originalPosition = position;
 			TokenType type = TokenType.Symbol;
-			Token currentToken;
 
 			int newPosition = position;
 			// as long as we don't hit whitespace or something that a symbol shouldn't have, assume it's a symbol
@@ -179,10 +164,7 @@ namespace Schemin.Tokenize
 				newPosition++;
 			}
 
-			currentToken = new Token(type, new String(input, position, newPosition - position));
-			currentToken.LineNumber = GetLineNumber(input, originalPosition);
-			currentToken.ColNumber = GetColNumber(input, originalPosition);
-			return new KeyValuePair<Token, int>(currentToken, newPosition);
+			return newTokenPair(type, new String(input, position, newPosition - position), input, originalPosition, newPosition);
 		}
 
 		// retrieve a quoted sugar token (' ` , ,@) and advance our position
@@ -190,7 +172,6 @@ namespace Schemin.Tokenize
 		{
 			int originalPosition = position;
 			TokenType type;
-			Token currentToken;
 
 			switch (input[position])
 			{
@@ -206,22 +187,14 @@ namespace Schemin.Tokenize
 				default:
 					throw new Exception("Parse error!");
 			}
-
+			int positionOffset = 1;
 			if ((position + 1) < input.Length && input[position + 1] == '@')
 			{
 				type = TokenType.AtComma;
-				currentToken = new Token(type, new String(input, position, 2));
-				currentToken.LineNumber = GetLineNumber(input, originalPosition);
-				currentToken.ColNumber = GetColNumber(input, originalPosition);
-				return new KeyValuePair<Token, int>(currentToken, position + 2);
+				positionOffset = 2;
 			}
-			else
-			{
-				currentToken = new Token(type, new String(input, position, 1));
-				currentToken.LineNumber = GetLineNumber(input, originalPosition);
-				currentToken.ColNumber = GetColNumber(input, originalPosition);
-				return new KeyValuePair<Token, int>(currentToken, position + 1);
-			}
+			
+			return newTokenPair(type, new String(input, position, positionOffset), input, originalPosition, position + positionOffset);
 		}
 
 		// retrieve a number literal token (int or decimal) and advance our position
@@ -229,7 +202,6 @@ namespace Schemin.Tokenize
 		{
 			int originalPosition = position;
 			TokenType type = TokenType.IntegerLiteral;
-			Token currentToken;
 
 			int newPosition = position;
 			while (newPosition < input.Length && !Whitespace(input[newPosition]) && NumericalPart(input[newPosition]))
@@ -241,10 +213,7 @@ namespace Schemin.Tokenize
 				newPosition++;
 			}
 
-			currentToken = new Token(type, new String(input, position, newPosition - position));
-			currentToken.LineNumber = GetLineNumber(input, originalPosition);
-			currentToken.ColNumber = GetColNumber(input, originalPosition);
-			return new KeyValuePair<Token, int>(currentToken, newPosition);
+			return newTokenPair(type, new String(input, position, newPosition - position), input, originalPosition, newPosition);
 		}
 
 		// retrieve a vector literal marker, boolean token, or character literal token and advance our position
@@ -252,22 +221,15 @@ namespace Schemin.Tokenize
 		{
 			int originalPosition = position;
 			List<char> boolLiterals = new List<char> { 'F', 'f', 't', 'T' };
-			Token currentToken;
 			if (boolLiterals.Contains(input[position + 1]))
 			{
 				// boolean literal!
-				currentToken = new Token(TokenType.BoolLiteral, new String(input, position, 2));
-				currentToken.LineNumber = GetLineNumber(input, originalPosition);
-				currentToken.ColNumber = GetColNumber(input, originalPosition);
-				return new KeyValuePair<Token, int>(currentToken, position + 2);
+				return newTokenPair(TokenType.BoolLiteral, new String(input, position, 2), input, originalPosition, position + 2);
 			}
 			else if (input[position + 1] == '(')
 			{
 				// vector literal!
-				currentToken = new Token(TokenType.VectorLiteral, new String(input, position, 1));
-				currentToken.LineNumber = GetLineNumber(input, originalPosition);
-				currentToken.ColNumber = GetColNumber(input, originalPosition);
-				return new KeyValuePair<Token, int>(currentToken, position + 1);
+				return newTokenPair(TokenType.VectorLiteral, new String(input, position, 1), input, originalPosition, position + 1);
 			}
 			else if (input[position + 1] == '\\')
 			{
@@ -279,10 +241,7 @@ namespace Schemin.Tokenize
 					sb.Append(input[newPosition]);
 					newPosition++;
 				}
-				currentToken = new Token(TokenType.CharLiteral, new String(input, position, newPosition - position));
-				currentToken.LineNumber = GetLineNumber(input, originalPosition);
-				currentToken.ColNumber = GetColNumber(input, originalPosition);
-				return new KeyValuePair<Token, int>(currentToken, newPosition);
+				return newTokenPair(TokenType.CharLiteral, new String(input, position, newPosition - position), input, originalPosition, newPosition);
 			}
 			else
 			{
@@ -322,7 +281,6 @@ namespace Schemin.Tokenize
 			switch (candidate)
 			{
 				case '\t':
-					return true;
 				case ' ':
 					return true;
 			}
