@@ -82,18 +82,19 @@ namespace Schemin.Tokenize
 			// get the next token
 			if (i < input.Length)
 			{
+				if (Numerical(input[i]))
+					return NumberLiteral(input, i);
+					
 				switch(input[i])
 				{
 				case '#': return VectorOrBooleanOrChar(input, i);
 				case '"': return StringLiteral(input, i);
 				case '-':
 				case '+': 
-				{
-					if(NumericalPart(input[i + 1]) || NumericalPart(input[i]))
+					if(NumericalPart(input[i + 1]))
 						return NumberLiteral(input, i);
 					else
 						return Symbol(input, i);
-				}
 				case '\'':
 				case '`':
 				case ',':
