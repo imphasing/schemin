@@ -29,6 +29,7 @@ namespace Schemin.AST
 {
 	using System;
 	using Schemin.Evaluate;
+	using Schemin.Tokenize;
 	using Schemin.Primitives;
 	using Environment = Schemin.Evaluate.Environment;
 
@@ -36,10 +37,18 @@ namespace Schemin.AST
 	{
 		public Primitive Definition;
 		public string Name;
+		public Token SourceToken;
 		private bool quoted = false;
 
 		public ScheminPrimitive(string name)
 		{
+			this.Definition = PrimitiveFactory.Get(name);
+			this.Name = name;
+		}
+
+		public ScheminPrimitive(string name, Token token)
+		{
+			this.SourceToken = token;
 			this.Definition = PrimitiveFactory.Get(name);
 			this.Name = name;
 		}

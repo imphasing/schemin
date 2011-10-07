@@ -33,6 +33,7 @@ namespace Schemin.Evaluate
 	using System.Collections.Generic;
 	using System.Linq;
 	using Schemin.AST;
+	using Schemin.Tokenize;
 	using Schemin.Primitives;
 
 	public class Evaluator
@@ -278,7 +279,13 @@ namespace Schemin.Evaluate
 					}
 					catch (BadArgumentsException ba)
 					{
-						throw new BadArgumentsException(prim.ToString() + " " + ba.Message);
+						Token sourceToken = prim.SourceToken;
+						string line = String.Empty;
+						if (sourceToken != null)
+						{
+							line = " line: " + sourceToken.LineNumber.ToString() + " col: " + sourceToken.ColNumber.ToString();
+						}
+						throw new BadArgumentsException(prim.ToString() + " " + ba.Message + line);
 					}
 
 					completeFrame.CurrentEnv = CurrentEnv;

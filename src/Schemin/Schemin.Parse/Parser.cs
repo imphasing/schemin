@@ -114,7 +114,7 @@ namespace Schemin.Parse
 			switch (token.Type)
 			{
 				case TokenType.Symbol:
-					return ConvertAtom(new ScheminAtom(token.Value));
+					return ConvertAtom(new ScheminAtom(token.Value), token);
 				case TokenType.IntegerLiteral:
 					return new ScheminInteger(BigInteger.Parse(token.Value));
 				case TokenType.DecimalLiteral:
@@ -130,45 +130,45 @@ namespace Schemin.Parse
 			}
 		}
 
-		private IScheminType ConvertAtom(ScheminAtom atom)
+		private IScheminType ConvertAtom(ScheminAtom atom, Token token)
 		{
 			switch (atom.Name)
 			{
 				// these are special forms that can't be bound to symbols, they're always primitives
 				case "lambda":
-					return new ScheminPrimitive("lambda");
+					return new ScheminPrimitive("lambda", token);
 				case "define": 
-					return new ScheminPrimitive("define");
+					return new ScheminPrimitive("define", token);
 				case "define-rewriter":
-					return new ScheminPrimitive("define-rewriter");
+					return new ScheminPrimitive("define-rewriter", token);
 				case "quote":
-					return new ScheminPrimitive("quote");
+					return new ScheminPrimitive("quote", token);
 				case "unquote":
-					return new ScheminPrimitive("unquote");
+					return new ScheminPrimitive("unquote", token);
 				case "unquote-splicing":
-					return new ScheminPrimitive("unquote-splicing");
+					return new ScheminPrimitive("unquote-splicing", token);
 				case "quasiquote":
-					return new ScheminPrimitive("quasiquote");
+					return new ScheminPrimitive("quasiquote", token);
 				case "begin":
-					return new ScheminPrimitive("begin");
+					return new ScheminPrimitive("begin", token);
 				case "if":
-					return new ScheminPrimitive("if");
+					return new ScheminPrimitive("if", token);
 				case "or":
-					return new ScheminPrimitive("or");
+					return new ScheminPrimitive("or", token);
 				case "and":
-					return new ScheminPrimitive("and");
+					return new ScheminPrimitive("and", token);
 				case "cond":
-					return new ScheminPrimitive("cond");
+					return new ScheminPrimitive("cond", token);
 				case "let":
-					return new ScheminPrimitive("let");
+					return new ScheminPrimitive("let", token);
 				case "letrec":
-					return new ScheminPrimitive("letrec");
+					return new ScheminPrimitive("letrec", token);
 				case "let*":
-					return new ScheminPrimitive("let*");
+					return new ScheminPrimitive("let*", token);
 				case "set!":
-					return new ScheminPrimitive("set!");
+					return new ScheminPrimitive("set!", token);
 				case "call/cc":
-					return new ScheminPrimitive("call/cc");
+					return new ScheminPrimitive("call/cc", token);
 				default:
 					return atom;
 			}

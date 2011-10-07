@@ -33,6 +33,8 @@ namespace Schemin.Tokenize
 	{
 		public TokenType Type;
 		public string Value;
+		public int LineNumber;
+		public int ColNumber;
 
 		public Token(TokenType type, string value)
 		{

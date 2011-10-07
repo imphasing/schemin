@@ -94,11 +94,18 @@ namespace Schemin.Tokenize
 				}
 				else if (input[i] == '(')
 				{
-					return new KeyValuePair<Token, int>(new Token(TokenType.OpenParen, new String(input, i, 1)), i + 1);
+					Token current = new Token(TokenType.OpenParen, new String(input, i, 1));
+					current.LineNumber = GetLineNumber(input, i);
+					current.ColNumber = GetColNumber(input, i);
+					return new KeyValuePair<Token, int>(current, i + 1);
 				}
 				else if (input[i] == ')')
 				{
-					return new KeyValuePair<Token, int>(new Token(TokenType.CloseParen, new String(input, i, 1)), i + 1);
+					Token current = new Token(TokenType.CloseParen, new String(input, i, 1));
+					current.LineNumber = GetLineNumber(input, i);
+					current.ColNumber = GetColNumber(input, i);
+
+					return new KeyValuePair<Token, int>(current, i + 1);
 				}
 				else
 				{
@@ -115,6 +122,7 @@ namespace Schemin.Tokenize
 		// retrieve a string literal token and advance our position
 		private KeyValuePair<Token, int> StringLiteral(char[] input, int position)
 		{
+			int originalPosition = position;
 			position++;
 			TokenType type = TokenType.StringLiteral;
 			Token currentToken;
@@ -151,12 +159,16 @@ namespace Schemin.Tokenize
 			}
 
 			currentToken = new Token(type, sb.ToString());
+			currentToken.LineNumber = GetLineNumber(input, originalPosition);
+			currentToken.ColNumber = GetColNumber(input, originalPosition);
+
 			return new KeyValuePair<Token, int>(currentToken, newPosition);
 		}
 
 		// retrieve a symbol token and advance our position
 		private KeyValuePair<Token, int> Symbol(char[] input, int position)
 		{
+			int originalPosition = position;
 			TokenType type = TokenType.Symbol;
 			Token currentToken;
 
@@ -168,12 +180,15 @@ namespace Schemin.Tokenize
 			}
 
 			currentToken = new Token(type, new String(input, position, newPosition - position));
+			currentToken.LineNumber = GetLineNumber(input, originalPosition);
+			currentToken.ColNumber = GetColNumber(input, originalPosition);
 			return new KeyValuePair<Token, int>(currentToken, newPosition);
 		}
 
 		// retrieve a quoted sugar token (' ` , ,@) and advance our position
 		private KeyValuePair<Token, int> QuoteSugar(char[] input, int position)
 		{
+			int originalPosition = position;
 			TokenType type;
 			Token currentToken;
 
@@ -196,11 +211,15 @@ namespace Schemin.Tokenize
 			{
 				type = TokenType.AtComma;
 				currentToken = new Token(type, new String(input, position, 2));
+				currentToken.LineNumber = GetLineNumber(input, originalPosition);
+				currentToken.ColNumber = GetColNumber(input, originalPosition);
 				return new KeyValuePair<Token, int>(currentToken, position + 2);
 			}
 			else
 			{
 				currentToken = new Token(type, new String(input, position, 1));
+				currentToken.LineNumber = GetLineNumber(input, originalPosition);
+				currentToken.ColNumber = GetColNumber(input, originalPosition);
 				return new KeyValuePair<Token, int>(currentToken, position + 1);
 			}
 		}
@@ -208,6 +227,7 @@ namespace Schemin.Tokenize
 		// retrieve a number literal token (int or decimal) and advance our position
 		private KeyValuePair<Token, int> NumberLiteral(char[] input, int position)
 		{
+			int originalPosition = position;
 			TokenType type = TokenType.IntegerLiteral;
 			Token currentToken;
 
@@ -222,24 +242,31 @@ namespace Schemin.Tokenize
 			}
 
 			currentToken = new Token(type, new String(input, position, newPosition - position));
+			currentToken.LineNumber = GetLineNumber(input, originalPosition);
+			currentToken.ColNumber = GetColNumber(input, originalPosition);
 			return new KeyValuePair<Token, int>(currentToken, newPosition);
 		}
 
 		// retrieve a vector literal marker, boolean token, or character literal token and advance our position
 		private KeyValuePair<Token, int> VectorOrBooleanOrChar(char[] input, int position)
 		{
+			int originalPosition = position;
 			List<char> boolLiterals = new List<char> { 'F', 'f', 't', 'T' };
 			Token currentToken;
 			if (boolLiterals.Contains(input[position + 1]))
 			{
 				// boolean literal!
 				currentToken = new Token(TokenType.BoolLiteral, new String(input, position, 2));
+				currentToken.LineNumber = GetLineNumber(input, originalPosition);
+				currentToken.ColNumber = GetColNumber(input, originalPosition);
 				return new KeyValuePair<Token, int>(currentToken, position + 2);
 			}
 			else if (input[position + 1] == '(')
 			{
 				// vector literal!
 				currentToken = new Token(TokenType.VectorLiteral, new String(input, position, 1));
+				currentToken.LineNumber = GetLineNumber(input, originalPosition);
+				currentToken.ColNumber = GetColNumber(input, originalPosition);
 				return new KeyValuePair<Token, int>(currentToken, position + 1);
 			}
 			else if (input[position + 1] == '\\')
@@ -253,6 +280,8 @@ namespace Schemin.Tokenize
 					newPosition++;
 				}
 				currentToken = new Token(TokenType.CharLiteral, new String(input, position, newPosition - position));
+				currentToken.LineNumber = GetLineNumber(input, originalPosition);
+				currentToken.ColNumber = GetColNumber(input, originalPosition);
 				return new KeyValuePair<Token, int>(currentToken, newPosition);
 			}
 			else
@@ -314,6 +343,36 @@ namespace Schemin.Tokenize
 			}
 
 			return escaped;
+		}
+
+		private int GetColNumber(char[] input, int position)
+		{
+			int colNumber = 0;
+			for (int i = 0; i < position; i++)
+			{
+				if (input[i] == '\n')
+				{
+					colNumber = 0;
+				}
+
+				colNumber++;
+			}
+
+			return colNumber;
+		}
+
+		private int GetLineNumber(char[] input, int position)
+		{
+			int line = 1;
+			for (int i = 0; i < position; i++)
+			{
+				if (input[i] == '\n')
+				{
+					line++;
+				}
+			}
+
+			return line;
 		}
 	}
 }
