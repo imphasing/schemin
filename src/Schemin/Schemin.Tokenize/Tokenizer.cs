@@ -29,173 +29,291 @@ namespace Schemin.Tokenize
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Text.RegularExpressions;
-	using System.Text;
 	using System.Linq;
+	using System.Text;
 
 	public class Tokenizer
 	{
-		private Dictionary<string, string> literals;	
-
-		public Tokenizer()
-		{
-			literals = new Dictionary<string, string>();
-		}
-
-		private string ExtractLiterals(string input)
-		{
-			int currentId = 0;
-			string literalMatch = "\"([^\"\\\\]|\\.)*\"";
-			Regex literal = new Regex(literalMatch);
-
-			var extractedLiterals = new Dictionary<string, string>();
-
-			Func<Match, string> replacer = m => {
-				string placeholder = string.Format("###STRING_LITERAL_{0}###", currentId++);
-				extractedLiterals.Add(placeholder, TrimQuotes(m.ToString()));
-				return placeholder;
-			};
-
-			MatchEvaluator evaluator = new MatchEvaluator(replacer);
-
-			string transformed = literal.Replace(input, evaluator);
-
-			this.literals = extractedLiterals;
-			return transformed;
-		}
-
-		private string RemoveComments(string input)
-		{
-			string commentMatch = ";.*$";
-			Regex comment = new Regex(commentMatch);
-
-			StringBuilder removed = new StringBuilder();
-			string[] lines = input.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-
-			foreach (string line in lines)
-			{
-				removed.Append(comment.Replace(line, String.Empty));
-				removed.Append(System.Environment.NewLine);
-			}
-
-			return removed.ToString();
-		}
-
-		private string TrimQuotes(string input)
-		{
-			string leading = input.Remove(0, 1);
-			return leading.Remove(leading.Length - 1, 1);
-		}
-
-		private string BreakSugaredQuotes(string token, List<Token> tokens)
-		{
-			// Since we replace ( with ' ( ', a leading quote like '(1 2) will automatically be interpreted
-			// as two tokens, but for atoms, ints, etc, there's no spaces added so we need to split the token apart here
-
-			string quoted = token;
-			if (token.StartsWith("'") && token != "'")
-			{
-				quoted = token.Substring(1, token.Length - 1);
-				tokens.Add(new Token(TokenType.Quote, "'"));
-
-				quoted = BreakSugaredQuotes(quoted, tokens);
-			}
-			else if (token.StartsWith("`") && token != "`")
-			{
-				quoted = token.Substring(1, token.Length - 1);
-				tokens.Add(new Token(TokenType.BackQuote, "`"));
-
-				quoted = BreakSugaredQuotes(quoted, tokens);
-			}
-			else if (token.StartsWith(",@") && token != ",@")
-			{
-				quoted = token.Substring(2, token.Length - 2);
-				tokens.Add(new Token(TokenType.AtComma, ",@"));
-
-				quoted = BreakSugaredQuotes(quoted, tokens);
-			}
-			else if (token.StartsWith(",") && token != "," && token != ",@")
-			{
-				quoted = token.Substring(1, token.Length - 1);
-				tokens.Add(new Token(TokenType.Comma, ","));
-
-				quoted = BreakSugaredQuotes(quoted, tokens);
-			}
-
-			return quoted;
-		}
-
-
 		public List<Token> Tokenize(string input)
 		{
-			var tokens = new List<Token>();
+			List<Token> tokenList = new List<Token>();
+			int currentPosition = 0;
+			char[] chars = input.ToCharArray();
 
-			// Normalize then remove newlines
-			string normalizedNewlines = input.Replace(System.Environment.NewLine, "\n");
-			normalizedNewlines = normalizedNewlines.Replace("\n", System.Environment.NewLine);
+			// We use KeyValuePair as a simple tuple type here, containing the next token
+			// as well as what position we should resume retrieving tokens from.
 
-			// Remove string literals so our type recognition doesn't screw up
-			string removedLiterals = ExtractLiterals(normalizedNewlines);
-
-			// Remove comments
-			string removedComments = RemoveComments(removedLiterals);
-
-			string removedNewlines = removedComments.Replace(System.Environment.NewLine, String.Empty);
-			string removedTabs = removedNewlines.Replace("\t", String.Empty);
-
-			string addedWhitespace = removedTabs.Replace("(", " ( ");
-			addedWhitespace = addedWhitespace.Replace(")", " ) ");
-
-			List<string> stringTokens = addedWhitespace.Split(' ').ToList();
-			Func<string, bool> filter = token => (token != String.Empty && token != "" && token != System.Environment.NewLine);
-			stringTokens = stringTokens.Where(filter).ToList();
-
-			var matchTokenTypes = new Dictionary<Regex, TokenType>();
-			matchTokenTypes.Add(new Regex("^#[f|t]"), TokenType.BoolLiteral);
-			matchTokenTypes.Add(new Regex("#\\\\.*"), TokenType.CharLiteral);
-			matchTokenTypes.Add(new Regex("^[-+]?[0-9]+$"), TokenType.IntegerLiteral);
-			matchTokenTypes.Add(new Regex("^([0-9]*)?(\\.[0-9]+)$"), TokenType.DecimalLiteral);
-			matchTokenTypes.Add(new Regex("[#]"), TokenType.VectorLiteral);
-			matchTokenTypes.Add(new Regex("[']"), TokenType.Quote);
-			matchTokenTypes.Add(new Regex("[`]"), TokenType.BackQuote);
-			matchTokenTypes.Add(new Regex(",@"), TokenType.AtComma);
-			matchTokenTypes.Add(new Regex("[,]"), TokenType.Comma);
-			matchTokenTypes.Add(new Regex("[^\"\',()]+"), TokenType.Symbol);
-			matchTokenTypes.Add(new Regex("[(]"), TokenType.OpenParen);
-			matchTokenTypes.Add(new Regex("[)]"), TokenType.CloseParen);
-
-			foreach (string token in stringTokens)
+			KeyValuePair<Token, int> currentToken;
+			while ((currentToken = GetNextToken(chars, currentPosition)).Key != null)
 			{
-				string working = token;
-				bool goodToken = false;
-				working = BreakSugaredQuotes(working, tokens);
+				currentPosition = currentToken.Value;
+				tokenList.Add(currentToken.Key);
+			}
 
-				if (working.Contains("###STRING_LITERAL_"))
+			return tokenList;
+		}
+
+		private KeyValuePair<Token, int> GetNextToken(char[] input, int position)
+		{
+			int i = position;
+
+			// Skip whitespace
+			while (i < input.Length && Whitespace(input[i])) i++;
+
+			// Skip comments and whitespace again, since we can have whitespace after comments etc.
+			if (i < input.Length)
+			{
+				while (input[i] == ';')
 				{
-					tokens.Add(new Token(TokenType.StringLiteral, this.literals[working]));
-					goodToken = true;
+					while (i < input.Length && !Newline(input[i])) i++;
+					i++;
+					while (i < input.Length && Whitespace(input[i])) i++;
+				}
+			}
+
+			// get the next token
+			if (i < input.Length)
+			{
+				if (input[i] == '#')
+				{
+					return VectorOrBooleanOrChar(input, i);
+				}
+				else if (input[i] == '"')
+				{
+					return StringLiteral(input, i);
+				}
+				else if (((input[i] == '-' || input[i] == '+') && NumericalPart(input[i + 1])) || Numerical(input[i]))
+				{
+					// only a number literal if the starting char is numerical, or if the starting char is a - or +
+					// AND the next char is part of a number.
+					return NumberLiteral(input, i);
+				}
+				else if (input[i] == '\'' || input[i] == '`' || input[i] == ',')
+				{
+					return QuoteSugar(input, i);
+				}
+				else if (input[i] == '(')
+				{
+					return new KeyValuePair<Token, int>(new Token(TokenType.OpenParen, new String(input, i, 1)), i + 1);
+				}
+				else if (input[i] == ')')
+				{
+					return new KeyValuePair<Token, int>(new Token(TokenType.CloseParen, new String(input, i, 1)), i + 1);
 				}
 				else
 				{
-					foreach (KeyValuePair<Regex, TokenType> kvp in matchTokenTypes)
-					{
-						Match m = kvp.Key.Match(working);
-						if (m.Success)
-						{
-							tokens.Add(new Token(kvp.Value, working));
-							goodToken = true;
-							break;
-						}
-					}
-				}
-
-				if (!goodToken)
-				{
-					Console.WriteLine(string.Format("Error: Bad Token \"{0}\"", working));
+					return Symbol(input, i);
 				}
 			}
+			else
+			{
+				// no more characters, return an empty KVP
+				return new KeyValuePair<Token,int>(null, 0);
+			}
+		}
 
-			return tokens;
+		// retrieve a string literal token and advance our position
+		private KeyValuePair<Token, int> StringLiteral(char[] input, int position)
+		{
+			position++;
+			TokenType type = TokenType.StringLiteral;
+			Token currentToken;
+			StringBuilder sb = new StringBuilder();
+			int newPosition = position;
+			bool matchingQuotes = false;
+			while (newPosition < input.Length)
+			{
+				// if we get an escape, increment the position some more and map the escaped character to what it should be
+				if (input[newPosition] == '\\')
+				{
+					newPosition++;
+					sb.Append(MapEscaped(input[newPosition]));
+					newPosition++;
+					continue;
+				}
+
+				// unescaped quote? We're done with this string.
+				if (input[newPosition] == '"')
+				{
+					newPosition++;
+					matchingQuotes = true;
+					break;
+				}
+
+				sb.Append(input[newPosition]);
+				newPosition++;
+			}
+
+			// we didn't get opening and closing quotes :(
+			if (!matchingQuotes)
+			{
+				throw new Exception("Tokenizing error: Unmatched quotes in string literal");
+			}
+
+			currentToken = new Token(type, sb.ToString());
+			return new KeyValuePair<Token, int>(currentToken, newPosition);
+		}
+
+		// retrieve a symbol token and advance our position
+		private KeyValuePair<Token, int> Symbol(char[] input, int position)
+		{
+			TokenType type = TokenType.Symbol;
+			Token currentToken;
+
+			int newPosition = position;
+			// as long as we don't hit whitespace or something that a symbol shouldn't have, assume it's a symbol
+			while (newPosition < input.Length && !Whitespace(input[newPosition]) && SymbolPart(input[newPosition]))
+			{
+				newPosition++;
+			}
+
+			currentToken = new Token(type, new String(input, position, newPosition - position));
+			return new KeyValuePair<Token, int>(currentToken, newPosition);
+		}
+
+		// retrieve a quoted sugar token (' ` , ,@) and advance our position
+		private KeyValuePair<Token, int> QuoteSugar(char[] input, int position)
+		{
+			TokenType type;
+			Token currentToken;
+
+			switch (input[position])
+			{
+				case '\'':
+					type = TokenType.Quote;
+					break;
+				case '`':
+					type = TokenType.BackQuote;
+					break;
+				case ',':
+					type = TokenType.Comma;
+					break;
+				default:
+					throw new Exception("Parse error!");
+			}
+
+			if ((position + 1) < input.Length && input[position + 1] == '@')
+			{
+				type = TokenType.AtComma;
+				currentToken = new Token(type, new String(input, position, 2));
+				return new KeyValuePair<Token, int>(currentToken, position + 2);
+			}
+			else
+			{
+				currentToken = new Token(type, new String(input, position, 1));
+				return new KeyValuePair<Token, int>(currentToken, position + 1);
+			}
+		}
+
+		// retrieve a number literal token (int or decimal) and advance our position
+		private KeyValuePair<Token, int> NumberLiteral(char[] input, int position)
+		{
+			TokenType type = TokenType.IntegerLiteral;
+			Token currentToken;
+
+			int newPosition = position;
+			while (newPosition < input.Length && !Whitespace(input[newPosition]) && NumericalPart(input[newPosition]))
+			{
+				// if we get a decimal we're no longer working with an integer 
+				if (input[newPosition] == '.')
+					type = TokenType.DecimalLiteral;
+
+				newPosition++;
+			}
+
+			currentToken = new Token(type, new String(input, position, newPosition - position));
+			return new KeyValuePair<Token, int>(currentToken, newPosition);
+		}
+
+		// retrieve a vector literal marker, boolean token, or character literal token and advance our position
+		private KeyValuePair<Token, int> VectorOrBooleanOrChar(char[] input, int position)
+		{
+			List<char> boolLiterals = new List<char> { 'F', 'f', 't', 'T' };
+			Token currentToken;
+			if (boolLiterals.Contains(input[position + 1]))
+			{
+				// boolean literal!
+				currentToken = new Token(TokenType.BoolLiteral, new String(input, position, 2));
+				return new KeyValuePair<Token, int>(currentToken, position + 2);
+			}
+			else if (input[position + 1] == '(')
+			{
+				// vector literal!
+				currentToken = new Token(TokenType.VectorLiteral, new String(input, position, 1));
+				return new KeyValuePair<Token, int>(currentToken, position + 1);
+			}
+			else if (input[position + 1] == '\\')
+			{
+				// char literal!
+				StringBuilder sb = new StringBuilder();
+				int newPosition = position;
+				while (newPosition < input.Length && !Whitespace(input[newPosition]) && SymbolPart(input[newPosition]))
+				{
+					sb.Append(input[newPosition]);
+					newPosition++;
+				}
+				currentToken = new Token(TokenType.CharLiteral, new String(input, position, newPosition - position));
+				return new KeyValuePair<Token, int>(currentToken, newPosition);
+			}
+			else
+			{
+				throw new Exception("Tokenizing error: Inside '#' but no matching characters to construct a token");
+			}
+		}
+
+		private bool Numerical(char candidate)
+		{
+			return Char.IsNumber(candidate);
+		}
+
+		private bool NumericalPart(char candidate)
+		{
+			char[] signs = { '-', '+' };
+			return candidate == '.' || Numerical(candidate) || signs.Contains(candidate);
+		}
+
+		private bool SymbolPart(char candidate)
+		{
+			char[] notAllowed = { '(', ')', '"', '\'', ',', '`' };
+			return !notAllowed.Contains(candidate);
+		}
+
+		private bool Newline(char candidate)
+		{
+			return candidate == '\r' || candidate == '\n';
+		}
+
+		private bool Whitespace(char candidate)
+		{
+			if (Newline(candidate))
+			{
+				return true;
+			}
+
+			switch (candidate)
+			{
+				case '\t':
+					return true;
+				case ' ':
+					return true;
+			}
+
+			return false;
+		}
+
+		private char MapEscaped(char escaped)
+		{
+			switch (escaped)
+			{
+				case 't':
+					return '\t';
+				case 'n':
+					return '\n';
+				case 'r':
+					return '\r';
+			}
+
+			return escaped;
 		}
 	}
 }
