@@ -1,5 +1,5 @@
-/* 
- * Copyright (c) 2011 Alex Fort 
+/*
+ * Copyright (c) 2011 Alex Fort
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,34 +30,43 @@ namespace Schemin.AST
 	using System.Text;
 	using System.Collections;
 	using System.Collections.Generic;
+
 	public class ScheminPair : IScheminType, IEnumerable<IScheminType>
 	{
-		public IScheminType Head = null;
-		public IScheminType Rest = null;
+		public IScheminType Car = null;
+		public IScheminType Cdr = null;
 		private bool quoted = true;
+
 		public static bool QuoteLists = true;
-		public int Length
-		{
-			get
-			{
-				int count = 0;
-				foreach (IScheminType type in this)
+
+		public int Length {
+			get {
+				if (this.Proper)
 				{
-					count++;
+					int count = 0;
+					foreach (IScheminType type in this)
+						count++;
+
+					return count;
 				}
 
-				return count;
+				return 2;
 			}
 		}
 
-		public bool Empty
-		{
-			get
-			{
-				if (this.Head == null && this.Rest == null)
-				{
+		public bool Empty {
+			get {
+				if (this.Car == null && this.Cdr == null)
 					return true;
-				}
+
+				return false;
+			}
+		}
+
+		public bool Proper {
+			get {
+				if (this.Cdr == null || (this.Cdr as ScheminPair) != null)
+					return true;
 
 				return false;
 			}
@@ -66,9 +75,7 @@ namespace Schemin.AST
 		public ScheminPair()
 		{
 			if (!QuoteLists)
-			{
 				this.quoted = false;
-			}
 		}
 
 		public ScheminPair(bool quoted)
@@ -76,35 +83,21 @@ namespace Schemin.AST
 			this.quoted = quoted;
 		}
 
-		public ScheminPair(IScheminType head)
+		public ScheminPair(IScheminType car)
 		{
 			if (!QuoteLists)
-			{
 				this.quoted = false;
-			}
 
-			this.Head = head;
+			this.Car = car;
 		}
 
-		public ScheminPair(IScheminType head, IScheminType rest)
+		public ScheminPair(IScheminType car, IScheminType cdr)
 		{
 			if (!QuoteLists)
-			{
 				this.quoted = false;
-			}
 
-			this.Head = head;
-			this.Rest = rest;
-		}
-
-		public IScheminType Car()
-		{
-			return this.Head;
-		}
-
-		public IScheminType Cdr()
-		{
-			return this.Rest;
+			this.Car = car;
+			this.Cdr = cdr;
 		}
 
 		public IScheminType ElementAt(int position)
@@ -121,79 +114,75 @@ namespace Schemin.AST
 			throw new Exception("No element in list: " + this.ToString() + " at position: " + position.ToString());
 		}
 
+		public ScheminPair ListCdr()
+		{
+			if (this.Proper)
+			{
+				ScheminPair ret = (ScheminPair) this.Cdr;
+
+				if (ret != null)
+					ret.quoted = this.quoted;
+				else
+					return new ScheminPair();
+
+				return ret;
+			}
+
+			throw new Exception("Can't get the list-cdr of an improper list");
+		}
+
 		public ScheminPair Cons(IScheminType type)
 		{
-			IScheminType oldHead = this.Head;
-			if (oldHead != null)
+			if (this.Proper)
 			{
-				this.Head = type;
-				this.Rest = new ScheminPair(oldHead, this.Rest);
+				ScheminPair ret = new ScheminPair(type, this);
+				ret.quoted = quoted;
+				return ret;
 			}
 			else
 			{
-				this.Head = type;
+				throw new Exception("Can't cons to an improper list");
 			}
-
-			return this;
 		}
 
 		public ScheminPair Append(IScheminType type)
 		{
-			if (this.Head == null)
+			if (this.Proper)
 			{
-				this.Cons(type);
-				return this;
-			}
-
-			if (this.Rest == null)
-			{
-				this.Rest = new ScheminPair(type);
-				return this;
-			}
-
-			IScheminType rest = this.Rest;
-			if ((rest as ScheminPair) != null)
-			{
-				ScheminPair temp = (ScheminPair) rest;
-				while (temp.Rest != null)
+				if (this.Car == null)
 				{
-					if ((temp.Rest as ScheminPair) != null)
-					{
-						temp = (ScheminPair)temp.Rest;
-					}
-					else
-					{
-						throw new Exception("Can't append to the non-list: " + rest);
-					}
+					ScheminPair ret = new ScheminPair(type);
+					ret.quoted = quoted;
+					return ret;
 				}
 
-				if (temp.Head == null)
+				if (this.Cdr == null)
 				{
-					temp.Head = type;
-					return this;
+					ScheminPair ret = new ScheminPair(this.Car, new ScheminPair(type));
+					ret.quoted = quoted;
+					return ret;
 				}
-				else
+
+				ScheminPair appended = new ScheminPair();
+				appended.quoted = quoted;
+
+				foreach (IScheminType e in this)
 				{
-					ScheminPair newRest;
-					if (temp.Rest != null)
-					{
-						newRest = new ScheminPair(type);
-						newRest.Rest = temp.Rest;
-					}
-					else
-					{
-						newRest = new ScheminPair(type);
-					}
-
-					newRest.quoted = quoted;
-					temp.Rest = newRest;
-
-					return this;
+					appended = appended.Append(e);
 				}
+
+				ScheminPair rest = appended;
+				while (rest.Cdr != null)
+				{
+					rest = (ScheminPair) rest.Cdr;
+				}
+
+				rest.Cdr = new ScheminPair(type);
+				return appended;
 			}
 			else
 			{
-				throw new Exception("Can't append to the non-list: " + rest);
+				throw new Exception("Can't append to an improper list");
 			}
 		}
 
@@ -204,61 +193,63 @@ namespace Schemin.AST
 
 		public IEnumerator<IScheminType> GetEnumerator ()
 		{
-			if (Car() != null)
-				yield return Car();
-
-			if ((Cdr() as ScheminPair) != null)
+			if (this.Proper)
 			{
-				IScheminType pair = Cdr();
+				if (!this.Empty)
+					yield return Car;
 
-				while ((pair as ScheminPair) != null)
+				var c = (ScheminPair) Cdr;
+				while (c != null)
 				{
-					yield return ((ScheminPair)pair).Car();
-					pair = ((ScheminPair) pair).Cdr();
+					yield return c.Car;
+					c = (ScheminPair) c.Cdr;
 				}
-
-				if (pair != null)
-					yield return pair;
 			}
 			else
 			{
-				if (Cdr() != null)
-					yield return Cdr();
+				throw new Exception("Can't enumerate an improper list");
 			}
 		}
 
 		public override string ToString()
 		{
-			return "(" + ToStringInternal(this) + ")";
+			if (this.Proper)
+			{
+				return ToStringList(this);
+			}
+			else
+			{
+				return "(" + this.Car + " . " + this.Cdr + ")";
+			}
 		}
 
-		public string ToStringInternal(ScheminPair list)
+		public string ToStringList(ScheminPair list)
 		{
 			StringBuilder builder = new StringBuilder();
+
 			if (list.Empty)
 			{
 				return "()";
 			}
 			else
 			{
-				bool dotted = false;
-				if ((list.Rest as ScheminPair) == null && list.Length > 1)
-					dotted = true;
+				builder.Append("(");
+				int index = 0;
+				foreach (var type in list)
+				{
+					if (index < list.Length - 1)
+					{
+						builder.Append(type.ToString() + " ");
+					}
+					else
+					{
+						builder.Append(type.ToString());
+					}
 
-				if (dotted)
-				{
-					builder.Append(list.Head);
-					if (list.Rest != null)
-						builder.Append(" . " + list.Rest);
+					index++;
 				}
-				else
-				{
-					builder.Append(list.Head);
-					if (list.Rest != null)
-						builder.Append(" ");
-					if ((list.Rest as ScheminPair) != null)
-						builder.Append(((ScheminPair) list.Rest).ToStringInternal((ScheminPair) list.Rest));
-				}
+
+				builder.Append(")");
 			}
 
 			return builder.ToString();
@@ -284,9 +275,7 @@ namespace Schemin.AST
 			if ((type as ScheminPair) != null)
 			{
 				if (type == this)
-				{
 					return true;
-				}
 			}
 			return false;
 		}

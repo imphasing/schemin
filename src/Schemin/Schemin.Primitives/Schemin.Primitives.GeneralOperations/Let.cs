@@ -29,48 +29,49 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Let : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 				bool isNamed = false;
-				if ((args.Car() as ScheminAtom) != null)
+				if ((args.Car as ScheminAtom) != null)
 				{
 					isNamed = true;
 				}
 
-				ScheminList bindings;
-				ScheminList expression;
+				ScheminPair bindings;
+				ScheminPair expression;
 
 				if (!isNamed)
 				{
-					expression = args.Cdr();
-					bindings = (ScheminList) args.Car();
+					expression = args.ListCdr();
+					bindings = (ScheminPair) args.Car;
 				}
 				else
 				{
-					expression = args.Cdr().Cdr();
-					bindings = (ScheminList) args.Cdr().Car();
+					expression = args.ListCdr().ListCdr();
+					bindings = (ScheminPair) args.ElementAt(1);
 				}
 
-				ScheminList letArgs = new ScheminList();
-				ScheminList argExps = new ScheminList();
+				ScheminPair letArgs = new ScheminPair();
+				ScheminPair argExps = new ScheminPair();
 
 				letArgs.UnQuote();
 				argExps.UnQuote();
 
-				foreach (ScheminList bindingPair in bindings)
+				foreach (ScheminPair bindingPair in bindings)
 				{
-					letArgs.Append(bindingPair.Car());
-					argExps.Append(bindingPair.Cdr().Car());
+					letArgs = letArgs.Append(bindingPair.Car);
+					argExps = argExps.Append(bindingPair.ElementAt(1));
 				}
 
-				ScheminList lambdaDef = new ScheminList(letArgs);
+				ScheminPair lambdaDef = new ScheminPair(letArgs);
 				lambdaDef.UnQuote();
 
 				foreach (IScheminType type in expression)
 				{
-					lambdaDef.Append(type);
+					lambdaDef = lambdaDef.Append(type);
 				}
 
 				Environment closure = env;
@@ -84,26 +85,26 @@ namespace Schemin.Primitives.GeneralOperations
 
 				if (isNamed)
 				{
-					ScheminAtom name = (ScheminAtom) args.Car();
+					ScheminAtom name = (ScheminAtom) args.Car;
 					closure.AddBinding(name, lam);
 				}
 
-				ScheminList toEvaluate = new ScheminList(lam);
+				ScheminPair toEvaluate = new ScheminPair(lam);
 				toEvaluate.UnQuote();
 
 				foreach (IScheminType arg in argExps)
 				{
-					toEvaluate.Append(arg);
+					toEvaluate  = toEvaluate.Append(arg);
 				}
 
 				return toEvaluate;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
-			if ((first as ScheminList) == null)
+			if ((first as ScheminPair) == null)
 			{
 				if ((first as ScheminAtom) == null)
 				{

@@ -43,14 +43,14 @@ namespace ScheminTests.PrimitiveTests
 			ScheminDecimal test_decimal = new ScheminDecimal(1.5m);
 			ScheminInteger test_integer = new ScheminInteger(2);
 
-			ScheminList decimal_args = new ScheminList(test_decimal);
-			decimal_args.Append(test_decimal);
+			ScheminPair decimal_args = new ScheminPair(test_decimal);
+			decimal_args = decimal_args.Append(test_decimal);
 
-			ScheminList int_args = new ScheminList(test_integer);
-			int_args.Append(test_integer);
+			ScheminPair int_args = new ScheminPair(test_integer);
+			int_args = int_args.Append(test_integer);
 
-			ScheminList mixed_args = new ScheminList(test_integer);
-			mixed_args.Append(test_decimal);
+			ScheminPair mixed_args = new ScheminPair(test_integer);
+			mixed_args = mixed_args.Append(test_decimal);
 
 			ScheminDecimal decimal_result = (ScheminDecimal) prim.Execute(null, null, decimal_args);
 			ScheminInteger int_result = (ScheminInteger) prim.Execute(null, null, int_args);
@@ -72,14 +72,14 @@ namespace ScheminTests.PrimitiveTests
 			ScheminInteger test_divisor_int = new ScheminInteger(2);
 			ScheminDecimal test_divisor_decimal = new ScheminDecimal(2);
 
-			ScheminList decimal_args = new ScheminList(test_decimal);
-			decimal_args.Append(test_divisor_decimal);
+			ScheminPair decimal_args = new ScheminPair(test_decimal);
+			decimal_args = decimal_args.Append(test_divisor_decimal);
 
-			ScheminList int_args = new ScheminList(test_integer);
-			int_args.Append(test_divisor_int);
+			ScheminPair int_args = new ScheminPair(test_integer);
+			int_args = int_args.Append(test_divisor_int);
 
-			ScheminList mixed_args = new ScheminList(test_integer);
-			mixed_args.Append(test_divisor_decimal);
+			ScheminPair mixed_args = new ScheminPair(test_integer);
+			mixed_args = mixed_args.Append(test_divisor_decimal);
 
 			ScheminDecimal decimal_result = (ScheminDecimal) prim.Execute(null, null, decimal_args);
 			ScheminInteger int_result = (ScheminInteger) prim.Execute(null, null, int_args);
@@ -101,14 +101,14 @@ namespace ScheminTests.PrimitiveTests
 			ScheminInteger test_mod_int = new ScheminInteger(1);
 			ScheminDecimal test_mod_decimal = new ScheminDecimal(0.8m);
 
-			ScheminList decimal_args = new ScheminList(test_decimal);
-			decimal_args.Append(test_mod_decimal);
+			ScheminPair decimal_args = new ScheminPair(test_decimal);
+			decimal_args = decimal_args.Append(test_mod_decimal);
 
-			ScheminList int_args = new ScheminList(test_integer);
-			int_args.Append(test_mod_int);
+			ScheminPair int_args = new ScheminPair(test_integer);
+			int_args = int_args.Append(test_mod_int);
 
-			ScheminList mixed_args = new ScheminList(test_integer);
-			mixed_args.Append(test_mod_decimal);
+			ScheminPair mixed_args = new ScheminPair(test_integer);
+			mixed_args = mixed_args.Append(test_mod_decimal);
 
 			ScheminDecimal decimal_result = (ScheminDecimal) prim.Execute(null, null, decimal_args);
 			ScheminInteger int_result = (ScheminInteger) prim.Execute(null, null, int_args);
@@ -133,17 +133,17 @@ namespace ScheminTests.PrimitiveTests
 			ScheminInteger test_large_2nd = new ScheminInteger(BigInteger.Parse("400000000000000000000"));
 
 
-			ScheminList decimal_args = new ScheminList(test_decimal);
+			ScheminPair decimal_args = new ScheminPair(test_decimal);
 			decimal_args.Append(test_mult_decimal);
 
-			ScheminList int_args = new ScheminList(test_integer);
-			int_args.Append(test_mult_int);
+			ScheminPair int_args = new ScheminPair(test_integer);
+			int_args = int_args.Append(test_mult_int);
 
-			ScheminList mixed_args = new ScheminList(test_integer);
-			mixed_args.Append(test_mult_decimal);
+			ScheminPair mixed_args = new ScheminPair(test_integer);
+			mixed_args = mixed_args.Append(test_mult_decimal);
 
-			ScheminList large_args = new ScheminList(test_large);
-			large_args.Append(test_large_2nd);
+			ScheminPair large_args = new ScheminPair(test_large);
+			large_args = large_args.Append(test_large_2nd);
 
 			ScheminDecimal decimal_result = (ScheminDecimal) prim.Execute(null, null, decimal_args);
 			ScheminInteger int_result = (ScheminInteger) prim.Execute(null, null, int_args);
@@ -168,14 +168,14 @@ namespace ScheminTests.PrimitiveTests
 			ScheminDecimal test_decimal_2 = new ScheminDecimal(4.1m);
 			ScheminInteger test_integer_2 = new ScheminInteger(6);
 
-			ScheminList decimal_args = new ScheminList(test_decimal);
-			decimal_args.Append(test_decimal_2);
+			ScheminPair decimal_args = new ScheminPair(test_decimal);
+			decimal_args = decimal_args.Append(test_decimal_2);
 
-			ScheminList int_args = new ScheminList(test_integer);
-			int_args.Append(test_integer_2);
+			ScheminPair int_args = new ScheminPair(test_integer);
+			int_args = int_args.Append(test_integer_2);
 
-			ScheminList mixed_args = new ScheminList(test_integer);
-			mixed_args.Append(test_decimal);
+			ScheminPair mixed_args = new ScheminPair(test_integer);
+			mixed_args = mixed_args.Append(test_decimal);
 
 			ScheminDecimal decimal_result = (ScheminDecimal) prim.Execute(null, null, decimal_args);
 			ScheminInteger int_result = (ScheminInteger) prim.Execute(null, null, int_args);

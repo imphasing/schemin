@@ -29,15 +29,16 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Lambda : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminLambda lam = new ScheminLambda(args, env);
 			return lam;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length < 2) 
 			{

@@ -29,12 +29,13 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class DefineRewriter : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminAtom symbol = (ScheminAtom) args.Car();
-			ScheminLambda definition = (ScheminLambda) args.Cdr().Car();
+			ScheminAtom symbol = (ScheminAtom) args.Car;
+			ScheminLambda definition = (ScheminLambda) args.ElementAt(1);
 
 			ScheminRewriter rewriter = new ScheminRewriter(definition);
 
@@ -48,12 +49,12 @@ namespace Schemin.Primitives.GeneralOperations
 				env.AddBinding(symbol, rewriter);
 			}
 
-			return new ScheminList(false);
+			return new ScheminPair();
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 2)
 			{

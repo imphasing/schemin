@@ -39,17 +39,17 @@ namespace Schemin.AST
 		public IScheminType Arguments;
 		public Environment Closure;
 
-		public ScheminLambda(ScheminList definition, Environment closure)
+		public ScheminLambda(ScheminPair definition, Environment closure)
 		{
-			this.Arguments = definition.Car();
+			this.Arguments = definition.Car;
 
-			if (definition.Cdr().Length == 1)
+			if (definition.ListCdr().Length == 1)
 			{
-				this.Definition = definition.Cdr().Car();
+				this.Definition = definition.ElementAt(1);
 			}
 			else
 			{
-				ScheminList def = definition.Cdr();
+				ScheminPair def = definition.ListCdr();
 				def.Cons(new ScheminPrimitive("begin"));
 				this.Definition = def;
 			}
@@ -57,45 +57,41 @@ namespace Schemin.AST
 			this.Closure = closure;
 		}
 
-		public Environment MakeEnvironment(ScheminList values, Evaluator eval)
+		public Environment MakeEnvironment(ScheminPair values, Evaluator eval)
 		{
-			if ((this.Arguments as ScheminList) != null)
+			if ((this.Arguments as ScheminPair) != null)
 			{
-				ScheminList argslist = (ScheminList) this.Arguments;
-				IScheminType first = argslist.Car();
-				ScheminList rest = argslist.Cdr();
-				IScheminType firstArg = values.Car();
-				ScheminList restArgs = values.Cdr();
+				ScheminPair argslist = (ScheminPair) this.Arguments;
+				IScheminType first = argslist.Car;
+				ScheminPair rest = argslist.ListCdr();
+				IScheminType firstArg = values.Car;
+				ScheminPair restArgs = values.ListCdr();
 
 				Environment args = new Environment();
 				args.parent = this.Closure;
 
 				for (; ;)
 				{
-					if (first.GetType() == typeof(ScheminList))
+					if (first == null || rest == null)
 					{
-						ScheminList tempFirst = (ScheminList) first;
-						if (tempFirst.Empty)
-						{
-							break;
-						}
+						break;
 					}
 
 					ScheminAtom atom = (ScheminAtom) first;
 					if (atom.Name == ".")
 					{
-						restArgs.Cons(firstArg);
+						restArgs = restArgs.Cons(firstArg);
 						restArgs.Quote();
-						args.AddBinding((ScheminAtom) rest.Car(), restArgs);
+						args.AddBinding((ScheminAtom) rest.Car, restArgs);
 						break;
 					}
 
 					args.AddBinding((ScheminAtom) first, firstArg);
 
-					first = rest.Car();
-					firstArg = restArgs.Car();
-					rest = rest.Cdr();
-					restArgs = restArgs.Cdr();
+					first = rest.Car;
+					firstArg = restArgs.Car;
+					rest = rest.ListCdr();
+					restArgs = restArgs.ListCdr();
 				}
 
 				return args;

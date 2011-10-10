@@ -40,7 +40,7 @@ namespace ScheminTests.PrimitiveTests
 		{
 			var prim = PrimitiveFactory.Get("string-length");
 			ScheminString test = new ScheminString("test");
-			ScheminInteger result = (ScheminInteger) prim.Execute(null, null, new ScheminList(test));
+			ScheminInteger result = (ScheminInteger) prim.Execute(null, null, new ScheminPair(test));
 			ScheminInteger expected = new ScheminInteger(4);
 
 			Assert.AreEqual(result.IntegerValue(), expected.IntegerValue());
@@ -52,8 +52,8 @@ namespace ScheminTests.PrimitiveTests
 			var prim = PrimitiveFactory.Get("string-ref");
 			ScheminString test = new ScheminString("test");
 
-			ScheminList args = new ScheminList(test);
-			args.Append(new ScheminInteger(0));
+			ScheminPair args = new ScheminPair(test);
+			args = args.Append(new ScheminInteger(0));
 
 			ScheminChar result = (ScheminChar) prim.Execute(null, null, args);
 			char expected = 't';

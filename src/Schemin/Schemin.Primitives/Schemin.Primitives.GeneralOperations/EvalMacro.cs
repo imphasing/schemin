@@ -29,24 +29,25 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class EvalMacro : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType rewritten = args.Car();
+			IScheminType rewritten = args.Car;
 			UnquoteAllRecursive(rewritten);
 			return rewritten;
 		}
 
 		private void UnquoteAllRecursive(IScheminType values)
 		{
-			if ((values as ScheminList) != null)
+			if ((values as ScheminPair) != null)
 			{
-				foreach (IScheminType type in (ScheminList) values)
+				foreach (IScheminType type in (ScheminPair) values)
 				{
-					if ((type as ScheminList) != null)
+					if ((type as ScheminPair) != null)
 					{
-						UnquoteAllRecursive((ScheminList) type);
+						UnquoteAllRecursive((ScheminPair) type);
 					}
 
 					type.UnQuote();
@@ -56,7 +57,7 @@ namespace Schemin.Primitives.GeneralOperations
 			values.UnQuote();
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length != 1)
 			{

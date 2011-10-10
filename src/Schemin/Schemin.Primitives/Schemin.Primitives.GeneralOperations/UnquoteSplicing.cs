@@ -31,28 +31,28 @@ namespace Schemin.Primitives.GeneralOperations
 	using Schemin.AST;
 	public class UnquoteSplicing : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList arg = (ScheminList) args.Car();
+			ScheminPair arg = (ScheminPair) args.Car;
 			if (arg.Empty)
 			{
-				return new ScheminList(false);
+				return new ScheminPair();
 			}
 
 			arg.UnQuote();
 			return arg;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{
 				throw new BadArgumentsException("expected 1 or 0 arguments");
 			}
 
-			if ((first as ScheminList) == null)
+			if ((first as ScheminPair) == null)
 			{
 				throw new BadArgumentsException("first argument must be a list");
 			}

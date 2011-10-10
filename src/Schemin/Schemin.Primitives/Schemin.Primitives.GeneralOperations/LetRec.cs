@@ -29,64 +29,65 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class LetRec : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList bindings = (ScheminList) args.Car();
-			IScheminType expression = args.Cdr().Car();
+			ScheminPair bindings = (ScheminPair) args.Car;
+			IScheminType expression = args.ElementAt(1);
 
-			ScheminList letArgs = new ScheminList();
-			ScheminList argExps = new ScheminList();
+			ScheminPair letArgs = new ScheminPair();
+			ScheminPair argExps = new ScheminPair();
 
 			letArgs.UnQuote();
 			argExps.UnQuote();
 
-			foreach (ScheminList bindingPair in bindings)
+			foreach (ScheminPair bindingPair in bindings)
 			{
-				letArgs.Append(bindingPair.Car());
-				argExps.Append(bindingPair.Cdr().Car());
+				letArgs = letArgs.Append(bindingPair.Car);
+				argExps = argExps.Append(bindingPair.ElementAt(1));
 			}
 
-			ScheminList body = new ScheminList();
+			ScheminPair body = new ScheminPair();
 			body.UnQuote();
 
-			ScheminList next = letArgs;
-			ScheminList nextExp = argExps;
+			ScheminPair next = letArgs;
+			ScheminPair nextExp = argExps;
 			while (next != null)
 			{
-				IScheminType symbol = next.Head;
-				IScheminType exp = nextExp.Head;
+				IScheminType symbol = next.Car;
+				IScheminType exp = nextExp.Car;
 
-				ScheminList setExp = new ScheminList(new ScheminPrimitive("set!"));
+				ScheminPair setExp = new ScheminPair(new ScheminPrimitive("set!"));
 				setExp.UnQuote();
-				setExp.Append(symbol);
-				setExp.Append(exp);
-				body.Append(setExp);
+				setExp = setExp.Append(symbol);
+				setExp = setExp.Append(exp);
+				body = body.Append(setExp);
 
-				next = next.Rest;
-				nextExp = nextExp.Rest;
+				next = next.ListCdr();
+				nextExp = nextExp.ListCdr();
 			}
 
-			body.Append(expression);
+			body = body.Append(expression);
 
-			ScheminList lambdaDef = new ScheminList(letArgs);
+			ScheminPair lambdaDef = new ScheminPair(letArgs);
 			lambdaDef.UnQuote();
 
 			foreach (IScheminType type in body)
 			{
-				lambdaDef.Append(type);
+				lambdaDef = lambdaDef.Append(type);
 			}
 
 			Environment closure = env;
 			ScheminLambda lam = new ScheminLambda(lambdaDef, closure);
 
-			ScheminList toEvaluate = new ScheminList(lam);
+			ScheminPair toEvaluate = new ScheminPair(lam);
 			toEvaluate.UnQuote();
 
 			foreach (IScheminType arg in argExps)
 			{
-				toEvaluate.Append(new ScheminList(true));
+				toEvaluate = toEvaluate.Append(new ScheminPair(true));
 			}
 
 			return toEvaluate;

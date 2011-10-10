@@ -30,45 +30,46 @@ namespace Schemin.Primitives.GeneralOperations
 	using System.Linq;
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Apply : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType function = args.Car();
-			ScheminList argList = args.Cdr();
-			ScheminList toApply = (ScheminList) args.Cdr().Last();
+			IScheminType function = args.Car;
+			ScheminPair argList = args.ListCdr();
+			ScheminPair toApply = (ScheminPair) args.ListCdr().Last();
 
-			ScheminList list = new ScheminList();
+			ScheminPair list = new ScheminPair();
 			list.UnQuote();
 
 			foreach (IScheminType type in toApply)
 			{
-				list.Append(type);
+				list = list.Append(type);
 			}
 
 			foreach (IScheminType type in argList)
 			{
 				if (type != toApply)
-					list.Cons(type);
+					list = list.Cons(type);
 			}
 
-			list.Cons(function);
+			list = list.Cons(function);
 
 			return list;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
-			IScheminType last = args.Cdr().Last();
+			IScheminType first = args.Car;
+			IScheminType last = args.ListCdr().Last();
 
 			if ((first as ScheminPrimitive) == null && (first as ScheminLambda) == null 
-			&& (first as ScheminContinuation) == null && (first as ScheminRewriter) == null)
+					&& (first as ScheminContinuation) == null && (first as ScheminRewriter) == null)
 			{
 				throw new BadArgumentsException("first argument must be a procedure");
 			}
 
-			if ((last as ScheminList) == null)
+			if ((last as ScheminPair) == null)
 			{
 				throw new BadArgumentsException("last argument must be a list");
 			}

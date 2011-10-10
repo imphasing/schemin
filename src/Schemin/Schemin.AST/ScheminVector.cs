@@ -45,14 +45,14 @@ namespace Schemin.AST
 			this.List = new List<IScheminType>();
 		}
 
-		public ScheminList ToList()
+		public ScheminPair ToList()
 		{
-			ScheminList list = new ScheminList();
+			ScheminPair list = new ScheminPair();
 			list.Quote();
 
 			foreach (IScheminType type in List)
 			{
-				list.Append(type);
+				list = list.Append(type);
 			}
 
 			return list;

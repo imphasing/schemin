@@ -29,12 +29,13 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class SetBang : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminAtom symbol = (ScheminAtom) args.Car();
-			IScheminType definition = args.Cdr().Car();
+			ScheminAtom symbol = (ScheminAtom) args.Car;
+			IScheminType definition = args.ElementAt(1);
 
 			Environment parent = env;
 			while (parent != null)
@@ -47,7 +48,7 @@ namespace Schemin.Primitives.GeneralOperations
 
 					parent.RemoveBinding(symbol);
 					parent.AddBinding(symbol, definition);
-					return new ScheminList(false);
+					return new ScheminPair();
 				}
 
 				parent = parent.parent;
@@ -56,9 +57,9 @@ namespace Schemin.Primitives.GeneralOperations
 			throw new UnboundAtomException(string.Format("Unbound atom: {0}", symbol));
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 2)
 			{
@@ -68,7 +69,7 @@ namespace Schemin.Primitives.GeneralOperations
 			if ((first as ScheminAtom) == null)
 			{
 				throw new BadArgumentsException("first argument must be a symbol");
-			}		
+			}
 
 			return;
 		}

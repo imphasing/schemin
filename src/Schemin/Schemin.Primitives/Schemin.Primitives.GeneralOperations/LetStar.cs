@@ -29,34 +29,35 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class LetStar : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList bindings = (ScheminList) args.Car();
-			IScheminType expression = args.Cdr().Car();
+			ScheminPair bindings = (ScheminPair) args.Car;
+			IScheminType expression = args.ElementAt(1);
 
-			ScheminList first = new ScheminList();
+			ScheminPair first = new ScheminPair();
 			first.UnQuote();
-			ScheminList firstBinding = new ScheminList(bindings.Car());
+			ScheminPair firstBinding = new ScheminPair(bindings.Car);
 			first.UnQuote();
 
-			first.Append(new ScheminPrimitive("let"));
-			first.Append(firstBinding);
+			first = first.Append(new ScheminPrimitive("let"));
+			first = first.Append(firstBinding);
 
-			if (bindings.Cdr().Length > 0)
+			if (bindings.Cdr != null)
 			{
-				ScheminList nextLet = new ScheminList(bindings.Cdr());
+				ScheminPair nextLet = new ScheminPair(bindings.Cdr);
 				nextLet.UnQuote();
 
-				nextLet.Cons(new ScheminPrimitive("let*"));
-				nextLet.Append(expression);
+				nextLet = nextLet.Cons(new ScheminPrimitive("let*"));
+				nextLet = nextLet.Append(expression);
 
-				first.Append(nextLet);
+				first = first.Append(nextLet);
 			}
 			else
 			{
-				first.Append(expression);
+				first = first.Append(expression);
 			}
 
 			return first;

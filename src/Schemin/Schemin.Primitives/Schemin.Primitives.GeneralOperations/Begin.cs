@@ -30,9 +30,10 @@ namespace Schemin.Primitives.GeneralOperations
 	using System.Linq;
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Begin : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			if (args.Length > 0)
 			{
@@ -40,7 +41,7 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 			else
 			{
-				return new ScheminList(true);
+				return new ScheminPair();
 			}
 		}
 	}

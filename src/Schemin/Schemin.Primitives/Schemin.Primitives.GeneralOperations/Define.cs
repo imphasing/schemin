@@ -29,21 +29,22 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Define : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			bool deffun = false;
 
-			if ((args.Car() as ScheminList) != null)
+			if ((args.Car as ScheminPair) != null)
 			{
 				deffun = true;
 			}
 
 			if (!deffun)
 			{
-				ScheminAtom symbol = (ScheminAtom) args.Car();
-				IScheminType definition = args.Cdr().Car();
+				ScheminAtom symbol = (ScheminAtom) args.ElementAt(0);
+				IScheminType definition = args.ElementAt(1);
 
 				if (env.bindings.ContainsKey(symbol.Name))
 				{
@@ -55,17 +56,17 @@ namespace Schemin.Primitives.GeneralOperations
 					env.AddBinding(symbol, definition);
 				}
 
-				return new ScheminList(false);
+				return new ScheminPair();
 			}
 			else
 			{
-				ScheminList arguments = (ScheminList) args.Car();
-				ScheminList expression = args.Cdr();
+				ScheminPair arguments = (ScheminPair) args.Car;
+				ScheminPair expression = args.ListCdr();
 
-				ScheminAtom name = (ScheminAtom) arguments.Car();
-				ScheminList argSymbols = arguments.Cdr();
+				ScheminAtom name = (ScheminAtom) arguments.Car;
+				ScheminPair argSymbols = arguments.ListCdr();
 
-				ScheminList lamArgs = new ScheminList(argSymbols, expression);
+				ScheminPair lamArgs = new ScheminPair(argSymbols, expression);
 				lamArgs.UnQuote();
 
 				ScheminLambda lam = new ScheminLambda(lamArgs, env);
@@ -80,15 +81,15 @@ namespace Schemin.Primitives.GeneralOperations
 					env.AddBinding(name, lam);
 				}
 
-				return new ScheminList(false);
+				return new ScheminPair();
 			}
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
-			if ((first as ScheminList) == null)
+			if ((first as ScheminPair) == null)
 			{
 				if (args.Length != 2)
 				{
@@ -102,8 +103,8 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 			else
 			{
-				ScheminList arguments = (ScheminList) args.Car();
-				IScheminType name = arguments.Car();
+				ScheminPair arguments = (ScheminPair) args.Car;
+				IScheminType name = arguments.Car;
 
 				if (args.Length != 2)
 				{

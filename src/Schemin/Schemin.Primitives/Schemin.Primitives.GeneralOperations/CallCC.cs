@@ -29,22 +29,23 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class CallCC : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList applied = new ScheminList();
+			ScheminPair applied = new ScheminPair();
 			applied.UnQuote();
 
-			applied.Append(args.Car());
-			applied.Append(new ScheminContinuation(eval.Stack));
+			applied = applied.Append(args.Car);
+			applied = applied.Append(new ScheminContinuation(eval.Stack));
 
 			return applied;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{

@@ -31,14 +31,14 @@ namespace Schemin.Primitives.GeneralOperations
 	using Schemin.AST;
 	public class Unquote : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType arg = args.Car();
-			if ((arg as ScheminList) != null)
+			IScheminType arg = args.Car;
+			if ((arg as ScheminPair) != null)
 			{
-				if (((ScheminList) arg).Empty)
+				if (((ScheminPair) arg).Empty)
 				{
-					return new ScheminList(false);
+					return new ScheminPair();
 				}
 			}
             
@@ -46,7 +46,7 @@ namespace Schemin.Primitives.GeneralOperations
 			return arg;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length != 1)
 			{

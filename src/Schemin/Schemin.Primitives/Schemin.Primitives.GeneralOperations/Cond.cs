@@ -29,41 +29,42 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Cond : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList conditions = (ScheminList) args;
-			ScheminList builtIf = new ScheminList();
+			ScheminPair conditions = args;
+			ScheminPair builtIf = new ScheminPair();
 			builtIf.UnQuote();
 
-			ScheminList firstCondition = (ScheminList) conditions.Car();
-			if ((firstCondition.Car() as ScheminAtom) != null)
+			ScheminPair firstCondition = (ScheminPair) conditions.Car;
+			if ((firstCondition.Car as ScheminAtom) != null)
 			{
-				ScheminAtom atom = (ScheminAtom) firstCondition.Car();
+				ScheminAtom atom = (ScheminAtom) firstCondition.Car;
 				if (atom.Name == "else")
 				{
-					ScheminList elseClause = firstCondition.Cdr();
-					elseClause.Cons(new ScheminPrimitive("begin"));
+					ScheminPair elseClause = firstCondition.ListCdr();
+					elseClause = elseClause.Cons(new ScheminPrimitive("begin"));
 
 					return elseClause;
 				}
 			}
 
-			builtIf.Append(new ScheminPrimitive("if"));
-			builtIf.Append(firstCondition.Car());
+			builtIf = builtIf.Append(new ScheminPrimitive("if"));
+			builtIf = builtIf.Append(firstCondition.Car);
 
-			ScheminList beginExpression = firstCondition.Cdr();
-			beginExpression.Cons(new ScheminPrimitive("begin"));
+			ScheminPair beginExpression = firstCondition.ListCdr();
+			beginExpression = beginExpression.Cons(new ScheminPrimitive("begin"));
 
-			builtIf.Append(beginExpression);
+			builtIf = builtIf.Append(beginExpression);
 
-			if (conditions.Cdr().Length > 0)
+			if (conditions.ListCdr().Length > 0)
 			{
-				ScheminList nextConditions = conditions.Cdr();
-				nextConditions.Cons(new ScheminPrimitive("cond"));
+				ScheminPair nextConditions = conditions.ListCdr();
+				nextConditions = nextConditions.Cons(new ScheminPrimitive("cond"));
 
-				builtIf.Append(nextConditions);
+				builtIf = builtIf.Append(nextConditions);
 			}
 
 			return builtIf;

@@ -40,8 +40,8 @@ namespace Schemin.Evaluate
 	{
 		public class StackFrame
 		{
-			public ScheminList Before;
-			public ScheminList After;
+			public ScheminPair Before;
+			public ScheminPair After;
 			public Environment CurrentEnv;
 
 			public IScheminType WaitingOn;
@@ -68,7 +68,7 @@ namespace Schemin.Evaluate
 			DefinePrimitives(this.GlobalEnv);
 		}
 
-		public IScheminType Evaluate(ScheminList ast)
+		public IScheminType Evaluate(ScheminPair ast)
 		{
 			IScheminType last = null;
 
@@ -97,9 +97,9 @@ namespace Schemin.Evaluate
 			{
 				return EvalAtom(ast, this.GlobalEnv);
 			}
-			else if ((ast as ScheminList) != null)
+			else if ((ast as ScheminPair) != null)
 			{
-				return EvaluateList((ScheminList) ast);
+				return EvaluateList((ScheminPair) ast);
 			}
 			else
 			{
@@ -107,7 +107,7 @@ namespace Schemin.Evaluate
 			}
 		}
 
-		public IScheminType EvaluateList(ScheminList list)
+		public IScheminType EvaluateList(ScheminPair list)
 		{
 			StackFrame start = new StackFrame();
 			start.WaitingOn = list;
@@ -122,11 +122,11 @@ namespace Schemin.Evaluate
 				StackFrame current = Stack.Pop();
 				Environment CurrentEnv = current.CurrentEnv;
 
-				ScheminList before = current.Before;
-				ScheminList after = current.After;
+				ScheminPair before = current.Before;
+				ScheminPair after = current.After;
 				IScheminType WaitingOn = current.WaitingOn;
 
-				if ((WaitingOn as ScheminList) == null || WaitingOn.Quoted() == true || IsEmptyList(WaitingOn))
+				if ((WaitingOn as ScheminPair) == null || WaitingOn.Quoted() == true || IsEmptyList(WaitingOn))
 				{
 					StackFrame next = new StackFrame();
 
@@ -177,15 +177,15 @@ namespace Schemin.Evaluate
 				StackFrame completeFrame = new StackFrame();
 				ScheminPrimitive currentPrimitive = null;
 
-				ScheminList rest = (ScheminList) WaitingOn;
-				ScheminList pendingBefore = new ScheminList();
+				ScheminPair rest = (ScheminPair) WaitingOn;
+				ScheminPair pendingBefore = new ScheminPair();
 				pendingBefore.UnQuote();
 
-				if ((rest.Car() as ScheminPrimitive) != null)
+				if ((rest.Car as ScheminPrimitive) != null)
 				{
-					if (rest.Car().Quoted() == false)
+					if (rest.Car.Quoted() == false)
 					{
-						currentPrimitive = (ScheminPrimitive) rest.Car();
+						currentPrimitive = (ScheminPrimitive) rest.Car;
 					}
 				}
 
@@ -193,14 +193,14 @@ namespace Schemin.Evaluate
 
 				while (!rest.Empty)
 				{
-					IScheminType type = rest.Car();
+					IScheminType type = rest.Car;
 
 					if (currentPrimitive != null)
 					{
-						if (!EvaluateNextArg(currentPrimitive, currentArg, ((ScheminList) WaitingOn).Cdr()))
+						if (!EvaluateNextArg(currentPrimitive, currentArg, ((ScheminPair) WaitingOn).ListCdr()))
 						{
-							pendingBefore.Append(type);
-							rest = rest.Cdr();
+							pendingBefore = pendingBefore.Append(type);
+							rest = rest.ListCdr();
 							currentArg++;
 							continue;
 						}
@@ -210,7 +210,7 @@ namespace Schemin.Evaluate
 					{
 						if (type.Quoted())
 						{
-							pendingBefore.Append(type);
+							pendingBefore = pendingBefore.Append(type);
 						}
 						else
 						{
@@ -218,30 +218,30 @@ namespace Schemin.Evaluate
 							if ((atomResult as ScheminRewriter) != null)
 							{
 								// if we get a quoted rewriter here, we're going to apply it :(
-								pendingBefore.Append(atomResult);
-								QuoteAll(rest.Cdr());
+								pendingBefore = pendingBefore.Append(atomResult);
+								QuoteAll(rest.ListCdr());
 							}
 							else
 							{
-								pendingBefore.Append(atomResult);
+								pendingBefore = pendingBefore.Append(atomResult);
 							}
 						}
 					}
-					else if ((type as ScheminList) != null)
+					else if ((type as ScheminPair) != null)
 					{
-						ScheminList tempList = (ScheminList) type;
+						ScheminPair tempList = (ScheminPair) type;
 
 						if (tempList.Quoted() || tempList.Empty)
 						{
-							pendingBefore.Append(type);
-							rest = rest.Cdr();
+							pendingBefore = pendingBefore.Append(type);
+							rest = rest.ListCdr();
 							currentArg++;
 							continue;
 						}
 
 						StackFrame next = new StackFrame();
 						next.WaitingOn = type;
-						next.After = rest.Cdr();
+						next.After = rest.ListCdr();
 						next.Before = pendingBefore;
 						next.CurrentEnv = CurrentEnv;
 
@@ -252,15 +252,15 @@ namespace Schemin.Evaluate
 					}
 					else
 					{
-						pendingBefore.Append(type);
+						pendingBefore = pendingBefore.Append(type);
 					}
 
-					rest = rest.Cdr();
+					rest = rest.ListCdr();
 					currentArg++;
 				}
 
-				IScheminType functionPosition = pendingBefore.Car();
-				ScheminList functionArgs = pendingBefore.Cdr();
+				IScheminType functionPosition = pendingBefore.Car;
+				ScheminPair functionArgs = pendingBefore.ListCdr();
 
 
 				if ((functionPosition as ScheminPrimitive) != null)
@@ -310,7 +310,7 @@ namespace Schemin.Evaluate
 				{
 					ScheminContinuation con = (ScheminContinuation) functionPosition;
 					this.Stack = new Stack<StackFrame>(con.PreviousStack);
-					this.Stack.Peek().WaitingOn = functionArgs.Car();
+					this.Stack.Peek().WaitingOn = functionArgs.Car;
 					continue;
 				}
 				else if ((functionPosition as ScheminRewriter) != null)
@@ -350,35 +350,35 @@ namespace Schemin.Evaluate
 			return bound;
 		}
 
-		private ScheminList CombineStackFrame(ScheminList before, ScheminList after, IScheminType result)
+		private ScheminPair CombineStackFrame(ScheminPair before, ScheminPair after, IScheminType result)
 		{
-			ScheminList complete = new ScheminList();
+			ScheminPair complete = new ScheminPair();
 			complete.UnQuote();
 
 			if (before != null && !before.Empty)
 			{
-				complete.Append(before.Head);
-				var restBefore = before.Rest;
-				while (restBefore != null)
+				complete = complete.Append(before.Car);
+				var restBefore = before.ListCdr();
+				while (!restBefore.Empty)
 				{
-					complete.Append(restBefore.Head);
-					restBefore = restBefore.Rest;
+					complete = complete.Append(restBefore.Car);
+					restBefore = restBefore.ListCdr();
 				}
 			}
 
 			if (result != null)
 			{
-				complete.Append(result);
+				complete = complete.Append(result);
 			}
 
 			if (after != null && !after.Empty)
 			{
-				complete.Append(after.Head);
-				var restAfter = after.Rest;
-				while (restAfter != null)
+				complete = complete.Append(after.Car);
+				var restAfter = after.ListCdr();
+				while (!restAfter.Empty)
 				{
-					complete.Append(restAfter.Head);
-					restAfter = restAfter.Rest;
+					complete = complete.Append(restAfter.Car);
+					restAfter = restAfter.ListCdr();
 				}
 			}
 
@@ -387,9 +387,9 @@ namespace Schemin.Evaluate
 
 		private bool IsEmptyList(IScheminType type)
 		{
-			if (type.GetType() == typeof(ScheminList))
+			if ((type as ScheminPair) != null)
 			{
-				ScheminList temp = (ScheminList) type;
+				ScheminPair temp = (ScheminPair) type;
 				if (temp.Empty == true)
 				{
 					return true;
@@ -399,14 +399,14 @@ namespace Schemin.Evaluate
 			return false;
 		}
 
-		private bool EvaluateNextArg(ScheminPrimitive currentPrimitive, int currentArg, ScheminList args)
+		private bool EvaluateNextArg(ScheminPrimitive currentPrimitive, int currentArg, ScheminPair args)
 		{
 			if (currentPrimitive != null)
 			{
 				switch (currentPrimitive.Name)
 				{
 					case "define":
-						if ((args.Car() as ScheminList) != null)
+						if ((args.Car as ScheminPair) != null)
 						{
 							return false;
 						}
@@ -462,7 +462,7 @@ namespace Schemin.Evaluate
 			return true;
 		}
 
-		private void QuoteAll(ScheminList list)
+		private void QuoteAll(ScheminPair list)
 		{
 			foreach (IScheminType type in list)
 			{
@@ -512,9 +512,9 @@ namespace Schemin.Evaluate
 
 			foreach (string primitive in prebound_schemin)
 			{
-				var tokens = t.Tokenize(primitive);
-				var ast = p.Parse(tokens, false);
-				Evaluate(ast);
+				//var tokens = t.Tokenize(primitive);
+				//var ast = p.Parse(tokens, false);
+				//Evaluate(ast);
 			}
 		}
 	}

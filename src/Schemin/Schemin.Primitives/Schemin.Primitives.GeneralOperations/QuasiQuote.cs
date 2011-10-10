@@ -31,12 +31,12 @@ namespace Schemin.Primitives.GeneralOperations
 	using Schemin.AST;
 	public class QuasiQuote : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType arg = args.Car();
-			if ((arg as ScheminList) != null)
+			IScheminType arg = args.Car;
+			if ((arg as ScheminPair) != null)
 			{
-				return RewriteRecursive((ScheminList) arg, 0);
+				return RewriteRecursive((ScheminPair) arg, 0);
 			}
 			else
 			{
@@ -45,17 +45,17 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 		}
 
-		private ScheminList RewriteRecursive(ScheminList rewrite, int currentLevel)
+		private ScheminPair RewriteRecursive(ScheminPair rewrite, int currentLevel)
 		{
-			ScheminList quoted = new ScheminList(new ScheminPrimitive("append"));
+			ScheminPair quoted = new ScheminPair(new ScheminPrimitive("append"));
 			quoted.UnQuote();
 
 			foreach (IScheminType type in rewrite)
 			{
-				if ((type as ScheminList) != null)
+				if ((type as ScheminPair) != null)
 				{
-					ScheminList typeList = (ScheminList)type;
-					ScheminPrimitive first = typeList.Car() as ScheminPrimitive;
+					ScheminPair typeList = (ScheminPair) type;
+					ScheminPrimitive first = typeList.Car as ScheminPrimitive;
 
 					if (first != null)
 					{
@@ -64,16 +64,16 @@ namespace Schemin.Primitives.GeneralOperations
 							if (first.Name == "unquote")
 							{
 								typeList.UnQuote();
-								ScheminList wrapper = new ScheminList(new ScheminPrimitive("list"));
+								ScheminPair wrapper = new ScheminPair(new ScheminPrimitive("list"));
 								wrapper.UnQuote();
-								wrapper.Append(typeList.Cdr().Car());
-								quoted.Append(wrapper);
+								wrapper = wrapper.Append(typeList.ElementAt(1));
+								quoted = quoted.Append(wrapper);
 								continue;
 							}
 							else if (first.Name == "unquote-splicing")
 							{
 								typeList.UnQuote();
-								quoted.Append(typeList.Cdr().Car());
+								quoted.Append(typeList.ElementAt(1));
 								continue;
 							}
 						}
@@ -81,23 +81,23 @@ namespace Schemin.Primitives.GeneralOperations
 						currentLevel = AdjustLevelEnter(first, currentLevel);
 					}
 
-					ScheminList rewritten = RewriteRecursive(typeList, currentLevel);
+					ScheminPair rewritten = RewriteRecursive(typeList, currentLevel);
 					currentLevel = AdjustLevelLeave(first, currentLevel);
 
-					ScheminList quotedRewrite = new ScheminList(new ScheminPrimitive("list"));
+					ScheminPair quotedRewrite = new ScheminPair(new ScheminPrimitive("list"));
 					quotedRewrite.UnQuote();
 
-					quotedRewrite.Append(rewritten);
-					quoted.Append(quotedRewrite);
+					quotedRewrite = quotedRewrite.Append(rewritten);
+					quoted = quoted.Append(quotedRewrite);
 				}
 				else
 				{
-					ScheminList quotedSub = new ScheminList(new ScheminPrimitive("quote"));
-					ScheminList wrappedElem = new ScheminList(type);
+					ScheminPair quotedSub = new ScheminPair(new ScheminPrimitive("quote"));
+					ScheminPair wrappedElem = new ScheminPair(type);
 					wrappedElem.UnQuote();
 					quotedSub.UnQuote();
-					quotedSub.Append(wrappedElem);
-					quoted.Append(quotedSub);
+					quotedSub = quotedSub.Append(wrappedElem);
+					quoted = quoted.Append(quotedSub);
 				}
 			}
 
@@ -146,7 +146,7 @@ namespace Schemin.Primitives.GeneralOperations
 			return currentLevel;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length != 1)
 			{

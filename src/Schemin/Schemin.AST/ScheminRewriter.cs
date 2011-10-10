@@ -42,30 +42,30 @@ namespace Schemin.AST
 			this.Rewriter = rewriter;
 		}
 
-		public IScheminType Rewrite(ScheminList values)
+		public IScheminType Rewrite(ScheminPair values)
 		{
 			QuoteAllRecursive(values);
-			ScheminList call = new ScheminList(Rewriter);
-			ScheminList unquote = new ScheminList(new ScheminPrimitive("eval-macro"));
+			ScheminPair call = new ScheminPair(Rewriter);
+			ScheminPair unquote = new ScheminPair(new ScheminPrimitive("eval-macro"));
 			unquote.UnQuote();
 			call.UnQuote();
 
 			foreach (IScheminType type in values)
 			{
-				call.Append(type);
+				call = call.Append(type);
 			}
 
-			unquote.Append(call);
+			unquote = unquote.Append(call);
 			return unquote;
 		}
 
-		private void QuoteAllRecursive(ScheminList values)
+		private void QuoteAllRecursive(ScheminPair values)
 		{
 			foreach (IScheminType type in values)
 			{
-				if ((type as ScheminList) != null)
+				if ((type as ScheminPair) != null)
 				{
-					QuoteAllRecursive((ScheminList)type);
+					QuoteAllRecursive((ScheminPair) type);
 				}
 
 				type.Quote();

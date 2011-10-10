@@ -32,24 +32,25 @@ namespace Schemin.Primitives.GeneralOperations
 	using Environment = Schemin.Evaluate.Environment;
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class DumpEnv : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList bindings = new ScheminList();
+			ScheminPair bindings = new ScheminPair();
 
 			foreach (KeyValuePair<string, IScheminType> kvp in env.bindings)
 			{
-				var binding = new ScheminList(new ScheminAtom(kvp.Key));
-				binding.Append(kvp.Value);
+				var binding = new ScheminPair(new ScheminAtom(kvp.Key));
+				binding = binding.Append(kvp.Value);
 
-				bindings.Append(binding);
+				bindings = bindings.Append(binding);
 			}
 
 			return bindings;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length != 0)
 			{

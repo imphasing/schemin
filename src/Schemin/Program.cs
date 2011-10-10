@@ -39,7 +39,7 @@ namespace Schemin
 
 	class Program
 	{
-		static void Main(string[] consoleArgs) 
+		static void Main(string[] consoleArgs)
 		{
 			bool help = false;
 			string fileName = String.Empty;
@@ -95,7 +95,7 @@ namespace Schemin
 		static void InterpretFile(string filename)
 		{
 			Tokenizer t = new Tokenizer();
-			Parser p = new Parser();
+			PairParser p = new PairParser();
 			Evaluator eval = new Evaluator();
 
 			string contents = File.ReadAllText(filename);
@@ -109,7 +109,7 @@ namespace Schemin
 		static void ReplPrompt()
 		{
 			Tokenizer t = new Tokenizer();
-			Parser p = new Parser();
+			PairParser p = new PairParser();
 			Evaluator eval = new Evaluator();
 
 			for (; ;)

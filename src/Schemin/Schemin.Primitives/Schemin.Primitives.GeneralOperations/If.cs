@@ -29,13 +29,14 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class If : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminBool condition = args.Car().BoolValue();
-			IScheminType then = args.Cdr().Car();
-			IScheminType otherwise = args.Cdr().Cdr().Car();
+			ScheminBool condition = args.Car.BoolValue();
+			IScheminType then = args.ElementAt(1);
+			IScheminType otherwise = args.ElementAt(2);
 
 			if (condition.Value)
 			{
@@ -47,7 +48,7 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length < 2 || args.Length > 3)
 			{
