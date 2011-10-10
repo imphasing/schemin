@@ -98,6 +98,22 @@ namespace Schemin.Primitives
 			Primitives.Add("input-port?", new BooleanOperations.InputPort());
 			Primitives.Add("output-port?", new BooleanOperations.OutputPort());
 			Primitives.Add("eof-object?", new BooleanOperations.EOFObject());
+
+			Primitives.Add("current-input-port", new PortOperations.CurrentInputPort());
+			Primitives.Add("current-output-port", new PortOperations.CurrentOutputPort());
+			Primitives.Add("set-current-output-port!", new PortOperations.SetCurrentOutputPort());
+			Primitives.Add("set-current-input-port!", new PortOperations.SetCurrentInputPort());
+			Primitives.Add("open-input-file", new PortOperations.OpenInputFile());
+			Primitives.Add("open-output-file", new PortOperations.OpenOutputFile());
+			Primitives.Add("close-port", new PortOperations.ClosePort());
+			Primitives.Add("port-closed?", new PortOperations.PortClosed());
+			Primitives.Add("display", new PortOperations.Display());
+			Primitives.Add("newline", new PortOperations.Newline());
+			Primitives.Add("read", new PortOperations.Read());
+			Primitives.Add("read-char", new PortOperations.ReadChar());
+			Primitives.Add("read-line", new PortOperations.ReadLine());
+			Primitives.Add("write", new PortOperations.Write());
+			Primitives.Add("write-char", new PortOperations.WriteChar());
 		}
 
 		public static Primitive Get(string name)

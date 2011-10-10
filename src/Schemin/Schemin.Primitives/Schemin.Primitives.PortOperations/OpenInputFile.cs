@@ -32,20 +32,21 @@ namespace Schemin.Primitives.PortOperations
 	using System.IO;
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class OpenInputFile : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminString filename = (ScheminString) args.Car();
+			ScheminString filename = (ScheminString) args.Car;
 			FileStream fs = File.OpenRead(filename.Value);
 			ScheminPort filePort = new ScheminPort(fs, ScheminPort.PortType.InputPort);
 
 			return filePort;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{

@@ -36,19 +36,20 @@ namespace Schemin.Primitives.PortOperations
 	using Schemin.Parse;
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Read : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType port = args.Car();
 			ScheminPort readFrom = eval.CurrentInputPort;
-			if ((port as ScheminPort) != null)
+
+			if (args.Length > 0)
 			{
-				readFrom = (ScheminPort) port;
+				readFrom = (ScheminPort) args.Car;
 			}
 
 			Tokenizer t = new Tokenizer();
-			Parser p = new Parser();
+			PairParser p = new PairParser();
 
 			bool completeInput = false;
 			bool emptyInput = true;
@@ -100,12 +101,12 @@ namespace Schemin.Primitives.PortOperations
 				}
 			}
 
-			var parsed = p.Parse(partialInput, true).Car();
+			var parsed = p.Parse(partialInput, true).Car;
 
 			return parsed;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length > 1)
 			{
@@ -114,7 +115,7 @@ namespace Schemin.Primitives.PortOperations
 
 			if (args.Length == 1)
 			{
-				IScheminType port = args.Car();
+				IScheminType port = args.Car;
 				if ((port as ScheminPort) == null)
 				{
 					throw new BadArgumentsException("second argument must be a port");

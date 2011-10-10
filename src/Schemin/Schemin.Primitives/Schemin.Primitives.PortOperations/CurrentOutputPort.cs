@@ -29,14 +29,15 @@ namespace Schemin.Primitives.PortOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class CurrentOutputPort : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			return eval.CurrentOutputPort;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length != 0)
 			{

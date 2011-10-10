@@ -29,17 +29,18 @@ namespace Schemin.Primitives.PortOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Write : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType obj = args.Car();
+			IScheminType obj = args.Car;
 			ScheminPort writeTo = eval.CurrentOutputPort;
 
-			IScheminType port = args.Cdr().Car();
-			if ((port as ScheminPort) != null)
+			IScheminType port = new ScheminPair();
+			if (args.Length > 1)
 			{
-				writeTo = (ScheminPort) port;
+				writeTo = (ScheminPort) args.ElementAt(1);
 			}
 
 			writeTo.OutputStream.Write(obj.ToString());
@@ -48,7 +49,7 @@ namespace Schemin.Primitives.PortOperations
 			return new ScheminList(false);
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length < 1 || args.Length > 2)
 			{
@@ -57,7 +58,7 @@ namespace Schemin.Primitives.PortOperations
 
 			if (args.Length == 2)
 			{
-				IScheminType port = args.Cdr().Car();
+				IScheminType port = args.ElementAt(1);
 				if ((port as ScheminPort) == null)
 				{
 					throw new BadArgumentsException("second argument must be a port");

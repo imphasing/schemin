@@ -31,16 +31,16 @@ namespace Schemin.Primitives.PortOperations
 	using Schemin.AST;
 	public class SetCurrentInputPort : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminPort inputPort = (ScheminPort) args.Car();
+			ScheminPort inputPort = (ScheminPort) args.Car;
 			eval.CurrentInputPort = inputPort;
 			return new ScheminList(false);
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{

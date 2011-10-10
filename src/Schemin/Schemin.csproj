@@ -111,6 +111,22 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Symbol.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Vector.cs" />
 
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\ClosePort.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\CurrentInputPort.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\CurrentOutputPort.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\Display.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\Newline.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\OpenInputFile.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\OpenOutputFile.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\PortClosed.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\Read.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\ReadChar.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\ReadLine.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\SetCurrentInputPort.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\SetCurrentOutputPort.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\Write.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\WriteChar.cs" />
+
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />

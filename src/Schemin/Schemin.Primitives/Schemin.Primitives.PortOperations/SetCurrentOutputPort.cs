@@ -29,18 +29,19 @@ namespace Schemin.Primitives.PortOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class SetCurrentOutputPort : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminPort outputPort = (ScheminPort) args.Car();
+			ScheminPort outputPort = (ScheminPort) args.Car;
 			eval.CurrentOutputPort = outputPort;
 			return new ScheminList(false);
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{

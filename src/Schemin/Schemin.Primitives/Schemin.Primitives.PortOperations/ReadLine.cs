@@ -30,15 +30,16 @@ namespace Schemin.Primitives.PortOperations
 	using System.Text;
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class ReadLine : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType port = args.Car();
 			ScheminPort readFrom = eval.CurrentInputPort;
-			if ((port as ScheminPort) != null)
+
+			if (args.Length > 0)
 			{
-				readFrom = (ScheminPort) port;
+				readFrom = (ScheminPort) args.Car;
 			}
 
 			StringBuilder built = new StringBuilder();
@@ -65,7 +66,7 @@ namespace Schemin.Primitives.PortOperations
 			return new ScheminString(built.ToString());
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length > 1)
 			{
@@ -74,7 +75,7 @@ namespace Schemin.Primitives.PortOperations
 
 			if (args.Length == 1)
 			{
-				IScheminType port = args.Car();
+				IScheminType port = args.Car;
 				if ((port as ScheminPort) == null)
 				{
 					throw new BadArgumentsException("second argument must be a port");

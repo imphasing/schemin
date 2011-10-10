@@ -29,11 +29,12 @@ namespace Schemin.Primitives.PortOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class PortClosed : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminPort toCheck = (ScheminPort) args.Car();
+			ScheminPort toCheck = (ScheminPort) args.Car;
 			if (toCheck.Closed)
 			{
 				return ScheminBool.True;
@@ -42,9 +43,9 @@ namespace Schemin.Primitives.PortOperations
 			return ScheminBool.False;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{
