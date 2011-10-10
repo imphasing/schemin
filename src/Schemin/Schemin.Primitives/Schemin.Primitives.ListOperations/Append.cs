@@ -31,17 +31,18 @@ namespace Schemin.Primitives.ListOperations
 	using Environment = Schemin.Evaluate.Environment;
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Append : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList appended = new ScheminList();
+			ScheminPair appended = new ScheminPair();
 
 			foreach (IScheminType type in args)
 			{
-				if (type.GetType() == typeof(ScheminList))
+				if ((type as ScheminPair) != null)
 				{
-					ScheminList temp = (ScheminList) type;
+					ScheminPair temp = (ScheminPair) type;
 
 					if (temp.Empty)
 					{
@@ -50,7 +51,7 @@ namespace Schemin.Primitives.ListOperations
 
 					foreach (IScheminType subType in temp)
 					{
-						appended.Append(subType);
+						appended = appended.Append(subType);
 					}
 				}
 				else

@@ -134,7 +134,7 @@ namespace ScheminTests.PrimitiveTests
 
 
 			ScheminPair decimal_args = new ScheminPair(test_decimal);
-			decimal_args.Append(test_mult_decimal);
+			decimal_args = decimal_args.Append(test_mult_decimal);
 
 			ScheminPair int_args = new ScheminPair(test_integer);
 			int_args = int_args.Append(test_mult_int);

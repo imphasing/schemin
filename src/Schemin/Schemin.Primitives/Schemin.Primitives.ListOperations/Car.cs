@@ -29,24 +29,25 @@ namespace Schemin.Primitives.ListOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Car : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList listArg = (ScheminList) args.Car();
-			return listArg.Car();
+			ScheminPair listArg = (ScheminPair) args.Car;
+			return listArg.Car;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{
 				throw new BadArgumentsException("expected 1 argument");
 			}
 
-			if ((first as ScheminList) == null)
+			if ((first as ScheminPair) == null)
 			{
 				throw new BadArgumentsException("argument must be a list");
 			}

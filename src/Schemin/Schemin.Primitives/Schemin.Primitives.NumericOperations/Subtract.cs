@@ -29,12 +29,13 @@ namespace Schemin.Primitives.NumericOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Subtract : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			bool dec = false;
-			var first = (IScheminNumeric) args.Car();
+			var first = (IScheminNumeric) args.Car;
 			IScheminNumeric result = null;
 
 			foreach (IScheminType type in args)
@@ -63,7 +64,7 @@ namespace Schemin.Primitives.NumericOperations
 				}
 			}
 
-			foreach (IScheminType type in args.Cdr())
+			foreach (IScheminType type in args.ListCdr())
 			{
 				if ((type as IScheminNumeric) != null)
 				{
@@ -82,7 +83,7 @@ namespace Schemin.Primitives.NumericOperations
 			return (IScheminType) result;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			foreach (IScheminType type in args)
 			{

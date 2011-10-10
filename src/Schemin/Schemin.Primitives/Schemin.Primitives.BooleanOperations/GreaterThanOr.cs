@@ -29,12 +29,13 @@ namespace Schemin.Primitives.BooleanOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class GreaterThanOr : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminNumeric first = (IScheminNumeric) args.Car();
-			IScheminNumeric second = (IScheminNumeric) args.Cdr().Car();
+			IScheminNumeric first = (IScheminNumeric) args.Car;
+			IScheminNumeric second = (IScheminNumeric) args.ElementAt(1);
 
 			if ((first as ScheminDecimal) != null || (second as ScheminDecimal) != null)
 			{
@@ -54,10 +55,10 @@ namespace Schemin.Primitives.BooleanOperations
 			return ScheminBool.False;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
-			IScheminType second = args.Cdr().Car();
+			IScheminType first = args.Car;
+			IScheminType second = args.ElementAt(1);
 
 			if (args.Length != 2)
 			{

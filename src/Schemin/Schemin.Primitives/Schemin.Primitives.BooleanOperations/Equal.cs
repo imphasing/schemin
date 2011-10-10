@@ -29,15 +29,16 @@ namespace Schemin.Primitives.BooleanOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Equal : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType last = args.Car();
+			IScheminType last = args.Car;
 
 			bool result = false;
 
-			foreach (IScheminType type in args.Cdr())
+			foreach (IScheminType type in args.ListCdr())
 			{
 				if (last.Equals(type))
 				{

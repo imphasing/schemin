@@ -29,22 +29,23 @@ namespace Schemin.Primitives.BooleanOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Or : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList nextCycle = new ScheminList();
+			ScheminPair nextCycle = new ScheminPair();
 			nextCycle.UnQuote();
-			nextCycle.Append(new ScheminPrimitive("or"));
+			nextCycle = nextCycle.Append(new ScheminPrimitive("or"));
 
-			if (args.Car().BoolValue() == ScheminBool.True)
+			if (args.Car.BoolValue() == ScheminBool.True)
 			{
 				return ScheminBool.True;
 			}
 
 			if (args.Length == 1)
 			{
-				return args.Car().BoolValue();
+				return args.Car.BoolValue();
 			}
 			else
 			{
@@ -53,7 +54,7 @@ namespace Schemin.Primitives.BooleanOperations
 				{
 					if (!first)
 					{
-						nextCycle.Append(type);
+						nextCycle = nextCycle.Append(type);
 					}
 
 					first = false;

@@ -201,8 +201,16 @@ namespace Schemin.AST
 				var c = (ScheminPair) Cdr;
 				while (c != null)
 				{
-					yield return c.Car;
-					c = (ScheminPair) c.Cdr;
+					if (c.Proper)
+					{
+						yield return c.Car;
+						c = (ScheminPair) c.Cdr;
+					}
+					else
+					{
+						yield return c;
+						break;
+					}
 				}
 			}
 			else
@@ -237,13 +245,10 @@ namespace Schemin.AST
 				int index = 0;
 				foreach (var type in list)
 				{
+					builder.Append(type);
 					if (index < list.Length - 1)
 					{
-						builder.Append(type.ToString() + " ");
-					}
-					else
-					{
-						builder.Append(type.ToString());
+						builder.Append(" ");
 					}
 
 					index++;

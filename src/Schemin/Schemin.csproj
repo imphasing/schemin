@@ -76,6 +76,41 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\EvalMacro.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\SetBang.cs" />
 
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Append.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Car.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Cdr.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Cons.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Length.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\List.cs" />
+
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Add.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Divide.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Mod.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Multiply.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Subtract.cs" />
+
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\And.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Boolean.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Char.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\EOFObject.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Equal.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\GreaterThan.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\GreaterThanOr.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\InputPort.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\LessThan.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\LessThanOr.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Null.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Number.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Or.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\OutputPort.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Pair.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Port.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Prime.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Procedure.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\String.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Symbol.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Vector.cs" />
+
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />

@@ -29,16 +29,17 @@ namespace Schemin.Primitives.BooleanOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Null : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			if ((args.Car() as ScheminList) == null)
+			if ((args.Car as ScheminPair) == null)
 			{
 				return ScheminBool.False;
 			}
 
-			ScheminList listArg = (ScheminList) args.Car();
+			ScheminPair listArg = (ScheminPair) args.Car;
 			if (listArg.Empty)
 			{
 				return ScheminBool.True;
@@ -47,7 +48,7 @@ namespace Schemin.Primitives.BooleanOperations
 			return ScheminBool.False;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length != 1)
 			{

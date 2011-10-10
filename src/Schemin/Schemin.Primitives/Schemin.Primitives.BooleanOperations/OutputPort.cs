@@ -29,11 +29,12 @@ namespace Schemin.Primitives.BooleanOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class OutputPort : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType type = args.Car();
+			IScheminType type = args.Car;
 
 			if ((type as ScheminPort) != null)
 			{
@@ -47,7 +48,7 @@ namespace Schemin.Primitives.BooleanOperations
 			return ScheminBool.False;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length != 1)
 			{

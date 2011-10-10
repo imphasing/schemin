@@ -29,23 +29,24 @@ namespace Schemin.Primitives.ListOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class List : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList ret = new ScheminList();
+			ScheminPair ret = new ScheminPair();
 
-			if (args.GetType() == typeof(ScheminList))
+			if ((args as ScheminPair) != null)
 			{
-				ScheminList temp = (ScheminList) args;
+				ScheminPair temp = (ScheminPair) args;
 				foreach (IScheminType type in temp)
 				{
-					ret.Append(type);
+					ret = ret.Append(type);
 				}
 			}
 			else
 			{
-				ret.Append(args);
+				ret = ret.Append(args);
 			}
 
 			return ret;

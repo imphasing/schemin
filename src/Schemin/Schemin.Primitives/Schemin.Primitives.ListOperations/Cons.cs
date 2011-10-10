@@ -29,40 +29,39 @@ namespace Schemin.Primitives.ListOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Cons : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType head = args.Car();
-			IScheminType rest = args.Cdr().Car();
+			IScheminType head = args.Car;
+			IScheminType rest = args.ElementAt(1);
 
-			if ((rest as ScheminList) != null)
+			if ((rest as ScheminPair) != null && ((ScheminPair) rest).Proper)
 			{
-				ScheminList temp = (ScheminList) rest;
+				ScheminPair temp = (ScheminPair) rest;
 
 				if (temp.Empty)
 				{
-					return new ScheminList(head);
+					return new ScheminPair(head);
 				}
 				else
 				{
-					ScheminList consd = new ScheminList(head);
+					ScheminPair consd = new ScheminPair(head);
 
 					foreach (IScheminType type in temp)
 					{
-						consd.Append(type);
+						consd = consd.Append(type);
 					}
-					
+
 					return consd;
 				}
 			}
 
-			var append = new ScheminList(head);
-			append.Append(rest);
-			return append; 
+			return new ScheminPair(head, rest);
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
 			if (args.Length != 2)
 			{

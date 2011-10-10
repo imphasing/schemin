@@ -508,13 +508,13 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.DefineMacro);
 
 			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
-			Schemin.Parse.Parser p = new Parse.Parser();
+			Schemin.Parse.PairParser p = new Parse.PairParser();
 
 			foreach (string primitive in prebound_schemin)
 			{
-				//var tokens = t.Tokenize(primitive);
-				//var ast = p.Parse(tokens, false);
-				//Evaluate(ast);
+				var tokens = t.Tokenize(primitive);
+				var ast = p.Parse(tokens, false);
+				Evaluate(ast);
 			}
 		}
 	}

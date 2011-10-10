@@ -32,9 +32,9 @@ namespace Schemin.Primitives.BooleanOperations
 	using Schemin.AST;
 	public class Prime : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			var first = (IScheminNumeric) args.Car();
+			var first = (IScheminNumeric) args.Car;
 			var candidate = first.IntegerValue();
 
 			if ((candidate & 1) == 0)
@@ -60,9 +60,9 @@ namespace Schemin.Primitives.BooleanOperations
 			return ScheminBool.GetValue(candidate != 1);
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{

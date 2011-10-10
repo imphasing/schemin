@@ -60,6 +60,44 @@ namespace Schemin.Primitives
 			Primitives.Add("let*", new GeneralOperations.LetStar());
 			Primitives.Add("set!", new GeneralOperations.SetBang());
 			Primitives.Add("call/cc", new GeneralOperations.CallCC());
+
+			Primitives.Add("car", new ListOperations.Car());
+			Primitives.Add("cons", new ListOperations.Cons());
+			Primitives.Add("cdr", new ListOperations.Cdr());
+			Primitives.Add("length", new ListOperations.Length());
+			Primitives.Add("append", new ListOperations.Append());
+			Primitives.Add("list", new ListOperations.List());
+
+			Primitives.Add("+", new NumericOperations.Add());
+			Primitives.Add("-", new NumericOperations.Subtract());
+			Primitives.Add("*", new NumericOperations.Multiply());
+			Primitives.Add("/", new NumericOperations.Divide());
+			Primitives.Add("mod", new NumericOperations.Mod());
+
+			Primitives.Add("null?", new BooleanOperations.Null());
+			Primitives.Add("=", new BooleanOperations.Equal());
+			Primitives.Add("eq?", new BooleanOperations.Equal());
+
+			Primitives.Add(">", new BooleanOperations.GreaterThan());
+			Primitives.Add(">=", new BooleanOperations.GreaterThanOr());
+			Primitives.Add("<", new BooleanOperations.LessThan());
+			Primitives.Add("<=", new BooleanOperations.LessThanOr());
+			Primitives.Add("prime?", new BooleanOperations.Prime());
+			Primitives.Add("or", new BooleanOperations.Or());
+			Primitives.Add("and", new BooleanOperations.And());
+
+			Primitives.Add("boolean?", new BooleanOperations.Boolean());
+			Primitives.Add("symbol?", new BooleanOperations.Symbol());
+			Primitives.Add("procedure?", new BooleanOperations.Procedure());
+			Primitives.Add("pair?", new BooleanOperations.Pair());
+			Primitives.Add("vector?", new BooleanOperations.Vector());
+			Primitives.Add("number?", new BooleanOperations.Number());
+			Primitives.Add("string?", new BooleanOperations.String());
+			Primitives.Add("char?", new BooleanOperations.Char());
+			Primitives.Add("port?", new BooleanOperations.Port());
+			Primitives.Add("input-port?", new BooleanOperations.InputPort());
+			Primitives.Add("output-port?", new BooleanOperations.OutputPort());
+			Primitives.Add("eof-object?", new BooleanOperations.EOFObject());
 		}
 
 		public static Primitive Get(string name)
