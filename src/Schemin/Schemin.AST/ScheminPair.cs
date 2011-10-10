@@ -65,7 +65,7 @@ namespace Schemin.AST
 
 		public bool Proper {
 			get {
-				if (this.Cdr == null || (this.Cdr as ScheminPair) != null)
+				if (this.Cdr == null || ((this.Cdr as ScheminPair) != null && ((ScheminPair) this.Cdr).Proper))
 					return true;
 
 				return false;

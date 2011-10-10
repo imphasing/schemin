@@ -36,7 +36,10 @@ namespace Schemin.Primitives.GeneralOperations
 		{
 			ScheminBool condition = args.Car.BoolValue();
 			IScheminType then = args.ElementAt(1);
-			IScheminType otherwise = args.ElementAt(2);
+			IScheminType otherwise = new ScheminPair();
+			
+			if (args.Length > 2)
+				otherwise = args.ElementAt(2);
 
 			if (condition.Value)
 			{
