@@ -166,6 +166,7 @@
     <Compile Include="Schemin.AST\ScheminInteger.cs" />
     <Compile Include="Schemin.AST\ScheminDecimal.cs" />
     <Compile Include="Schemin.AST\ScheminList.cs" />
+    <Compile Include="Schemin.AST\ScheminPair.cs" />
     <Compile Include="Schemin.AST\ScheminLambda.cs" />
     <Compile Include="Schemin.AST\ScheminRewriter.cs" />
     <Compile Include="Schemin.AST\ScheminPrimitive.cs" />
