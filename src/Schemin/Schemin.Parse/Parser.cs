@@ -221,28 +221,34 @@ namespace Schemin.Parse
 				if ((type as ScheminAtom) != null)
 				{
 					ScheminAtom atom = (ScheminAtom) type;
-					ScheminList newhead;
-					
-					switch(atom.Name)
+					if (atom.Name == "`")
 					{
-					case "`":
-						newhead = new ScheminList(new ScheminPrimitive("quasiquote"));
-						break;
-					case ",@":
-						newhead = new ScheminList(new ScheminPrimitive("unquote-splicing"));
-						break;
-					case ",":
-						newhead = new ScheminList(new ScheminPrimitive("unquote"));
-						break;
+						ScheminList newhead = new ScheminList(new ScheminPrimitive("quasiquote"));
+						TransformQuasiQuotes(c.Rest);
+						newhead.Append(c.Rest.Head);
+
+						c.Head = newhead;
+						c.Rest = c.Rest.Rest;
+						continue;
 					}
+					else if (atom.Name == ",@")
+					{
+						ScheminList newhead = new ScheminList(new ScheminPrimitive("unquote-splicing"));
+						TransformQuasiQuotes(c.Rest);
+						newhead.Append(c.Rest.Head);
 
-					TransformQuasiQuotes(c.Rest);
-					newhead.Append(c.Rest.Head);
+						c.Head = newhead;
+						c.Rest = c.Rest.Rest;
+					}
+					else if (atom.Name == ",")
+					{
+						ScheminList newhead = new ScheminList(new ScheminPrimitive("unquote"));
+						TransformQuasiQuotes(c.Rest);
+						newhead.Append(c.Rest.Head);
 
-					c.Head = newhead;
-					c.Rest = c.Rest.Rest;
-					if(atom.Name == "`") continue;
-
+						c.Head = newhead;
+						c.Rest = c.Rest.Rest;
+					}
 				}
 				else if ((type as ScheminList) != null)
 				{
