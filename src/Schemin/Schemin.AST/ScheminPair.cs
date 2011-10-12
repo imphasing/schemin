@@ -116,74 +116,55 @@ namespace Schemin.AST
 
 		public ScheminPair ListCdr()
 		{
-			if (this.Proper)
-			{
-				ScheminPair ret = (ScheminPair) this.Cdr;
+			ScheminPair ret = (ScheminPair) this.Cdr;
 
-				if (ret != null)
-					ret.quoted = this.quoted;
-				else
-					return new ScheminPair();
+			if (ret != null)
+				ret.quoted = this.quoted;
+			else
+				return new ScheminPair();
 
-				return ret;
-			}
-
-			throw new Exception("Can't get the list-cdr of an improper list");
+			return ret;
 		}
 
 		public ScheminPair Cons(IScheminType type)
 		{
-			if (this.Proper)
-			{
-				ScheminPair ret = new ScheminPair(type, this);
-				ret.quoted = quoted;
-				return ret;
-			}
-			else
-			{
-				throw new Exception("Can't cons to an improper list");
-			}
+			ScheminPair ret = new ScheminPair(type, this);
+			ret.quoted = quoted;
+			return ret;
 		}
 
 		public ScheminPair Append(IScheminType type)
 		{
-			if (this.Proper)
+			if (this.Car == null)
 			{
-				if (this.Car == null)
-				{
-					ScheminPair ret = new ScheminPair(type);
-					ret.quoted = quoted;
-					return ret;
-				}
-
-				if (this.Cdr == null)
-				{
-					ScheminPair ret = new ScheminPair(this.Car, new ScheminPair(type));
-					ret.quoted = quoted;
-					return ret;
-				}
-
-				ScheminPair appended = new ScheminPair();
-				appended.quoted = quoted;
-
-				foreach (IScheminType e in this)
-				{
-					appended = appended.Append(e);
-				}
-
-				ScheminPair rest = appended;
-				while (rest.Cdr != null)
-				{
-					rest = (ScheminPair) rest.Cdr;
-				}
-
-				rest.Cdr = new ScheminPair(type);
-				return appended;
+				ScheminPair ret = new ScheminPair(type);
+				ret.quoted = quoted;
+				return ret;
 			}
-			else
+
+			if (this.Cdr == null)
 			{
-				throw new Exception("Can't append to an improper list");
+				ScheminPair ret = new ScheminPair(this.Car, new ScheminPair(type));
+				ret.quoted = quoted;
+				return ret;
 			}
+
+			ScheminPair reversed = new ScheminPair(this.Car);
+
+			foreach (IScheminType e in this.ListCdr())
+			{
+				reversed = reversed.Cons(e);
+			}
+
+			ScheminPair appended = new ScheminPair(type);
+			appended.quoted = quoted;
+
+			foreach (IScheminType e in reversed)
+			{
+				appended = appended.Cons(e);
+			}
+
+			return appended;
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

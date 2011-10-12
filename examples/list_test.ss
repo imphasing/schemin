@@ -55,7 +55,7 @@
       (append (qs (filter (lambda (x) (<= x (car l))) (cdr l))) (cons (car l) (qs (filter (lambda (x) (> x (car l))) (cdr l))))))))
 
 
-(define test_list (list 23 5342 234 44 322 6654 44 1 3))
+(define test_list (list 23 5342 234 44 322 6654 44 1 3 54 22 334 11 332 44 322 11 3 1 4 6 3 2 5 7 2 234 2))
 (define sel_sorted_list (sel-sort test_list))
 (define bubble_sorted_list (bubblesort test_list))
 (define qs_sorted_list (qs test_list))
