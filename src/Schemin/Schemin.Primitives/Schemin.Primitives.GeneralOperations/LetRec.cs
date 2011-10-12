@@ -49,12 +49,12 @@ namespace Schemin.Primitives.GeneralOperations
 				argExps = argExps.Append(bindingPair.ElementAt(1));
 			}
 
-			ScheminPair body = new ScheminPair();
+			ScheminPair body = new ScheminPair(new ScheminPrimitive("begin"));
 			body.UnQuote();
 
 			ScheminPair next = letArgs;
 			ScheminPair nextExp = argExps;
-			while (next != null)
+			while (!next.Empty)
 			{
 				IScheminType symbol = next.Car;
 				IScheminType exp = nextExp.Car;

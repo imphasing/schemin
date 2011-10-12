@@ -36,9 +36,16 @@ namespace Schemin.Primitives.ListOperations
 		{
 			ScheminPair listArg = (ScheminPair) args.Car;
 			if (listArg.Cdr == null)
+			{
 				return new ScheminPair();
+			}
 			else
-				return listArg.Cdr;
+			{
+				if (!listArg.Proper)
+					return listArg.Cdr;
+
+				return listArg.ListCdr();
+			}
 		}
 
 		public override void CheckArguments(ScheminPair args)
