@@ -481,6 +481,9 @@ namespace Schemin.Evaluate
 			}
 
 			var prebound_schemin = new List<string>();
+			prebound_schemin.Add(ScheminPrimitives.Cadr);
+			prebound_schemin.Add(ScheminPrimitives.Cddr);
+			prebound_schemin.Add(ScheminPrimitives.Caddr);
 			prebound_schemin.Add(ScheminPrimitives.Map);
 			prebound_schemin.Add(ScheminPrimitives.Filter);
 			prebound_schemin.Add(ScheminPrimitives.Foldl);
@@ -504,7 +507,6 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.Product);
 			prebound_schemin.Add(ScheminPrimitives.Max);
 			prebound_schemin.Add(ScheminPrimitives.Min);
-			prebound_schemin.Add(ScheminPrimitives.Caddr);
 			prebound_schemin.Add(ScheminPrimitives.DefineMacro);
 
 			Tokenize.Tokenizer t = new Tokenize.Tokenizer();

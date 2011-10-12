@@ -50,7 +50,7 @@ namespace Schemin.AST
 			else
 			{
 				ScheminPair def = definition.ListCdr();
-				def.Cons(new ScheminPrimitive("begin"));
+				def = def.Cons(new ScheminPrimitive("begin"));
 				this.Definition = def;
 			}
 

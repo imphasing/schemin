@@ -106,11 +106,6 @@ namespace Schemin.Primitives.GeneralOperations
 				ScheminPair arguments = (ScheminPair) args.Car;
 				IScheminType name = arguments.Car;
 
-				if (args.Length != 2)
-				{
-					throw new BadArgumentsException("expected 2 arguments");
-				}
-
 				if ((name as ScheminAtom) == null)
 				{
 					throw new BadArgumentsException("must supply a symbol for definition");

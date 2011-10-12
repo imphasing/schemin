@@ -29,6 +29,10 @@ namespace Schemin.Primitives
 {
 	public static class ScheminPrimitives
 	{
+		public static string Cadr = "(define (cadr list) (car (cdr list)))";
+		public static string Cddr = "(define (cddr list) (cdr (cdr list)))";
+		public static string Caddr = "(define (caddr list) (car (cdr (cdr list))))";
+
 		public static string Foldl = @"(define (foldl func accum lst)
 						 (if (null? lst)
 						   accum
@@ -39,9 +43,9 @@ namespace Schemin.Primitives
 						   end
 						   (func (car lst) (foldr func end (cdr lst)))))";
 
-		public static string Filter = @"(define (filter pred lst) (foldr (lambda (x y) (if (pred x) (cons x y) y)) '() lst))";
+		public static string Filter = @"(define (filter pred lst) (foldr (lambda (x y) (if (pred x) (cons x y) y)) (quote ()) lst))";
 
-		public static string Map = @"(define (map func lst) (foldr (lambda (x y) (cons (func x) y)) '() lst))";
+		public static string Map = @"(define (map func lst) (foldr (lambda (x y) (cons (func x) y)) (quote ()) lst))";
 
 		public static string Not = "(define (not x) (if x #f #t))";
 
@@ -85,8 +89,6 @@ namespace Schemin.Primitives
 		public static string Max = "(define (max first . num-list) (fold (lambda (old new) (if (> old new) old new)) first num-list))";
 
 		public static string Min = "(define (min first . num-list) (fold (lambda (old new) (if (< old new) old new)) first num-list))";
-
-		public static string Caddr = "(define (caddr list) (car (cdr (cdr list))))";
 
 		public static string DefineMacro = @"(define-rewriter define-macro
 						      (lambda args
