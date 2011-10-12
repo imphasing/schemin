@@ -63,7 +63,7 @@ namespace Schemin.Tokenize
 			// Skip comments and whitespace again, since we can have whitespace after comments etc.
 			if (i < input.Length)
 			{
-				while (input[i] == ';')
+				while (i < input.Length && input[i] == ';')
 				{
 					while (i < input.Length && !Newline(input[i])) i++;
 					i++;

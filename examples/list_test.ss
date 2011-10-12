@@ -7,7 +7,7 @@
 (define (remove-smallest lst)
   (let remove-smaller-than ((val (car lst))
                             (rest (cdr lst))
-                            (acc '()))
+                            (acc (quote ())))
     (cond
       ((null? rest)
         (list val acc))
@@ -18,7 +18,7 @@
 
 (define (sel-sort lst)
   (if (null? lst)
-    '()
+    (quote ())
     (let ((smallest (remove-smallest lst)))
       (cons (car smallest) (sel-sort (cadr smallest))))))
 
@@ -26,10 +26,10 @@
 ; produce new list with E interleaved between each pair of elements in input list
 (define (interleave E L)
   (if (null? L)
-      '()
+      (quote ())
       (cons (car L)              ; head of list
             (if (null? (cdr L))  ; followed by...
-                '()              ; nothing, if it was the last element,
+                (quote ())              ; nothing, if it was the last element,
                 (cons E          ; otherwise E, then E interleaved with rest of list
                       (interleave E (cdr L)))))))
 
@@ -55,11 +55,11 @@
       (append (qs (filter (lambda (x) (<= x (car l))) (cdr l))) (cons (car l) (qs (filter (lambda (x) (> x (car l))) (cdr l))))))))
 
 
-(define test_list '(23 5342 234 44 322 6654 44 223 44 11 3 1 23 4 1 3 55 2))
+(define test_list (list 23 5342 234 44 322 6654 44 1 3))
 (define sel_sorted_list (sel-sort test_list))
 (define bubble_sorted_list (bubblesort test_list))
 (define qs_sorted_list (qs test_list))
-(define interleaved_list (interleave 'I test_list))
+(define interleaved_list (interleave "I" test_list))
 
 (display "Test list: ")
 (display test_list)
