@@ -28,6 +28,7 @@
 namespace Schemin.Parse
 {
 	using System;
+	using System.Linq;
 	using System.Collections.Generic;
 	using System.Numerics;
 	using Schemin.Tokenize;
@@ -41,7 +42,8 @@ namespace Schemin.Parse
 		{
 			ScheminPair.QuoteLists = quoteLists;
 			KeyValuePair<ScheminPair, int> parsed = ParseInternal(tokens, 0);
-			ScheminPair transformed = TransformQuotes(parsed.Key);
+			ScheminPair transformed = TransformQuasiQuotes(parsed.Key);
+			transformed = TransformQuotes(transformed);
 			ScheminPair.QuoteLists = true;
 			return transformed;
 		}
@@ -193,9 +195,12 @@ namespace Schemin.Parse
 						ScheminPair rewritten = new ScheminPair(new ScheminPrimitive("quote"));
 						IScheminType toQuote = rest.ElementAt(1);
 
-						rewritten = rewritten.Append(TransformQuotes((ScheminPair) rest.Cdr).Car);
+						ScheminPair recursed = TransformQuotes((ScheminPair) rest.Cdr);
+
+						rewritten = rewritten.Append(recursed.Car);
 						transformed = transformed.Append(rewritten);
-						return transformed;
+						rest = (ScheminPair) recursed.Cdr;
+						continue;
 					}
 					else
 					{
@@ -206,63 +211,63 @@ namespace Schemin.Parse
 				{
 					transformed = transformed.Append(type);
 				}
-				
+
 				rest = (ScheminPair) rest.Cdr;
 			}
 
 			return transformed;
 		}
 
-		private void TransformQuasiQuotes(ScheminList ast)
+		private ScheminPair TransformQuasiQuotes(ScheminPair ast)
 		{
-			// this horrible code transforms quasiquoted literals into their expanded form
-			// eg: `(a ,b) becomes (quasiquote a (unquote b))
+			ScheminPair transformed = new ScheminPair();
 
-			ScheminList c = ast;
-
-			while (c != null)
+			ScheminPair rest = ast;
+			while (rest != null)
 			{
-				IScheminType type = c.Head;
-
-				if ((type as ScheminAtom) != null)
+				IScheminType type = rest.Car;
+				if ((type as ScheminPair) != null)
 				{
-					ScheminAtom atom = (ScheminAtom) type;
-					if (atom.Name == "`")
-					{
-						ScheminList newhead = new ScheminList(new ScheminPrimitive("quasiquote"));
-						TransformQuasiQuotes(c.Rest);
-						newhead.Append(c.Rest.Head);
+					transformed = transformed.Append(TransformQuasiQuotes((ScheminPair)type));
+				}
+				else if ((type as ScheminAtom) != null)
+				{
+					ScheminAtom atom = (ScheminAtom)type;
 
-						c.Head = newhead;
-						c.Rest = c.Rest.Rest;
+					string[] quotes = { "`", ",", ",@" };
+
+					Dictionary<string, string> quoteSubs = new Dictionary<string, string>();
+					quoteSubs.Add("`", "quasiquote");
+					quoteSubs.Add(",", "unquote");
+					quoteSubs.Add(",@", "unquote-splicing");
+
+					if (quotes.Contains(atom.Name))
+					{
+						ScheminPair rewritten = new ScheminPair(new ScheminPrimitive(quoteSubs[atom.Name]));
+						IScheminType toQuote = rest.ElementAt(1);
+
+						ScheminPair recursed = TransformQuasiQuotes((ScheminPair)rest.Cdr);
+
+						rewritten = rewritten.Append(recursed.Car);
+						transformed = transformed.Append(rewritten);
+						rest = (ScheminPair)recursed.Cdr;
 						continue;
 					}
-					else if (atom.Name == ",@")
+					else
 					{
-						ScheminList newhead = new ScheminList(new ScheminPrimitive("unquote-splicing"));
-						TransformQuasiQuotes(c.Rest);
-						newhead.Append(c.Rest.Head);
-
-						c.Head = newhead;
-						c.Rest = c.Rest.Rest;
-					}
-					else if (atom.Name == ",")
-					{
-						ScheminList newhead = new ScheminList(new ScheminPrimitive("unquote"));
-						TransformQuasiQuotes(c.Rest);
-						newhead.Append(c.Rest.Head);
-
-						c.Head = newhead;
-						c.Rest = c.Rest.Rest;
+						transformed = transformed.Append(type);
 					}
 				}
-				else if ((type as ScheminList) != null)
+				else
 				{
-					TransformQuasiQuotes((ScheminList) type);
+					transformed = transformed.Append(type);
 				}
 
-				c = c.Rest;
+				rest = (ScheminPair)rest.Cdr;
 			}
+
+			return transformed;
 		}
+
 	}
 }

@@ -73,7 +73,7 @@ namespace Schemin.Primitives.GeneralOperations
 							else if (first.Name == "unquote-splicing")
 							{
 								typeList.UnQuote();
-								quoted.Append(typeList.ElementAt(1));
+								quoted = quoted.Append(typeList.ElementAt(1));
 								continue;
 							}
 						}
