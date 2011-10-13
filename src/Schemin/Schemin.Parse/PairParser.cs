@@ -41,8 +41,9 @@ namespace Schemin.Parse
 		{
 			ScheminPair.QuoteLists = quoteLists;
 			KeyValuePair<ScheminPair, int> parsed = ParseInternal(tokens, 0);
+			ScheminPair transformed = TransformQuotes(parsed.Key);
 			ScheminPair.QuoteLists = true;
-			return (ScheminPair) parsed.Key;
+			return transformed;
 		}
 
 		private KeyValuePair<ScheminPair, int> ParseInternal(List<Token> tokens, int startIndex)
@@ -172,37 +173,44 @@ namespace Schemin.Parse
 			}
 		}
 
-		private void TransformQuotes(ScheminList ast)
+		private ScheminPair TransformQuotes(ScheminPair ast)
 		{
-			ScheminList c = ast;
+			ScheminPair transformed = new ScheminPair();
 
-			while (c != null)
+			ScheminPair rest = ast;
+			while (rest != null)
 			{
-				IScheminType type = c.Head;
-
-				if ((type as ScheminAtom) != null)
+				IScheminType type = rest.Car;	
+				if ((type as ScheminPair) != null)
+				{
+					transformed = transformed.Append(TransformQuotes((ScheminPair) type));
+				}
+				else if ((type as ScheminAtom) != null)
 				{
 					ScheminAtom atom = (ScheminAtom) type;
 					if (atom.Name == "'")
 					{
-						// This pass replaces a list like (' a b) with ((quote a) b)
-						// and ''a with (quote (quote a))
-						ScheminList newhead = new ScheminList(new ScheminPrimitive("quote"));
-						TransformQuotes(c.Rest);
+						ScheminPair rewritten = new ScheminPair(new ScheminPrimitive("quote"));
+						IScheminType toQuote = rest.ElementAt(1);
 
-						newhead.Append(c.Rest.Head);
-
-						c.Head = newhead;
-						c.Rest = c.Rest.Rest;
+						rewritten = rewritten.Append(TransformQuotes((ScheminPair) rest.Cdr).Car);
+						transformed = transformed.Append(rewritten);
+						return transformed;
+					}
+					else
+					{
+						transformed = transformed.Append(type);
 					}
 				}
-				else if ((type as ScheminList) != null)
+				else
 				{
-					TransformQuotes((ScheminList) type);
+					transformed = transformed.Append(type);
 				}
-
-				c = c.Rest;
+				
+				rest = (ScheminPair) rest.Cdr;
 			}
+
+			return transformed;
 		}
 
 		private void TransformQuasiQuotes(ScheminList ast)
