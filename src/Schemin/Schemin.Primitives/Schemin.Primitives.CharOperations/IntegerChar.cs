@@ -29,18 +29,19 @@ namespace Schemin.Primitives.CharOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class IntegerChar : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminInteger num = (ScheminInteger) args.Car();
+			ScheminInteger num = (ScheminInteger) args.Car;
 
 			return new ScheminChar((char) num.Value);
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{

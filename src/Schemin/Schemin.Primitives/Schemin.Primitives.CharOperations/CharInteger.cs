@@ -31,19 +31,20 @@ namespace Schemin.Primitives.CharOperations
 	using Environment = Schemin.Evaluate.Environment;
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class CharInteger : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminChar chr = (ScheminChar) args.Car();
+			ScheminChar chr = (ScheminChar) args.Car;
 
 			int result = Convert.ToInt32(chr.Value);
 			return new ScheminInteger(result);
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{

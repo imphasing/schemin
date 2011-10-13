@@ -33,20 +33,20 @@ namespace Schemin.Primitives.StringOperations
 	using Schemin.AST;
 	public class StringRef : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminString str = (ScheminString) args.Car();
-			ScheminInteger pos = (ScheminInteger) args.Cdr().Car();
+			ScheminString str = (ScheminString) args.Car;
+			ScheminInteger pos = (ScheminInteger) args.ElementAt(1);
 
 			int pos_int = (int) pos.IntegerValue();
 			ScheminChar chr = new ScheminChar(str.Value[pos_int]);
 			return chr;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
-			IScheminType second = args.Cdr().Car();
+			IScheminType first = args.Car;
+			IScheminType second = args.ElementAt(1);
 			
 			if (args.Length != 2)
 			{

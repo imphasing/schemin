@@ -31,10 +31,10 @@ namespace Schemin.Primitives.CharOperations
 	using Schemin.AST;
 	public class CharEquals : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminChar first = (ScheminChar) args.Car();
-			ScheminChar second = (ScheminChar) args.Cdr().Car();
+			ScheminChar first = (ScheminChar) args.Car;
+			ScheminChar second = (ScheminChar) args.ElementAt(1);
 
 			if (first.Equals(second))
 			{
@@ -44,10 +44,10 @@ namespace Schemin.Primitives.CharOperations
 			return ScheminBool.False;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
-			IScheminType second = args.Cdr().Car();
+			IScheminType first = args.Car;
+			IScheminType second = args.ElementAt(1);
 
 			if (args.Length != 2)
 			{

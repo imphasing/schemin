@@ -31,16 +31,16 @@ namespace Schemin.Primitives.StringOperations
 	using Schemin.AST;
 	public class StringLength : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminString str = (ScheminString) args.Car();
+			ScheminString str = (ScheminString) args.Car;
 			ScheminInteger len = new ScheminInteger(str.Value.Length);
 			return len;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 			
 			if (args.Length != 1)
 			{

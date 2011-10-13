@@ -114,6 +114,25 @@ namespace Schemin.Primitives
 			Primitives.Add("read-line", new PortOperations.ReadLine());
 			Primitives.Add("write", new PortOperations.Write());
 			Primitives.Add("write-char", new PortOperations.WriteChar());
+
+			Primitives.Add("string-ref", new StringOperations.StringRef());
+			Primitives.Add("string-length", new StringOperations.StringLength());
+
+			Primitives.Add("char=?", new CharOperations.CharEquals());
+			Primitives.Add("char<?", new CharOperations.CharGreaterThan());
+			Primitives.Add("char>?", new CharOperations.CharLessThan());
+			Primitives.Add("char>=?", new CharOperations.CharLessThanOr());
+			Primitives.Add("char<=?", new CharOperations.CharGreaterThanOr());
+
+			Primitives.Add("char-alphabetic?", new CharOperations.CharAlphabetic());
+			Primitives.Add("char-numeric?", new CharOperations.CharNumeric());
+			Primitives.Add("char-whitespace?", new CharOperations.CharWhitespace());
+			Primitives.Add("char-upper-case?", new CharOperations.CharUpperCase());
+			Primitives.Add("char-lower-case?", new CharOperations.CharLowerCase());
+			Primitives.Add("char->integer", new CharOperations.CharInteger());
+			Primitives.Add("integer->char", new CharOperations.IntegerChar());
+			Primitives.Add("char-upcase", new CharOperations.CharUpcase());
+			Primitives.Add("char-downcase", new CharOperations.CharDowncase());
 		}
 
 		public static Primitive Get(string name)

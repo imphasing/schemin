@@ -127,6 +127,24 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\Write.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.PortOperations\WriteChar.cs" />
 
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\StringLength.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\StringRef.cs" />
+
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharEquals.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharLessThan.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharAlphabetic.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharDowncase.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharGreaterThan.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharGreaterThanOr.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharInteger.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharLessThanOr.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharLowerCase.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharNumeric.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharUpcase.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharUpperCase.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharWhitespace.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\IntegerChar.cs" />
+
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />
