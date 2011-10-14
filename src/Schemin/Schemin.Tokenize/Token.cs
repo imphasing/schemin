@@ -41,5 +41,10 @@ namespace Schemin.Tokenize
 			this.Type = type;
 			this.Value = value;
 		}
+
+		public override string ToString()
+		{
+			return Value;
+		}
 	}
 }

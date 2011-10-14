@@ -40,6 +40,7 @@ namespace Schemin.Tokenize
 		BackQuote,
 		Comma,
 		AtComma,
+		Dot,
 		OpenParen,
 		CloseParen
 	}

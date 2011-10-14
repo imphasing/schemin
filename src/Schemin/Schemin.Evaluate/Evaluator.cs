@@ -191,6 +191,11 @@ namespace Schemin.Evaluate
 
 				int currentArg = 0;
 
+				if (!rest.Proper)
+				{
+					throw new Exception("Unable to evaluate the dotted pair: " + rest);
+				}
+
 				while (!rest.Empty)
 				{
 					IScheminType type = rest.Car;

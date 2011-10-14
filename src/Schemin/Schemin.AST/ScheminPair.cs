@@ -241,6 +241,17 @@ namespace Schemin.AST
 			return builder.ToString();
 		}
 
+		public ScheminVector ToVector()
+		{
+			ScheminVector vec = new ScheminVector();
+			foreach (IScheminType type in this)
+			{
+				vec.List.Add(type);
+			}
+
+			return vec;
+		}
+
 		public bool Quoted()
 		{
 			return this.quoted;

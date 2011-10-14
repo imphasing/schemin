@@ -100,6 +100,8 @@ namespace Schemin.Tokenize
 						return MakeTokenPair(TokenType.OpenParen, new String(input, i, 1), input, i, i + 1);
 					case ')':
 						return MakeTokenPair(TokenType.CloseParen, new String(input, i, 1), input, i, i + 1);
+					case '.':
+						return MakeTokenPair(TokenType.Dot, new String(input, i, 1), input, i, i + 1);
 					default:
 						return Symbol(input, i);
 				}

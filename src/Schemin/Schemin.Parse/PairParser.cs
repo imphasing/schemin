@@ -41,73 +41,109 @@ namespace Schemin.Parse
 		public ScheminPair Parse(List<Token> tokens, bool quoteLists)
 		{
 			ScheminPair.QuoteLists = quoteLists;
-			KeyValuePair<ScheminPair, int> parsed = ParseInternal(tokens, 0);
-			ScheminPair transformed = TransformQuasiQuotes(parsed.Key);
-			transformed = TransformQuotes(transformed);
-			ScheminPair.QuoteLists = true;
-			return transformed;
-		}
+			int currentPosition = 0;
 
-		private KeyValuePair<ScheminPair, int> ParseInternal(List<Token> tokens, int startIndex)
-		{
-			ScheminPair parsed = new ScheminPair();
-
-			while (startIndex < tokens.Count)
+			ScheminPair totalParsed = new ScheminPair();
+			while (currentPosition < tokens.Count)
 			{
-				if (tokens[startIndex].Type == TokenType.VectorLiteral)
-				{
-					if (tokens[startIndex + 1].Type == TokenType.OpenParen)
-					{
-						KeyValuePair<ScheminPair, int> descended = ParseInternal(tokens, startIndex + 2);
-						ScheminVector vec = new ScheminVector();
-						foreach (IScheminType type in descended.Key)
-						{
-							type.Quote();
-							vec.List.Add(type);
-						}
-
-						parsed = parsed.Append(vec);
-						startIndex = descended.Value;
-					}
-
-				}
-				else if (tokens[startIndex].Type == TokenType.OpenParen)
-				{
-					KeyValuePair<ScheminPair, int> descended = ParseInternal(tokens, startIndex + 1);
-					parsed = parsed.Append(descended.Key);
-
-					startIndex = descended.Value;
-				}
-				else if (tokens[startIndex].Type == TokenType.CloseParen)
-				{
-					break;
-				}
-				else if (tokens[startIndex].Type == TokenType.Quote)
-				{
-					parsed = parsed.Append(new ScheminAtom("'"));
-				}
-				else if (tokens[startIndex].Type == TokenType.BackQuote)
-				{
-					parsed = parsed.Append(new ScheminAtom("`"));
-				}
-				else if (tokens[startIndex].Type == TokenType.AtComma)
-				{
-					parsed = parsed.Append(new ScheminAtom(",@"));
-				}
-				else if (tokens[startIndex].Type == TokenType.Comma)
-				{
-					parsed = parsed.Append(new ScheminAtom(","));
-				}
-				else
-				{
-					IScheminType converted = ConvertToken(tokens[startIndex]);
-					parsed = parsed.Append(converted);
-				}
-
-				startIndex++;
+				totalParsed = totalParsed.Append(ParseTopLevel(tokens, ref currentPosition));
 			}
 
-			return new KeyValuePair<ScheminPair, int>(parsed, startIndex);
+			ScheminPair.QuoteLists = true;
+			return totalParsed;
+		}
+
+		private IScheminType ParseTopLevel(List<Token> tokens, ref int currentPosition)
+		{
+			switch (tokens[currentPosition].Type)
+			{
+				case TokenType.OpenParen:
+					if (tokens[currentPosition + 1].Type == TokenType.CloseParen)
+					{
+						currentPosition++;
+						return new ScheminPair();
+					}
+					else
+					{
+						currentPosition++;
+						return ParseList(tokens, ref currentPosition);
+					}
+
+				case TokenType.VectorLiteral:
+					currentPosition += 2;
+					var parsedListVector = ParseList(tokens, ref currentPosition);
+					return ((ScheminPair) parsedListVector).ToVector();
+
+				case TokenType.Quote:
+				case TokenType.BackQuote:
+				case TokenType.Comma:
+				case TokenType.AtComma:
+					tokens[currentPosition] = RemapQuote(tokens[currentPosition]);
+					tokens.Insert(0, new Token(TokenType.OpenParen, "("));
+
+					int quotedTermination = FindQuotedTermination(tokens, currentPosition + 2);
+
+					tokens.Insert(quotedTermination, new Token(TokenType.CloseParen, ")"));
+					return ParseTopLevel(tokens, ref currentPosition);
+
+				default:
+					IScheminType converted = ConvertToken(tokens[currentPosition]);
+					currentPosition++;
+					return converted;    
+			}
+		}
+
+		private IScheminType ParseList(List<Token> tokens, ref int currentPosition)
+		{
+			ScheminPair built = new ScheminPair();
+
+			switch (tokens[currentPosition].Type)
+			{
+				case TokenType.CloseParen:
+					if (tokens[currentPosition - 1].Type == TokenType.OpenParen)
+					{
+						currentPosition++;
+						return new ScheminPair();
+					}
+
+					currentPosition++;
+					return null;
+
+				case TokenType.OpenParen:
+					currentPosition++;
+					built.Car = ParseList(tokens, ref currentPosition);
+					built.Cdr = ParseList(tokens, ref currentPosition);
+					return built;
+
+				case TokenType.VectorLiteral:
+					currentPosition += 2;
+					built.Car = ((ScheminPair) ParseList(tokens, ref currentPosition)).ToVector();
+					built.Cdr = ParseList(tokens, ref currentPosition);
+					return built;
+
+				case TokenType.Dot:
+					currentPosition++;
+					var converted = ConvertToken(tokens[currentPosition]);
+					currentPosition += 2;
+					return converted;
+
+				case TokenType.Quote:
+				case TokenType.BackQuote:
+				case TokenType.Comma:
+				case TokenType.AtComma:
+					tokens[currentPosition] = RemapQuote(tokens[currentPosition]);
+					tokens.Insert(currentPosition, new Token(TokenType.OpenParen, "("));
+					int quotedTermination = FindQuotedTermination(tokens, currentPosition + 2);
+
+					tokens.Insert(quotedTermination, new Token(TokenType.CloseParen, ")"));
+					return ParseList(tokens, ref currentPosition);
+
+				default:
+					built.Car = ConvertToken(tokens[currentPosition]);
+					currentPosition++;
+					built.Cdr = ParseList(tokens, ref currentPosition);
+					return built;
+			}
 		}
 
 		private IScheminType ConvertToken(Token token)
@@ -175,99 +211,88 @@ namespace Schemin.Parse
 			}
 		}
 
-		private ScheminPair TransformQuotes(ScheminPair ast)
+		private Token RemapQuote(Token quote)
 		{
-			ScheminPair transformed = new ScheminPair();
+			Dictionary<string, Token> remapped = new Dictionary<string, Token>();
+			remapped.Add("'", new Token(TokenType.Symbol, "quote"));
+			remapped.Add("`", new Token(TokenType.Symbol, "quasiquote"));
+			remapped.Add(",", new Token(TokenType.Symbol, "unquote"));
+			remapped.Add(",@", new Token(TokenType.Symbol, "unquote-splicing"));
 
-			ScheminPair rest = ast;
-			while (rest != null)
-			{
-				IScheminType type = rest.Car;	
-				if ((type as ScheminPair) != null)
-				{
-					transformed = transformed.Append(TransformQuotes((ScheminPair) type));
-				}
-				else if ((type as ScheminAtom) != null)
-				{
-					ScheminAtom atom = (ScheminAtom) type;
-					if (atom.Name == "'")
-					{
-						ScheminPair rewritten = new ScheminPair(new ScheminPrimitive("quote"));
-						IScheminType toQuote = rest.ElementAt(1);
-
-						ScheminPair recursed = TransformQuotes((ScheminPair) rest.Cdr);
-
-						rewritten = rewritten.Append(recursed.Car);
-						transformed = transformed.Append(rewritten);
-						rest = (ScheminPair) recursed.Cdr;
-						continue;
-					}
-					else
-					{
-						transformed = transformed.Append(type);
-					}
-				}
-				else
-				{
-					transformed = transformed.Append(type);
-				}
-
-				rest = (ScheminPair) rest.Cdr;
-			}
-
-			return transformed;
+			return remapped[quote.Value];
 		}
 
-		private ScheminPair TransformQuasiQuotes(ScheminPair ast)
+		private int FindQuotedTermination(List<Token> tokens, int startIndex)
 		{
-			ScheminPair transformed = new ScheminPair();
-
-			ScheminPair rest = ast;
-			while (rest != null)
+			switch (tokens[startIndex].Type)
 			{
-				IScheminType type = rest.Car;
-				if ((type as ScheminPair) != null)
-				{
-					transformed = transformed.Append(TransformQuasiQuotes((ScheminPair)type));
-				}
-				else if ((type as ScheminAtom) != null)
-				{
-					ScheminAtom atom = (ScheminAtom)type;
+				case TokenType.OpenParen:
+					startIndex++;
+					return FindMatchingParen(tokens, startIndex);
 
-					string[] quotes = { "`", ",", ",@" };
+				case TokenType.VectorLiteral:
+					startIndex += 2;
+					return FindMatchingParen(tokens, startIndex);
 
-					Dictionary<string, string> quoteSubs = new Dictionary<string, string>();
-					quoteSubs.Add("`", "quasiquote");
-					quoteSubs.Add(",", "unquote");
-					quoteSubs.Add(",@", "unquote-splicing");
+				case TokenType.AtComma:
+				case TokenType.BackQuote:
+				case TokenType.Quote:
+				case TokenType.Comma:
+					while (!(IsQuotable(tokens[startIndex])))
+						startIndex++;
+					return startIndex + 1;
 
-					if (quotes.Contains(atom.Name))
-					{
-						ScheminPair rewritten = new ScheminPair(new ScheminPrimitive(quoteSubs[atom.Name]));
-						IScheminType toQuote = rest.ElementAt(1);
-
-						ScheminPair recursed = TransformQuasiQuotes((ScheminPair)rest.Cdr);
-
-						rewritten = rewritten.Append(recursed.Car);
-						transformed = transformed.Append(rewritten);
-						rest = (ScheminPair)recursed.Cdr;
-						continue;
-					}
-					else
-					{
-						transformed = transformed.Append(type);
-					}
-				}
-				else
-				{
-					transformed = transformed.Append(type);
-				}
-
-				rest = (ScheminPair)rest.Cdr;
+				default:
+					return startIndex + 1;
 			}
-
-			return transformed;
 		}
 
+		private bool IsQuoteToken(Token token)
+		{
+			string[] quotes = { "'", "`", ",", ",@" };
+			if (quotes.Contains(token.Value))
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool IsQuotable(Token token)
+		{
+			TokenType[] quotables = { TokenType.DecimalLiteral, TokenType.IntegerLiteral, TokenType.OpenParen,
+				TokenType.StringLiteral, TokenType.Symbol, TokenType.VectorLiteral };
+			if (quotables.Contains(token.Type))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private int FindMatchingParen(List<Token> tokens, int startIndex)
+		{
+			int neededClosing = 1;
+			while (neededClosing != 0)
+			{
+				if (tokens[startIndex].Type == TokenType.CloseParen)
+				{
+					neededClosing--;
+				}
+				else if (tokens[startIndex].Type == TokenType.OpenParen)
+				{
+					neededClosing++;
+				}
+
+				if (neededClosing == 0)
+					break;
+
+				startIndex++;
+			}
+
+			return startIndex;
+		}
 	}
 }
