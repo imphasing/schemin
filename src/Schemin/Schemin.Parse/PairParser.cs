@@ -40,6 +40,7 @@ namespace Schemin.Parse
 	{
 		public ScheminPair Parse(List<Token> tokens, bool quoteLists)
 		{
+			TransformQuoteTokens(tokens);
 			ScheminPair.QuoteLists = quoteLists;
 			int currentPosition = 0;
 
@@ -70,21 +71,7 @@ namespace Schemin.Parse
 					}
 
 				case TokenType.VectorLiteral:
-					currentPosition += 2;
-					var parsedListVector = ParseList(tokens, ref currentPosition);
-					return ((ScheminPair) parsedListVector).ToVector();
-
-				case TokenType.Quote:
-				case TokenType.BackQuote:
-				case TokenType.Comma:
-				case TokenType.AtComma:
-					tokens[currentPosition] = RemapQuote(tokens[currentPosition]);
-					tokens.Insert(0, new Token(TokenType.OpenParen, "("));
-
-					int quotedTermination = FindQuotedTermination(tokens, currentPosition + 2);
-
-					tokens.Insert(quotedTermination, new Token(TokenType.CloseParen, ")"));
-					return ParseTopLevel(tokens, ref currentPosition);
+					return ParseVector(tokens, ref currentPosition);
 
 				default:
 					IScheminType converted = ConvertToken(tokens[currentPosition]);
@@ -116,27 +103,13 @@ namespace Schemin.Parse
 					return built;
 
 				case TokenType.VectorLiteral:
-					currentPosition += 2;
-					built.Car = ((ScheminPair) ParseList(tokens, ref currentPosition)).ToVector();
+					built.Car = ParseVector(tokens, ref currentPosition);
 					built.Cdr = ParseList(tokens, ref currentPosition);
 					return built;
 
 				case TokenType.Dot:
 					currentPosition++;
-					var converted = ConvertToken(tokens[currentPosition]);
-					currentPosition += 2;
-					return converted;
-
-				case TokenType.Quote:
-				case TokenType.BackQuote:
-				case TokenType.Comma:
-				case TokenType.AtComma:
-					tokens[currentPosition] = RemapQuote(tokens[currentPosition]);
-					tokens.Insert(currentPosition, new Token(TokenType.OpenParen, "("));
-					int quotedTermination = FindQuotedTermination(tokens, currentPosition + 2);
-
-					tokens.Insert(quotedTermination, new Token(TokenType.CloseParen, ")"));
-					return ParseList(tokens, ref currentPosition);
+					return ParseDot(tokens, ref currentPosition);
 
 				default:
 					built.Car = ConvertToken(tokens[currentPosition]);
@@ -144,6 +117,58 @@ namespace Schemin.Parse
 					built.Cdr = ParseList(tokens, ref currentPosition);
 					return built;
 			}
+		}
+
+		private IScheminType ParseVector(List<Token> tokens, ref int currentPosition)
+		{
+			currentPosition += 2;
+			ScheminVector parsed = ((ScheminPair) ParseList(tokens, ref currentPosition)).ToVector();
+			return parsed;
+		}
+
+		private IScheminType ParseDot(List<Token> tokens, ref int currentPosition)
+		{
+			switch (tokens[currentPosition].Type)
+			{
+				case TokenType.OpenParen:
+					currentPosition++;
+					IScheminType parsed = ParseList(tokens, ref currentPosition);
+					currentPosition++;
+					return parsed;
+				case TokenType.VectorLiteral:
+					IScheminType parsedVec = ParseVector(tokens, ref currentPosition);
+					currentPosition++;
+					return parsedVec;
+				default:
+					var converted = ConvertToken(tokens[currentPosition]);
+					currentPosition += 2;
+					return converted;
+			}
+		}
+
+		private void TransformQuoteTokens(List<Token> tokens)
+		{
+			for (int i = 0; i < tokens.Count; i++)
+			{
+				switch (tokens[i].Type)
+				{
+					case TokenType.Quote:
+					case TokenType.BackQuote:
+					case TokenType.Comma:
+					case TokenType.AtComma:
+						RemapQuoteToken(tokens, i);
+						break;
+				}
+			}
+		}
+
+		private void RemapQuoteToken(List<Token> tokens, int currentPosition)
+		{
+			tokens[currentPosition] = RemapQuote(tokens[currentPosition]);
+			tokens.Insert(currentPosition, new Token(TokenType.OpenParen, "("));
+			int quotedTermination = FindQuotedTermination(tokens, currentPosition + 2);
+
+			tokens.Insert(quotedTermination, new Token(TokenType.CloseParen, ")"));
 		}
 
 		private IScheminType ConvertToken(Token token)
