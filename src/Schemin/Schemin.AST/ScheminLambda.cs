@@ -28,14 +28,14 @@
 namespace Schemin.AST
 {
 	using System;
+	using System.Collections.Generic;
 	using Schemin.Evaluate;
 	using Schemin.Primitives;
-
 	using Environment = Schemin.Evaluate.Environment;
 
 	public class ScheminLambda : IScheminType
 	{
-		public IScheminType Definition;
+		public ScheminPair Definition;
 		public IScheminType Arguments;
 		public Environment Closure;
 
@@ -43,16 +43,9 @@ namespace Schemin.AST
 		{
 			this.Arguments = definition.Car;
 
-			if (definition.ListCdr().Length == 1)
-			{
-				this.Definition = definition.ElementAt(1);
-			}
-			else
-			{
-				ScheminPair def = definition.ListCdr();
-				def = def.Cons(new ScheminPrimitive("begin"));
-				this.Definition = def;
-			}
+			ScheminPair def = definition.ListCdr();
+			def = def.Cons(new ScheminPrimitive("begin"));
+			this.Definition = def;
 
 			this.Closure = closure;
 		}
@@ -61,37 +54,14 @@ namespace Schemin.AST
 		{
 			if ((this.Arguments as ScheminPair) != null)
 			{
-				ScheminPair argslist = (ScheminPair) this.Arguments;
-				IScheminType first = argslist.Car;
-				ScheminPair rest = argslist.ListCdr();
-				IScheminType firstArg = values.Car;
-				ScheminPair restArgs = values.ListCdr();
+				var argBindings = ExtractArguments(values, (ScheminPair) this.Arguments);
 
 				Environment args = new Environment();
 				args.parent = this.Closure;
 
-				for (; ;)
+				foreach (KeyValuePair<ScheminAtom, IScheminType> binding in argBindings)
 				{
-					if (first == null || rest == null)
-					{
-						break;
-					}
-
-					ScheminAtom atom = (ScheminAtom) first;
-					if (atom.Name == ".")
-					{
-						restArgs = restArgs.Cons(firstArg);
-						restArgs.Quote();
-						args.AddBinding((ScheminAtom) rest.Car, restArgs);
-						break;
-					}
-
-					args.AddBinding((ScheminAtom) first, firstArg);
-
-					first = rest.Car;
-					firstArg = restArgs.Car;
-					rest = rest.ListCdr();
-					restArgs = restArgs.ListCdr();
+					args.AddBinding(binding.Key, binding.Value);
 				}
 
 				return args;
@@ -103,6 +73,50 @@ namespace Schemin.AST
 				values.Quote();
 				args.AddBinding((ScheminAtom) this.Arguments, values);
 				return args;
+			}
+		}
+
+		private Dictionary<ScheminAtom, IScheminType> ExtractArguments(ScheminPair values, ScheminPair arguments)
+		{
+			Dictionary<ScheminAtom, IScheminType> bindings = new Dictionary<ScheminAtom, IScheminType>();
+
+			if (arguments.Proper)
+			{
+				if (!arguments.Empty)
+				{
+					for (int i = 0; i < arguments.Length; i++)
+					{
+						bindings.Add((ScheminAtom)arguments.ElementAt(i), values.ElementAt(i));
+					}
+				}
+
+				return bindings;
+			}
+			else
+			{
+				IScheminType args = arguments;
+				ScheminPair vals = values;
+
+				while ((args as ScheminPair) != null)
+				{
+					ScheminPair pairArgs = (ScheminPair)args;
+
+					ScheminAtom arg = (ScheminAtom)pairArgs.Car;
+					IScheminType value = vals.Car;
+
+					value.Quote();
+					bindings.Add(arg, value);
+
+					args = pairArgs.Cdr;
+
+					if ((args as ScheminPair) != null)
+						vals = (ScheminPair)vals.Cdr;
+				}
+
+				vals.Cdr.Quote();
+				bindings.Add((ScheminAtom)args, vals.Cdr);
+
+				return bindings;
 			}
 		}
 

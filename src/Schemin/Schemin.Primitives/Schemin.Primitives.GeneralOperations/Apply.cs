@@ -33,6 +33,11 @@ namespace Schemin.Primitives.GeneralOperations
 
 	public class Apply : Primitive
 	{
+		public Apply()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			IScheminType function = args.Car;
@@ -40,8 +45,6 @@ namespace Schemin.Primitives.GeneralOperations
 			ScheminPair toApply = (ScheminPair) args.ListCdr().Last();
 
 			ScheminPair list = new ScheminPair();
-			list.UnQuote();
-
 			foreach (IScheminType type in toApply)
 			{
 				list = list.Append(type);

@@ -32,6 +32,11 @@ namespace Schemin.Primitives.GeneralOperations
 
 	public class LetStar : Primitive
 	{
+		public LetStar()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminPair bindings = (ScheminPair) args.Car;

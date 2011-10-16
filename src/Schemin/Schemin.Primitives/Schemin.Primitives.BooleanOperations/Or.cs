@@ -32,6 +32,11 @@ namespace Schemin.Primitives.BooleanOperations
 
 	public class Or : Primitive
 	{
+		public Or()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminPair nextCycle = new ScheminPair();

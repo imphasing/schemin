@@ -31,6 +31,11 @@ namespace Schemin.Primitives.GeneralOperations
 	using Schemin.AST;
 	public class QuasiQuote : Primitive
 	{
+		public QuasiQuote()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			IScheminType arg = args.Car;
@@ -40,8 +45,7 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 			else
 			{
-				arg.Quote();
-				return arg;
+				return new ScheminPair(new ScheminPrimitive("quote")).Append(arg);
 			}
 		}
 

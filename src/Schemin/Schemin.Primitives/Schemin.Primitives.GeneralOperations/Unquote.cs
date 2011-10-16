@@ -29,20 +29,17 @@ namespace Schemin.Primitives.GeneralOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Unquote : Primitive
 	{
+		public Unquote()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			IScheminType arg = args.Car;
-			if ((arg as ScheminPair) != null)
-			{
-				if (((ScheminPair) arg).Empty)
-				{
-					return new ScheminPair();
-				}
-			}
-            
-			arg.UnQuote();
 			return arg;
 		}
 

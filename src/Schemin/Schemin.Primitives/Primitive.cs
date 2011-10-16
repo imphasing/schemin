@@ -34,6 +34,7 @@ namespace Schemin.Primitives
 
 	public abstract class Primitive
 	{
+		public bool Rewriter = false;
 		public abstract IScheminType Execute(Environment env, Evaluator eval, ScheminPair args);
 
 		public virtual void CheckArguments(ScheminPair args)

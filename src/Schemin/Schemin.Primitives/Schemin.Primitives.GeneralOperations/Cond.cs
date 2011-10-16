@@ -32,11 +32,15 @@ namespace Schemin.Primitives.GeneralOperations
 
 	public class Cond : Primitive
 	{
+		public Cond()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminPair conditions = args;
 			ScheminPair builtIf = new ScheminPair();
-			builtIf.UnQuote();
 
 			ScheminPair firstCondition = (ScheminPair) conditions.Car;
 			if ((firstCondition.Car as ScheminAtom) != null)

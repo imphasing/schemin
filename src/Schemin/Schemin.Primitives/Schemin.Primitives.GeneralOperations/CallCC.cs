@@ -32,10 +32,14 @@ namespace Schemin.Primitives.GeneralOperations
 
 	public class CallCC : Primitive
 	{
+		public CallCC()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminPair applied = new ScheminPair();
-			applied.UnQuote();
 
 			applied = applied.Append(args.Car);
 			applied = applied.Append(new ScheminContinuation(eval.Stack));
@@ -53,7 +57,7 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 
 			if ((first as ScheminPrimitive) == null && (first as ScheminLambda) == null 
-			&& (first as ScheminContinuation) == null && (first as ScheminRewriter) == null)
+					&& (first as ScheminContinuation) == null && (first as ScheminRewriter) == null)
 			{
 				throw new BadArgumentsException("first argument must be a procedure");
 			}

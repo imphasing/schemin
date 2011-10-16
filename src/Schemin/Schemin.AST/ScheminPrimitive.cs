@@ -36,6 +36,7 @@ namespace Schemin.AST
 	public class ScheminPrimitive : IScheminType
 	{
 		public Primitive Definition;
+		public bool Rewriter = false;
 		public string Name;
 		public Token SourceToken;
 		private bool quoted = false;
@@ -43,6 +44,8 @@ namespace Schemin.AST
 		public ScheminPrimitive(string name)
 		{
 			this.Definition = PrimitiveFactory.Get(name);
+			if (this.Definition.Rewriter)
+				this.Rewriter = true;
 			this.Name = name;
 		}
 
@@ -50,12 +53,16 @@ namespace Schemin.AST
 		{
 			this.SourceToken = token;
 			this.Definition = PrimitiveFactory.Get(name);
+			if (this.Definition.Rewriter)
+				this.Rewriter = true;
 			this.Name = name;
 		}
 
 		public ScheminPrimitive(Primitive definition, string name)
 		{
 			this.Definition = definition;
+			if (this.Definition.Rewriter)
+				this.Rewriter = true;
 			this.Name = name;
 		}
 

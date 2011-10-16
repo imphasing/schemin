@@ -40,11 +40,9 @@ namespace Schemin.Evaluate
 	{
 		public class StackFrame
 		{
-			public ScheminPair Before;
-			public ScheminPair After;
+			public IScheminType Evaluated = new ScheminPair();
+			public IScheminType Unevaluated = new ScheminPair();
 			public Environment CurrentEnv;
-
-			public IScheminType WaitingOn;
 		}
 
 		public Stack<StackFrame> Stack;
@@ -93,24 +91,8 @@ namespace Schemin.Evaluate
 
 		public IScheminType EvaluateInternal(IScheminType ast)
 		{
-			if ((ast as ScheminAtom) != null)
-			{
-				return EvalAtom(ast, this.GlobalEnv);
-			}
-			else if ((ast as ScheminPair) != null)
-			{
-				return EvaluateList((ScheminPair) ast);
-			}
-			else
-			{
-				return ast;
-			}
-		}
-
-		public IScheminType EvaluateList(ScheminPair list)
-		{
 			StackFrame start = new StackFrame();
-			start.WaitingOn = list;
+			start.Unevaluated = ast;
 			start.CurrentEnv = this.GlobalEnv;
 
 			Stack.Clear();
@@ -120,226 +102,207 @@ namespace Schemin.Evaluate
 			while (Stack.Count > 0)
 			{
 				StackFrame current = Stack.Pop();
-				Environment CurrentEnv = current.CurrentEnv;
+				Environment currentEnv = current.CurrentEnv;
+				IScheminType unevaled = current.Unevaluated;
 
-				ScheminPair before = current.Before;
-				ScheminPair after = current.After;
-				IScheminType WaitingOn = current.WaitingOn;
-
-				if ((WaitingOn as ScheminPair) == null || WaitingOn.Quoted() == true || IsEmptyList(WaitingOn))
+				if ((unevaled as ScheminAtom) != null)
 				{
-					StackFrame next = new StackFrame();
-
-					if (before == null && after == null)
+					if (this.Stack.Count < 1)
 					{
-						if ((WaitingOn as ScheminAtom) != null && !WaitingOn.Quoted())
-						{
-							WaitingOn = EvalAtom(WaitingOn, CurrentEnv);
-						}
-
-						if (Stack.Count < 1)
-						{
-							return WaitingOn;
-						}
-
-						StackFrame previous = Stack.Pop();
-						if (previous.Before == null && previous.After == null)
-						{
-							next.WaitingOn = WaitingOn;
-						}
-						else
-						{
-							next.WaitingOn = CombineStackFrame(previous.Before, previous.After, WaitingOn);
-						}
-
-						// Use the previous environment in this case as well
-						if (Stack.Count > 0)
-						{
-							next.CurrentEnv = Stack.Peek().CurrentEnv;
-						}
-						else
-						{
-							next.CurrentEnv = previous.CurrentEnv;
-						}
-
-						Stack.Push(next);
-						continue;
-					}
-
-					// We need to use the PREVIOUS environment here, so peek it.. otherwise we're re-using the same environment for the previous context.
-					StackFrame peeked = Stack.Peek();
-					next.WaitingOn = CombineStackFrame(before, after, WaitingOn);
-					next.CurrentEnv = peeked.CurrentEnv;
-					Stack.Push(next);
-					continue;
-				}
-
-				StackFrame completeFrame = new StackFrame();
-				ScheminPrimitive currentPrimitive = null;
-
-				ScheminPair rest = (ScheminPair) WaitingOn;
-				ScheminPair pendingBefore = new ScheminPair();
-				pendingBefore.UnQuote();
-
-				if ((rest.Car as ScheminPrimitive) != null)
-				{
-					if (rest.Car.Quoted() == false)
-					{
-						currentPrimitive = (ScheminPrimitive) rest.Car;
-					}
-				}
-
-				int currentArg = 0;
-
-				if (!rest.Proper)
-				{
-					throw new Exception("Unable to evaluate the dotted pair: " + rest);
-				}
-
-				while (!rest.Empty)
-				{
-					IScheminType type = rest.Car;
-
-					if (currentPrimitive != null)
-					{
-						if (!EvaluateNextArg(currentPrimitive, currentArg, ((ScheminPair) WaitingOn).ListCdr()))
-						{
-							pendingBefore = pendingBefore.Append(type);
-							rest = rest.ListCdr();
-							currentArg++;
-							continue;
-						}
-					}
-
-					if ((type as ScheminAtom) != null)
-					{
-						if (type.Quoted())
-						{
-							pendingBefore = pendingBefore.Append(type);
-						}
-						else
-						{
-							IScheminType atomResult = EvalAtom(type, CurrentEnv);
-							if ((atomResult as ScheminRewriter) != null)
-							{
-								// if we get a quoted rewriter here, we're going to apply it :(
-								pendingBefore = pendingBefore.Append(atomResult);
-								QuoteAll(rest.ListCdr());
-							}
-							else
-							{
-								pendingBefore = pendingBefore.Append(atomResult);
-							}
-						}
-					}
-					else if ((type as ScheminPair) != null)
-					{
-						ScheminPair tempList = (ScheminPair) type;
-
-						if (tempList.Quoted() || tempList.Empty)
-						{
-							pendingBefore = pendingBefore.Append(type);
-							rest = rest.ListCdr();
-							currentArg++;
-							continue;
-						}
-
-						StackFrame next = new StackFrame();
-						next.WaitingOn = type;
-						next.After = rest.ListCdr();
-						next.Before = pendingBefore;
-						next.CurrentEnv = CurrentEnv;
-
-						Stack.Push(current);
-						Stack.Push(next);
-
-						goto StackStart;
+						return EvalAtom(unevaled, currentEnv);
 					}
 					else
 					{
-						pendingBefore = pendingBefore.Append(type);
+						StackFrame previous = this.Stack.Pop();
+						previous.Evaluated = ((ScheminPair) previous.Evaluated).Append(EvalAtom(unevaled, currentEnv));
+						Stack.Push(previous);
+						continue;
 					}
-
-					rest = rest.ListCdr();
-					currentArg++;
 				}
-
-				IScheminType functionPosition = pendingBefore.Car;
-				ScheminPair functionArgs = pendingBefore.ListCdr();
-
-
-				if ((functionPosition as ScheminPrimitive) != null)
+				else if ((unevaled as ScheminPair) != null)
 				{
-					ScheminPrimitive prim = (ScheminPrimitive) functionPosition;
-					completeFrame.Before = before;
-					completeFrame.After = after;
+					ScheminPair unevaluated = (ScheminPair) unevaled;
+					ScheminPair evaluatedList = (ScheminPair) current.Evaluated;
 
-					// Need to pass push the previous frame back on so we can get access to the current continuation via the evaluator's Stack field.
-					// also adding the primitive's name to the exception if it gets thrown.
-					try
+					IScheminType function;
+					int currentArg = 0;
+					if (!evaluatedList.Empty)
 					{
-						Stack.Push(current);
-						completeFrame.WaitingOn = prim.Evaluate(functionArgs, CurrentEnv, this);
-						Stack.Pop();
+						function = evaluatedList.Car;
+						currentArg += evaluatedList.Length;
 					}
-					catch (BadArgumentsException ba)
+					else
 					{
-						Token sourceToken = prim.SourceToken;
-						string line = String.Empty;
-						if (sourceToken != null)
+						function = unevaluated.Car;
+					}
+
+					ScheminPrimitive currentPrimitive = null;
+					if ((function as ScheminPrimitive) != null)
+					{
+						if (function.Quoted() == false)
 						{
-							line = " line: " + sourceToken.LineNumber.ToString() + " col: " + sourceToken.ColNumber.ToString();
+							currentPrimitive = (ScheminPrimitive)function;
 						}
-						throw new BadArgumentsException(prim.ToString() + " " + ba.Message + line);
 					}
 
-					completeFrame.CurrentEnv = CurrentEnv;
+					ScheminPair evaluated = new ScheminPair(false);
+					while (!unevaluated.Empty)
+					{
+						IScheminType type = unevaluated.Car;
 
-					Stack.Push(completeFrame);
-					continue;
-				}
-				else if ((functionPosition as ScheminLambda) != null)
-				{
-					ScheminLambda lam = (ScheminLambda) functionPosition;
-					completeFrame.Before = before;
-					completeFrame.After = after;
+						if (currentPrimitive != null)
+						{
+							ScheminPair fullArgs = (ScheminPair)current.Evaluated;
+							foreach (IScheminType restArg in (ScheminPair) current.Unevaluated)
+							{
+								fullArgs = fullArgs.Append(restArg);
+							}
 
-					Environment args = lam.MakeEnvironment(functionArgs, this);
-					completeFrame.WaitingOn = lam.Definition;
-					completeFrame.CurrentEnv = args;
+							if (!EvaluateNextArg(currentPrimitive, currentArg, fullArgs.ListCdr()))
+							{
+								evaluated = evaluated.Append(type);
+								unevaluated = unevaluated.ListCdr();
+								currentArg++;
+								continue;
+							}
+						}
 
-					Stack.Push(completeFrame);
-					continue;
-				}
-				else if ((functionPosition as ScheminContinuation) != null)
-				{
-					ScheminContinuation con = (ScheminContinuation) functionPosition;
-					this.Stack = new Stack<StackFrame>(con.PreviousStack);
-					this.Stack.Peek().WaitingOn = functionArgs.Car;
-					continue;
-				}
-				else if ((functionPosition as ScheminRewriter) != null)
-				{
-					ScheminRewriter rewriter = (ScheminRewriter) functionPosition;
+						if ((type as ScheminAtom) != null)
+						{
+							IScheminType atomResult = EvalAtom(type, currentEnv);
+							evaluated = evaluated.Append(atomResult);
+						}
+						else if ((type as ScheminPair) != null)
+						{
+							ScheminPair tempList = (ScheminPair)type;
 
-					QuoteAll(functionArgs);
-					IScheminType result = rewriter.Rewrite(functionArgs);
+							if (tempList.Empty)
+							{
+								evaluated = evaluated.Append(type);
+								unevaluated = unevaluated.ListCdr();
+								currentArg++;
+								continue;
+							}
 
-					completeFrame.Before = before;
-					completeFrame.After = after;
-					completeFrame.WaitingOn = result;
-					completeFrame.CurrentEnv = CurrentEnv;
+							StackFrame next = new StackFrame();
+							next.Unevaluated = tempList;
+							next.CurrentEnv = currentEnv;
 
-					this.Stack.Push(completeFrame);
-					continue;
+							ScheminPair doneArgs = (ScheminPair) current.Evaluated;
+							foreach (IScheminType evaled in evaluated)
+							{
+								doneArgs = doneArgs.Append(evaled);
+							}
+							current.Evaluated = doneArgs;
+							current.Unevaluated = unevaluated.ListCdr();
+
+							this.Stack.Push(current);
+							this.Stack.Push(next);
+
+							goto StackStart;
+						}
+						else
+						{
+							evaluated = evaluated.Append(type);
+						}
+
+						unevaluated = unevaluated.ListCdr();
+						currentArg++;
+					}
+
+					foreach (IScheminType type in evaluated)
+					{
+						evaluatedList = evaluatedList.Append(type);
+					}
+					current.Evaluated = evaluatedList;
+					current.Unevaluated = unevaluated;
+
+
+					IScheminType waiting = evaluatedList.Car;
+					if ((waiting as ScheminAtom) != null)
+					{
+						waiting = EvalAtom(waiting, currentEnv);
+					}
+
+					if ((waiting as ScheminPrimitive) != null)
+					{
+						ScheminPrimitive prim = (ScheminPrimitive)waiting;
+						this.Stack.Push(current);
+						IScheminType result = EvaluatePrimitive((ScheminPrimitive)waiting, evaluatedList.ListCdr(), currentEnv);
+						this.Stack.Pop();
+
+						if (prim.Rewriter)
+						{
+							current.Unevaluated = result;
+							current.Evaluated = new ScheminPair();
+							this.Stack.Push(current);
+							continue;
+						}
+
+						if (this.Stack.Count < 1)
+						{
+							return result;
+						}
+						else
+						{
+							StackFrame previous = this.Stack.Pop();
+							ScheminPair previousDone = (ScheminPair) previous.Evaluated;
+							previousDone = previousDone.Append(result);
+							previous.Evaluated = previousDone;
+							Stack.Push(previous);
+							continue;
+						}
+					}
+					else if ((waiting as ScheminLambda) != null)
+					{
+						ScheminLambda lam = (ScheminLambda)waiting;
+						StackFrame next = new StackFrame();
+						next.Unevaluated = lam.Definition;
+						next.CurrentEnv = lam.MakeEnvironment(evaluatedList.ListCdr(), this);
+
+						this.Stack.Push(next);
+						continue;
+					}
+					else
+					{
+						throw new InvalidOperationException("Non-function in function position: " + waiting.ToString());
+					}
 				}
 				else
 				{
-					throw new InvalidOperationException("Non-function in function position: " + functionPosition.ToString());
+					if (this.Stack.Count < 1)
+					{
+						return unevaled;
+					}
+					else
+					{
+						StackFrame previous = this.Stack.Pop();
+						previous.Evaluated = ((ScheminPair)previous.Evaluated).Append(unevaled);
+						Stack.Push(previous);
+						continue;
+					}
 				}
 			}
 
-			throw new InvalidOperationException("Control escaped list evaluator...");
+			throw new Exception("Control escaped evaluator");
+		}
+
+		private IScheminType EvaluatePrimitive(ScheminPrimitive functionPosition, ScheminPair args, Environment env)
+		{
+			try
+			{
+				return functionPosition.Evaluate(args, env, this);
+			}
+			catch (BadArgumentsException ba)
+			{
+				Token sourceToken = functionPosition.SourceToken;
+				string line = String.Empty;
+				if (sourceToken != null)
+				{
+					line = " line: " + sourceToken.LineNumber.ToString() + " col: " + sourceToken.ColNumber.ToString();
+				}
+				throw new BadArgumentsException(functionPosition.ToString() + " " + ba.Message + line);
+			}
 		}
 
 		private IScheminType EvalAtom(IScheminType ast, Environment env)
@@ -353,55 +316,6 @@ namespace Schemin.Evaluate
 			}
 
 			return bound;
-		}
-
-		private ScheminPair CombineStackFrame(ScheminPair before, ScheminPair after, IScheminType result)
-		{
-			ScheminPair complete = new ScheminPair();
-			complete.UnQuote();
-
-			if (before != null && !before.Empty)
-			{
-				complete = complete.Append(before.Car);
-				var restBefore = before.ListCdr();
-				while (!restBefore.Empty)
-				{
-					complete = complete.Append(restBefore.Car);
-					restBefore = restBefore.ListCdr();
-				}
-			}
-
-			if (result != null)
-			{
-				complete = complete.Append(result);
-			}
-
-			if (after != null && !after.Empty)
-			{
-				complete = complete.Append(after.Car);
-				var restAfter = after.ListCdr();
-				while (!restAfter.Empty)
-				{
-					complete = complete.Append(restAfter.Car);
-					restAfter = restAfter.ListCdr();
-				}
-			}
-
-			return complete;
-		}
-
-		private bool IsEmptyList(IScheminType type)
-		{
-			if ((type as ScheminPair) != null)
-			{
-				ScheminPair temp = (ScheminPair) type;
-				if (temp.Empty == true)
-				{
-					return true;
-				}
-			}
-
-			return false;
 		}
 
 		private bool EvaluateNextArg(ScheminPrimitive currentPrimitive, int currentArg, ScheminPair args)
@@ -465,14 +379,6 @@ namespace Schemin.Evaluate
 			}
 
 			return true;
-		}
-
-		private void QuoteAll(ScheminPair list)
-		{
-			foreach (IScheminType type in list)
-			{
-				type.Quote();
-			}
 		}
 
 		private void DefinePrimitives(Environment env)

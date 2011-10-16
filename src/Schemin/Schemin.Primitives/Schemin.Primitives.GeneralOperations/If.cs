@@ -32,12 +32,17 @@ namespace Schemin.Primitives.GeneralOperations
 
 	public class If : Primitive
 	{
+		public If()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminBool condition = args.Car.BoolValue();
 			IScheminType then = args.ElementAt(1);
 			IScheminType otherwise = new ScheminPair();
-			
+
 			if (args.Length > 2)
 				otherwise = args.ElementAt(2);
 
