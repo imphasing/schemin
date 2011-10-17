@@ -205,10 +205,6 @@ namespace Schemin.Parse
 					return new ScheminPrimitive("define-rewriter", token);
 				case "quote":
 					return new ScheminPrimitive("quote", token);
-				case "unquote":
-					return new ScheminPrimitive("unquote", token);
-				case "unquote-splicing":
-					return new ScheminPrimitive("unquote-splicing", token);
 				case "quasiquote":
 					return new ScheminPrimitive("quasiquote", token);
 				case "begin":

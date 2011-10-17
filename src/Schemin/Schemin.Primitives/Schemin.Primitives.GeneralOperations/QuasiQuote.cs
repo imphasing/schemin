@@ -52,14 +52,13 @@ namespace Schemin.Primitives.GeneralOperations
 		private ScheminPair RewriteRecursive(ScheminPair rewrite, int currentLevel)
 		{
 			ScheminPair quoted = new ScheminPair(new ScheminPrimitive("append"));
-			quoted.UnQuote();
 
 			foreach (IScheminType type in rewrite)
 			{
 				if ((type as ScheminPair) != null)
 				{
 					ScheminPair typeList = (ScheminPair) type;
-					ScheminPrimitive first = typeList.Car as ScheminPrimitive;
+					ScheminAtom first = typeList.Car as ScheminAtom;
 
 					if (first != null)
 					{
@@ -67,16 +66,13 @@ namespace Schemin.Primitives.GeneralOperations
 						{
 							if (first.Name == "unquote")
 							{
-								typeList.UnQuote();
 								ScheminPair wrapper = new ScheminPair(new ScheminPrimitive("list"));
-								wrapper.UnQuote();
 								wrapper = wrapper.Append(typeList.ElementAt(1));
 								quoted = quoted.Append(wrapper);
 								continue;
 							}
 							else if (first.Name == "unquote-splicing")
 							{
-								typeList.UnQuote();
 								quoted = quoted.Append(typeList.ElementAt(1));
 								continue;
 							}
@@ -89,8 +85,6 @@ namespace Schemin.Primitives.GeneralOperations
 					currentLevel = AdjustLevelLeave(first, currentLevel);
 
 					ScheminPair quotedRewrite = new ScheminPair(new ScheminPrimitive("list"));
-					quotedRewrite.UnQuote();
-
 					quotedRewrite = quotedRewrite.Append(rewritten);
 					quoted = quoted.Append(quotedRewrite);
 				}
@@ -98,8 +92,6 @@ namespace Schemin.Primitives.GeneralOperations
 				{
 					ScheminPair quotedSub = new ScheminPair(new ScheminPrimitive("quote"));
 					ScheminPair wrappedElem = new ScheminPair(type);
-					wrappedElem.UnQuote();
-					quotedSub.UnQuote();
 					quotedSub = quotedSub.Append(wrappedElem);
 					quoted = quoted.Append(quotedSub);
 				}
@@ -108,7 +100,7 @@ namespace Schemin.Primitives.GeneralOperations
 			return quoted;
 		}
 
-		private int AdjustLevelEnter(ScheminPrimitive first, int currentLevel)
+		private int AdjustLevelEnter(ScheminAtom first, int currentLevel)
 		{
 			if (first != null)
 			{
@@ -129,7 +121,7 @@ namespace Schemin.Primitives.GeneralOperations
 			return currentLevel;
 		}
 
-		private int AdjustLevelLeave(ScheminPrimitive first, int currentLevel)
+		private int AdjustLevelLeave(ScheminAtom first, int currentLevel)
 		{
 			if (first != null)
 			{

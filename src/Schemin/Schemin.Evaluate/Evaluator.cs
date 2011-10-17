@@ -263,6 +263,14 @@ namespace Schemin.Evaluate
 						this.Stack.Push(next);
 						continue;
 					}
+					else if ((waiting as ScheminContinuation) != null)
+					{
+						ScheminContinuation con = (ScheminContinuation) waiting;
+						this.Stack = new Stack<StackFrame>(con.PreviousStack);
+						this.Stack.Peek().Evaluated = new ScheminPair();
+						this.Stack.Peek().Unevaluated = evaluatedList.ListCdr().Car;
+						continue;
+					}
 					else
 					{
 						throw new InvalidOperationException("Non-function in function position: " + waiting.ToString());

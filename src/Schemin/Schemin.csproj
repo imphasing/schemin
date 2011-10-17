@@ -71,8 +71,6 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\LetStar.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Quote.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\QuasiQuote.cs" />
-    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Unquote.cs" />
-    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\UnquoteSplicing.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\EvalMacro.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\SetBang.cs" />
 
