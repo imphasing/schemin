@@ -32,6 +32,11 @@ namespace Schemin.Primitives.GeneralOperations
 
 	public class EvalMacro : Primitive
 	{
+		public EvalMacro()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			IScheminType rewritten = args.Car;

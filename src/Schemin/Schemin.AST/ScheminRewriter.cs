@@ -42,14 +42,14 @@ namespace Schemin.AST
 			this.Rewriter = rewriter;
 		}
 
-		public IScheminType Rewrite(ScheminPair values)
+		public ScheminPair Rewrite(ScheminPair values)
 		{
 			ScheminPair call = new ScheminPair(Rewriter);
 			ScheminPair unquote = new ScheminPair(new ScheminPrimitive("eval-macro"));
 
 			foreach (IScheminType type in values)
 			{
-				call = call.Append(type);
+				call = call.Append(new ScheminPair(new ScheminPrimitive("quote")).Append(type));
 			}
 
 			unquote = unquote.Append(call);

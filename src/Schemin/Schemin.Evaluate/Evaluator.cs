@@ -166,9 +166,16 @@ namespace Schemin.Evaluate
 					}
 
 					ScheminPrimitive currentPrimitive = null;
+					ScheminRewriter currentRewriter = null;
 					if ((function as ScheminPrimitive) != null)
 					{
 						currentPrimitive = (ScheminPrimitive)function;
+					}
+					else if ((function as ScheminAtom) != null)
+					{
+						IScheminType evaledFunction = EvalAtom(function, currentEnv);
+						if ((evaledFunction as ScheminRewriter) != null)
+							currentRewriter = (ScheminRewriter) evaledFunction;
 					}
 
 					ScheminPair fullArgs = (ScheminPair)current.Evaluated;
@@ -182,9 +189,9 @@ namespace Schemin.Evaluate
 					{
 						IScheminType type = unevaluated.Car;
 
-						if (currentPrimitive != null)
+						if (currentPrimitive != null || currentRewriter != null)
 						{
-							if (!EvaluateNextArg(currentPrimitive, currentArg, fullArgs.ListCdr()))
+							if (!EvaluateNextArg(currentPrimitive, currentArg, fullArgs.ListCdr()) || (currentRewriter != null && currentArg > 0))
 							{
 								evaluated = evaluated.Append(type);
 								unevaluated = unevaluated.ListCdr();
@@ -312,6 +319,17 @@ namespace Schemin.Evaluate
 							this.Stack.Push(combinedPrevious);
 							continue;
 						}
+					}
+					else if ((waiting as ScheminRewriter) != null)
+					{
+						ScheminRewriter rewriter = (ScheminRewriter) waiting;
+						ScheminPair macroCall = rewriter.Rewrite(evaluatedList.ListCdr());
+
+						StackFrame macroRewrite = new StackFrame(current);
+						macroRewrite.Unevaluated = macroCall; 
+						macroRewrite.Evaluated = new ScheminPair();
+						this.Stack.Push(macroRewrite);
+						continue;
 					}
 					else
 					{
