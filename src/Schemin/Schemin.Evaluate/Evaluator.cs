@@ -40,9 +40,22 @@ namespace Schemin.Evaluate
 	{
 		public class StackFrame
 		{
-			public IScheminType Evaluated = new ScheminPair();
-			public IScheminType Unevaluated = new ScheminPair();
+			public IScheminType Evaluated;
+			public IScheminType Unevaluated;
 			public Environment CurrentEnv;
+
+			public StackFrame(StackFrame original)
+			{
+				this.Evaluated = original.Evaluated;
+				this.Unevaluated = original.Unevaluated;
+				this.CurrentEnv = original.CurrentEnv;
+			}
+
+			public StackFrame()
+			{
+				this.Evaluated = new ScheminPair();
+				this.Unevaluated = new ScheminPair();
+			}
 		}
 
 		public Stack<StackFrame> Stack;
@@ -95,13 +108,13 @@ namespace Schemin.Evaluate
 			start.Unevaluated = ast;
 			start.CurrentEnv = this.GlobalEnv;
 
-			Stack.Clear();
-			Stack.Push(start);
+			this.Stack.Clear();
+			this.Stack.Push(start);
 
 			StackStart:
-			while (Stack.Count > 0)
+			while (this.Stack.Count > 0)
 			{
-				StackFrame current = Stack.Pop();
+				StackFrame current = new StackFrame(this.Stack.Pop());
 				Environment currentEnv = current.CurrentEnv;
 				IScheminType unevaled = current.Unevaluated;
 
@@ -114,8 +127,24 @@ namespace Schemin.Evaluate
 					else
 					{
 						StackFrame previous = this.Stack.Pop();
-						previous.Evaluated = ((ScheminPair) previous.Evaluated).Append(EvalAtom(unevaled, currentEnv));
-						Stack.Push(previous);
+						StackFrame combinedPrevious = new StackFrame(previous);
+						combinedPrevious.Evaluated = ((ScheminPair) combinedPrevious.Evaluated).Append(EvalAtom(unevaled, currentEnv));
+						this.Stack.Push(combinedPrevious);
+						continue;
+					}
+				}
+				else if (IsEmptyList(current.Unevaluated) && IsEmptyList(current.Evaluated))
+				{
+					if (this.Stack.Count < 1)
+					{
+						return unevaled;
+					}
+					else
+					{
+						StackFrame previous = this.Stack.Pop();
+						StackFrame combinedPrevious = new StackFrame(previous);
+						combinedPrevious.Evaluated = ((ScheminPair)combinedPrevious.Evaluated).Append(unevaled);
+						this.Stack.Push(combinedPrevious);
 						continue;
 					}
 				}
@@ -145,6 +174,12 @@ namespace Schemin.Evaluate
 						}
 					}
 
+					ScheminPair fullArgs = (ScheminPair)current.Evaluated;
+					foreach (IScheminType restArg in (ScheminPair) unevaluated)
+					{
+						fullArgs = fullArgs.Append(restArg);
+					}
+
 					ScheminPair evaluated = new ScheminPair(false);
 					while (!unevaluated.Empty)
 					{
@@ -152,12 +187,6 @@ namespace Schemin.Evaluate
 
 						if (currentPrimitive != null)
 						{
-							ScheminPair fullArgs = (ScheminPair)current.Evaluated;
-							foreach (IScheminType restArg in (ScheminPair) current.Unevaluated)
-							{
-								fullArgs = fullArgs.Append(restArg);
-							}
-
 							if (!EvaluateNextArg(currentPrimitive, currentArg, fullArgs.ListCdr()))
 							{
 								evaluated = evaluated.Append(type);
@@ -188,15 +217,16 @@ namespace Schemin.Evaluate
 							next.Unevaluated = tempList;
 							next.CurrentEnv = currentEnv;
 
-							ScheminPair doneArgs = (ScheminPair) current.Evaluated;
+							StackFrame newSublist = new StackFrame(current);
+							ScheminPair doneArgs = (ScheminPair)newSublist.Evaluated;
 							foreach (IScheminType evaled in evaluated)
 							{
 								doneArgs = doneArgs.Append(evaled);
 							}
-							current.Evaluated = doneArgs;
-							current.Unevaluated = unevaluated.ListCdr();
+							newSublist.Evaluated = doneArgs;
+							newSublist.Unevaluated = unevaluated.ListCdr();
 
-							this.Stack.Push(current);
+							this.Stack.Push(newSublist);
 							this.Stack.Push(next);
 
 							goto StackStart;
@@ -233,9 +263,10 @@ namespace Schemin.Evaluate
 
 						if (prim.Rewriter)
 						{
-							current.Unevaluated = result;
-							current.Evaluated = new ScheminPair();
-							this.Stack.Push(current);
+							StackFrame rewritten = new StackFrame(current);
+							rewritten.Unevaluated = result;
+							rewritten.Evaluated = new ScheminPair();
+							this.Stack.Push(rewritten);
 							continue;
 						}
 
@@ -246,10 +277,11 @@ namespace Schemin.Evaluate
 						else
 						{
 							StackFrame previous = this.Stack.Pop();
-							ScheminPair previousDone = (ScheminPair) previous.Evaluated;
+							StackFrame combinedPrevious = new StackFrame(previous);
+							ScheminPair previousDone = (ScheminPair)combinedPrevious.Evaluated;
 							previousDone = previousDone.Append(result);
-							previous.Evaluated = previousDone;
-							Stack.Push(previous);
+							combinedPrevious.Evaluated = previousDone;
+							this.Stack.Push(combinedPrevious);
 							continue;
 						}
 					}
@@ -267,9 +299,22 @@ namespace Schemin.Evaluate
 					{
 						ScheminContinuation con = (ScheminContinuation) waiting;
 						this.Stack = new Stack<StackFrame>(con.PreviousStack);
-						this.Stack.Peek().Evaluated = new ScheminPair();
-						this.Stack.Peek().Unevaluated = evaluatedList.ListCdr().Car;
-						continue;
+						StackFrame continuationStart = new StackFrame(this.Stack.Pop());
+
+						if (this.Stack.Count < 1)
+						{
+							return evaluatedList.ListCdr().Car;
+						}
+						else
+						{
+							StackFrame previous = this.Stack.Pop();
+							StackFrame combinedPrevious = new StackFrame(previous);
+							ScheminPair previousDone = (ScheminPair) combinedPrevious.Evaluated;
+							previousDone = previousDone.Append(evaluatedList.ListCdr().Car);
+							combinedPrevious.Evaluated = previousDone;
+							this.Stack.Push(combinedPrevious);
+							continue;
+						}
 					}
 					else
 					{
@@ -285,8 +330,9 @@ namespace Schemin.Evaluate
 					else
 					{
 						StackFrame previous = this.Stack.Pop();
-						previous.Evaluated = ((ScheminPair)previous.Evaluated).Append(unevaled);
-						Stack.Push(previous);
+						StackFrame combinedPrevious = new StackFrame(previous);
+						combinedPrevious.Evaluated = ((ScheminPair)combinedPrevious.Evaluated).Append(unevaled);
+						this.Stack.Push(combinedPrevious);
 						continue;
 					}
 				}
@@ -387,6 +433,20 @@ namespace Schemin.Evaluate
 			}
 
 			return true;
+		}
+
+		private bool IsEmptyList(IScheminType type)
+		{
+			if ((type as ScheminPair) != null)
+			{
+				ScheminPair temp = (ScheminPair) type;
+				if (temp.Empty == true)
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private void DefinePrimitives(Environment env)

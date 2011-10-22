@@ -64,7 +64,11 @@ namespace Schemin.Primitives.GeneralOperations
 				ScheminPair expression = args.ListCdr();
 
 				ScheminAtom name = (ScheminAtom) arguments.Car;
-				ScheminPair lamArgs = new ScheminPair(arguments.Cdr, expression);
+				IScheminType lamParams = arguments.Cdr;
+
+				if (lamParams == null)
+					lamParams = new ScheminPair();
+				ScheminPair lamArgs = new ScheminPair(lamParams, expression);
 				lamArgs.UnQuote();
 
 				ScheminLambda lam = new ScheminLambda(lamArgs, env);

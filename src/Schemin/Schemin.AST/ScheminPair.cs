@@ -172,31 +172,16 @@ namespace Schemin.AST
 			return GetEnumerator();
 		}
 
-		public IEnumerator<IScheminType> GetEnumerator ()
+		public IEnumerator<IScheminType> GetEnumerator()
 		{
-			if (this.Proper)
-			{
-				if (!this.Empty)
-					yield return Car;
+			if (!this.Empty)
+				yield return Car;
 
-				var c = (ScheminPair) Cdr;
-				while (c != null)
-				{
-					if (c.Proper)
-					{
-						yield return c.Car;
-						c = (ScheminPair) c.Cdr;
-					}
-					else
-					{
-						yield return c;
-						break;
-					}
-				}
-			}
-			else
+			var c = (ScheminPair) Cdr;
+			while (c != null)
 			{
-				throw new Exception("Can't enumerate an improper list");
+				yield return c.Car;
+				c = (ScheminPair) c.Cdr;
 			}
 		}
 
