@@ -46,19 +46,6 @@ namespace Schemin.AST
 			return "<Continuation>";
 		}
 
-		public bool Quoted()
-		{
-			return false;
-		}
-
-		public void Quote()
-		{
-		}
-
-		public void UnQuote()
-		{
-		}
-
 		public bool Equals(IScheminType type)
 		{
 			if ((type as ScheminContinuation) != null)

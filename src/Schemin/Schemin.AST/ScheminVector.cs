@@ -48,7 +48,6 @@ namespace Schemin.AST
 		public ScheminPair ToList()
 		{
 			ScheminPair list = new ScheminPair();
-			list.Quote();
 
 			foreach (IScheminType type in List)
 			{
@@ -78,19 +77,6 @@ namespace Schemin.AST
 
 			builder.Append(")");
 			return builder.ToString();
-		}
-
-		public bool Quoted()
-		{
-			return false;
-		}
-
-		public void Quote()
-		{
-		}
-
-		public void UnQuote()
-		{
 		}
 
 		public bool Equals(IScheminType type)

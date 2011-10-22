@@ -69,7 +69,6 @@ namespace Schemin.Primitives.GeneralOperations
 				if (lamParams == null)
 					lamParams = new ScheminPair();
 				ScheminPair lamArgs = new ScheminPair(lamParams, expression);
-				lamArgs.UnQuote();
 
 				ScheminLambda lam = new ScheminLambda(lamArgs, env);
 

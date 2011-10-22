@@ -36,10 +36,9 @@ namespace Schemin.AST
 	public class ScheminPrimitive : IScheminType
 	{
 		public Primitive Definition;
-		public bool Rewriter = false;
-		public string Name;
 		public Token SourceToken;
-		private bool quoted = false;
+		public string Name;
+		public bool Rewriter = false;
 
 		public ScheminPrimitive(string name)
 		{
@@ -82,21 +81,6 @@ namespace Schemin.AST
 			{
 				return "<Primitive:unbound>";
 			}
-		}
-
-		public bool Quoted()
-		{
-			return quoted;
-		}
-
-		public void Quote()
-		{
-			quoted = true;
-		}
-
-		public void UnQuote()
-		{
-			quoted = false;
 		}
 
 		public bool Equals(IScheminType type)

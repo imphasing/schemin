@@ -50,7 +50,6 @@ namespace Schemin.Primitives.GeneralOperations
 			eval.GenSymSeed++;
 
 			ScheminAtom gen = new ScheminAtom(symbolName);
-			gen.Quote();
 			return gen;
 		}
 

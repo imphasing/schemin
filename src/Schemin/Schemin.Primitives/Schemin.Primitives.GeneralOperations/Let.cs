@@ -62,9 +62,6 @@ namespace Schemin.Primitives.GeneralOperations
 			ScheminPair letArgs = new ScheminPair();
 			ScheminPair argExps = new ScheminPair();
 
-			letArgs.UnQuote();
-			argExps.UnQuote();
-
 			foreach (ScheminPair bindingPair in bindings)
 			{
 				letArgs = letArgs.Append(bindingPair.Car);
@@ -72,7 +69,6 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 
 			ScheminPair lambdaDef = new ScheminPair(letArgs);
-			lambdaDef.UnQuote();
 
 			foreach (IScheminType type in expression)
 			{
@@ -95,7 +91,6 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 
 			ScheminPair toEvaluate = new ScheminPair(lam);
-			toEvaluate.UnQuote();
 
 			foreach (IScheminType arg in argExps)
 			{

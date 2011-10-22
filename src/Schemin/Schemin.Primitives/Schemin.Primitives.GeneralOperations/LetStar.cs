@@ -43,9 +43,7 @@ namespace Schemin.Primitives.GeneralOperations
 			IScheminType expression = args.ElementAt(1);
 
 			ScheminPair first = new ScheminPair();
-			first.UnQuote();
 			ScheminPair firstBinding = new ScheminPair(bindings.Car);
-			first.UnQuote();
 
 			first = first.Append(new ScheminPrimitive("let"));
 			first = first.Append(firstBinding);
@@ -53,8 +51,6 @@ namespace Schemin.Primitives.GeneralOperations
 			if (bindings.Cdr != null)
 			{
 				ScheminPair nextLet = new ScheminPair(bindings.Cdr);
-				nextLet.UnQuote();
-
 				nextLet = nextLet.Cons(new ScheminPrimitive("let*"));
 				nextLet = nextLet.Append(expression);
 

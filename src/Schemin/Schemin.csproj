@@ -146,7 +146,6 @@
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />
-    <Compile Include="Schemin.Parse\Parser.cs" />
     <Compile Include="Schemin.Parse\PairParser.cs" />
     <Compile Include="Schemin.AST\IScheminType.cs" />
     <Compile Include="Schemin.AST\IScheminNumeric.cs" />

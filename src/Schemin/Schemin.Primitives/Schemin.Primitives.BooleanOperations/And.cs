@@ -40,7 +40,6 @@ namespace Schemin.Primitives.BooleanOperations
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminPair nextCycle = new ScheminPair();
-			nextCycle.UnQuote();
 			nextCycle = nextCycle.Append(new ScheminPrimitive("and"));
 
 			if (args.Car.BoolValue() == ScheminBool.False)

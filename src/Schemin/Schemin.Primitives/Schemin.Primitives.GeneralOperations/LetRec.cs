@@ -45,9 +45,6 @@ namespace Schemin.Primitives.GeneralOperations
 			ScheminPair letArgs = new ScheminPair();
 			ScheminPair argExps = new ScheminPair();
 
-			letArgs.UnQuote();
-			argExps.UnQuote();
-
 			foreach (ScheminPair bindingPair in bindings)
 			{
 				letArgs = letArgs.Append(bindingPair.Car);
@@ -55,7 +52,6 @@ namespace Schemin.Primitives.GeneralOperations
 			}
 
 			ScheminPair body = new ScheminPair(new ScheminPrimitive("begin"));
-			body.UnQuote();
 
 			ScheminPair next = letArgs;
 			ScheminPair nextExp = argExps;
@@ -65,7 +61,6 @@ namespace Schemin.Primitives.GeneralOperations
 				IScheminType exp = nextExp.Car;
 
 				ScheminPair setExp = new ScheminPair(new ScheminPrimitive("set!"));
-				setExp.UnQuote();
 				setExp = setExp.Append(symbol);
 				setExp = setExp.Append(exp);
 				body = body.Append(setExp);
@@ -77,8 +72,6 @@ namespace Schemin.Primitives.GeneralOperations
 			body = body.Append(expression);
 
 			ScheminPair lambdaDef = new ScheminPair(letArgs);
-			lambdaDef.UnQuote();
-
 			foreach (IScheminType type in body)
 			{
 				lambdaDef = lambdaDef.Append(type);
@@ -88,11 +81,9 @@ namespace Schemin.Primitives.GeneralOperations
 			ScheminLambda lam = new ScheminLambda(lambdaDef, closure);
 
 			ScheminPair toEvaluate = new ScheminPair(lam);
-			toEvaluate.UnQuote();
-
 			foreach (IScheminType arg in argExps)
 			{
-				toEvaluate = toEvaluate.Append(new ScheminPair(true));
+				toEvaluate = toEvaluate.Append(new ScheminPair());
 			}
 
 			return toEvaluate;

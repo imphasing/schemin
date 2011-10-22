@@ -41,7 +41,6 @@ namespace Schemin.Parse
 		public ScheminPair Parse(List<Token> tokens, bool quoteLists)
 		{
 			TransformQuoteTokens(tokens);
-			ScheminPair.QuoteLists = quoteLists;
 			int currentPosition = 0;
 
 			ScheminPair totalParsed = new ScheminPair();
@@ -50,7 +49,6 @@ namespace Schemin.Parse
 				totalParsed = totalParsed.Append(ParseTopLevel(tokens, ref currentPosition));
 			}
 
-			ScheminPair.QuoteLists = true;
 			return totalParsed;
 		}
 

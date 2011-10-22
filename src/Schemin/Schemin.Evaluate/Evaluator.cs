@@ -168,10 +168,7 @@ namespace Schemin.Evaluate
 					ScheminPrimitive currentPrimitive = null;
 					if ((function as ScheminPrimitive) != null)
 					{
-						if (function.Quoted() == false)
-						{
-							currentPrimitive = (ScheminPrimitive)function;
-						}
+						currentPrimitive = (ScheminPrimitive)function;
 					}
 
 					ScheminPair fullArgs = (ScheminPair)current.Evaluated;
@@ -180,7 +177,7 @@ namespace Schemin.Evaluate
 						fullArgs = fullArgs.Append(restArg);
 					}
 
-					ScheminPair evaluated = new ScheminPair(false);
+					ScheminPair evaluated = new ScheminPair();
 					while (!unevaluated.Empty)
 					{
 						IScheminType type = unevaluated.Car;

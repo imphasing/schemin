@@ -70,7 +70,6 @@ namespace Schemin.AST
 			{
 				Environment args = new Environment();
 				args.parent = this.Closure;
-				values.Quote();
 				args.AddBinding((ScheminAtom) this.Arguments, values);
 				return args;
 			}
@@ -104,7 +103,6 @@ namespace Schemin.AST
 					ScheminAtom arg = (ScheminAtom)pairArgs.Car;
 					IScheminType value = vals.Car;
 
-					value.Quote();
 					bindings.Add(arg, value);
 
 					args = pairArgs.Cdr;
@@ -113,7 +111,6 @@ namespace Schemin.AST
 						vals = (ScheminPair)vals.Cdr;
 				}
 
-				vals.Cdr.Quote();
 				bindings.Add((ScheminAtom)args, vals.Cdr);
 
 				return bindings;
@@ -123,19 +120,6 @@ namespace Schemin.AST
 		public override string ToString()
 		{
 			return "<Lambda>";
-		}
-
-		public bool Quoted()
-		{
-			return false;
-		}
-
-		public void Quote()
-		{
-		}
-
-		public void UnQuote()
-		{
 		}
 
 		public bool Equals(IScheminType type)

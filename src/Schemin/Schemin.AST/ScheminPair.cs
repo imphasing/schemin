@@ -35,9 +35,6 @@ namespace Schemin.AST
 	{
 		public IScheminType Car = null;
 		public IScheminType Cdr = null;
-		private bool quoted = true;
-
-		public static bool QuoteLists = true;
 
 		public int Length {
 			get {
@@ -74,28 +71,15 @@ namespace Schemin.AST
 
 		public ScheminPair()
 		{
-			if (!QuoteLists)
-				this.quoted = false;
-		}
-
-		public ScheminPair(bool quoted)
-		{
-			this.quoted = quoted;
 		}
 
 		public ScheminPair(IScheminType car)
 		{
-			if (!QuoteLists)
-				this.quoted = false;
-
 			this.Car = car;
 		}
 
 		public ScheminPair(IScheminType car, IScheminType cdr)
 		{
-			if (!QuoteLists)
-				this.quoted = false;
-
 			this.Car = car;
 			this.Cdr = cdr;
 		}
@@ -117,10 +101,7 @@ namespace Schemin.AST
 		public ScheminPair ListCdr()
 		{
 			ScheminPair ret = (ScheminPair) this.Cdr;
-
-			if (ret != null)
-				ret.quoted = this.quoted;
-			else
+			if (ret == null)
 				return new ScheminPair();
 
 			return ret;
@@ -129,7 +110,6 @@ namespace Schemin.AST
 		public ScheminPair Cons(IScheminType type)
 		{
 			ScheminPair ret = new ScheminPair(type, this);
-			ret.quoted = quoted;
 			return ret;
 		}
 
@@ -138,14 +118,12 @@ namespace Schemin.AST
 			if (this.Car == null)
 			{
 				ScheminPair ret = new ScheminPair(type);
-				ret.quoted = quoted;
 				return ret;
 			}
 
 			if (this.Cdr == null)
 			{
 				ScheminPair ret = new ScheminPair(this.Car, new ScheminPair(type));
-				ret.quoted = quoted;
 				return ret;
 			}
 
@@ -157,7 +135,6 @@ namespace Schemin.AST
 			}
 
 			ScheminPair appended = new ScheminPair(type);
-			appended.quoted = quoted;
 
 			foreach (IScheminType e in reversed)
 			{
@@ -235,21 +212,6 @@ namespace Schemin.AST
 			}
 
 			return vec;
-		}
-
-		public bool Quoted()
-		{
-			return this.quoted;
-		}
-
-		public void Quote()
-		{
-			quoted = true;
-		}
-
-		public void UnQuote()
-		{
-			quoted = false;
 		}
 
 		public bool Equals(IScheminType type)

@@ -35,7 +35,6 @@ namespace Schemin.Primitives.GeneralOperations
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			IScheminType arg = args.Car;
-			arg.Quote();
 			return arg;
 		}
 

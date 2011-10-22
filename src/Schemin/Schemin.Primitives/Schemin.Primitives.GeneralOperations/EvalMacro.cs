@@ -35,26 +35,7 @@ namespace Schemin.Primitives.GeneralOperations
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			IScheminType rewritten = args.Car;
-			UnquoteAllRecursive(rewritten);
 			return rewritten;
-		}
-
-		private void UnquoteAllRecursive(IScheminType values)
-		{
-			if ((values as ScheminPair) != null)
-			{
-				foreach (IScheminType type in (ScheminPair) values)
-				{
-					if ((type as ScheminPair) != null)
-					{
-						UnquoteAllRecursive((ScheminPair) type);
-					}
-
-					type.UnQuote();
-				}
-			}
-
-			values.UnQuote();
 		}
 
 		public override void CheckArguments(ScheminPair args)

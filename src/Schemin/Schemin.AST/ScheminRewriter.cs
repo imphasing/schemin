@@ -44,11 +44,8 @@ namespace Schemin.AST
 
 		public IScheminType Rewrite(ScheminPair values)
 		{
-			QuoteAllRecursive(values);
 			ScheminPair call = new ScheminPair(Rewriter);
 			ScheminPair unquote = new ScheminPair(new ScheminPrimitive("eval-macro"));
-			unquote.UnQuote();
-			call.UnQuote();
 
 			foreach (IScheminType type in values)
 			{
@@ -59,36 +56,9 @@ namespace Schemin.AST
 			return unquote;
 		}
 
-		private void QuoteAllRecursive(ScheminPair values)
-		{
-			foreach (IScheminType type in values)
-			{
-				if ((type as ScheminPair) != null)
-				{
-					QuoteAllRecursive((ScheminPair) type);
-				}
-
-				type.Quote();
-			}
-		}
-
-
 		public override string ToString()
 		{
 			return "<Rewriter>";
-		}
-
-		public bool Quoted()
-		{
-			return false;
-		}
-
-		public void Quote()
-		{
-		}
-
-		public void UnQuote()
-		{
 		}
 
 		public bool Equals(IScheminType type)
