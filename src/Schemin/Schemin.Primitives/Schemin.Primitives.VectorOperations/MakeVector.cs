@@ -29,17 +29,18 @@ namespace Schemin.Primitives.VectorOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class MakeVector : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminInteger len = (ScheminInteger) args.Car();
-			IScheminType init = args.Cdr().Car();
+			ScheminInteger len = (ScheminInteger) args.Car;
+			IScheminType init = args.ListCdr().Car;
 
 			ScheminVector vec = new ScheminVector();
 			if (args.Length == 1)
 			{
-				ScheminList empty = new ScheminList(true);
+				ScheminPair empty = new ScheminPair();
 				for (int i = 0; i < len.IntegerValue(); i++)
 				{
 					vec.List.Add(empty);
@@ -56,10 +57,10 @@ namespace Schemin.Primitives.VectorOperations
 			return vec;
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
-			IScheminType second = args.Cdr().Car();
+			IScheminType first = args.Car;
+			IScheminType second = args.ListCdr().Car;
 			
 			if (args.Length > 2 || args.Length < 1)
 			{

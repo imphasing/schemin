@@ -131,6 +131,15 @@ namespace Schemin.Primitives
 			Primitives.Add("integer->char", new CharOperations.IntegerChar());
 			Primitives.Add("char-upcase", new CharOperations.CharUpcase());
 			Primitives.Add("char-downcase", new CharOperations.CharDowncase());
+
+			Primitives.Add("vector", new VectorOperations.Vector());
+			Primitives.Add("make-vector", new VectorOperations.MakeVector());
+			Primitives.Add("vector-length", new VectorOperations.VectorLength());
+			Primitives.Add("vector-ref", new VectorOperations.VectorRef());
+			Primitives.Add("vector-set!", new VectorOperations.VectorSet());
+			Primitives.Add("vector-fill!", new VectorOperations.VectorFill());
+			Primitives.Add("list->vector", new VectorOperations.ListVector());
+			Primitives.Add("vector->list", new VectorOperations.VectorList());
 		}
 
 		public static Primitive Get(string name)

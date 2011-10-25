@@ -143,6 +143,15 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharWhitespace.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\IntegerChar.cs" />
 
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.VectorOperations\Vector.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.VectorOperations\MakeVector.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.VectorOperations\VectorLength.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.VectorOperations\VectorRef.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.VectorOperations\VectorSet.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.VectorOperations\VectorFill.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.VectorOperations\ListVector.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.VectorOperations\VectorList.cs" />
+
     <Compile Include="Schemin.Tokenize\Tokenizer.cs" />
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />
@@ -162,8 +171,8 @@
     <Compile Include="Schemin.AST\ScheminBool.cs" />
     <Compile Include="Schemin.AST\ScheminPort.cs" />
     <Compile Include="Schemin.AST\ScheminVector.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

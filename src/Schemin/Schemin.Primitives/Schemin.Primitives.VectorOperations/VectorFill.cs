@@ -29,24 +29,25 @@ namespace Schemin.Primitives.VectorOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class VectorFill : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminVector vec = (ScheminVector) args.Car();
-			IScheminType fill = args.Cdr().Car();
+			ScheminVector vec = (ScheminVector) args.Car;
+			IScheminType fill = args.ListCdr().Car;
 
 			for (int i = 0; i < vec.List.Count; i++)
 			{
 				vec.List[i] = fill;
 			}
 
-			return new ScheminList(true);
+			return new ScheminPair();
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 			
 			if (args.Length != 2)
 			{

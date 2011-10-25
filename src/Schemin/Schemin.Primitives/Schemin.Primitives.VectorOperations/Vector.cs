@@ -29,15 +29,16 @@ namespace Schemin.Primitives.VectorOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class Vector : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminVector vec = new ScheminVector();
 
-			if ((args as ScheminList) != null)
+			if ((args as ScheminPair) != null)
 			{
-				ScheminList temp = (ScheminList) args;
+				ScheminPair temp = (ScheminPair) args;
 				foreach (IScheminType type in temp)
 				{
 					vec.List.Add(type);

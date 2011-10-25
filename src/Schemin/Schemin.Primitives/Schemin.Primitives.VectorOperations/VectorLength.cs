@@ -29,17 +29,18 @@ namespace Schemin.Primitives.VectorOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class VectorLength : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminVector vec = (ScheminVector) args.Car();
+			ScheminVector vec = (ScheminVector) args.Car;
 			return new ScheminInteger(vec.List.Count);
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 
 			if (args.Length != 1)
 			{

@@ -29,31 +29,25 @@ namespace Schemin.Primitives.VectorOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class ListVector : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminList list = (ScheminList) args.Car();
-			ScheminVector vec = new ScheminVector();
-
-			foreach (IScheminType type in list)
-			{
-				vec.List.Add(type);
-			}
-
-			return vec;
+			ScheminPair list = (ScheminPair) args.Car;
+			return list.ToVector();
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
+			IScheminType first = args.Car;
 			
 			if (args.Length != 1)
 			{
 				throw new BadArgumentsException("expected 1 argument");
 			}
 
-			if ((first as ScheminList) == null)
+			if ((first as ScheminPair) == null)
 			{
 				throw new BadArgumentsException("first argument must be a list");
 			}

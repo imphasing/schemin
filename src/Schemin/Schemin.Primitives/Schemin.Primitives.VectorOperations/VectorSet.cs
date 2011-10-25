@@ -29,23 +29,24 @@ namespace Schemin.Primitives.VectorOperations
 {
 	using Schemin.Evaluate;
 	using Schemin.AST;
+
 	public class VectorSet : Primitive
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminList args)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			ScheminVector vec = (ScheminVector) args.Car();
-			ScheminInteger pos = (ScheminInteger) args.Cdr().Car();
-			IScheminType val = args.Cdr().Cdr().Car();
+			ScheminVector vec = (ScheminVector) args.Car;
+			ScheminInteger pos = (ScheminInteger) args.ElementAt(1);
+			IScheminType val = args.ElementAt(2);
 
 			int pos_int = (int) pos.IntegerValue();
 			vec.List[pos_int] = val;
-			return new ScheminList(true);
+			return new ScheminPair();
 		}
 
-		public override void CheckArguments(ScheminList args)
+		public override void CheckArguments(ScheminPair args)
 		{
-			IScheminType first = args.Car();
-			IScheminType second = args.Cdr().Car();
+			IScheminType first = args.Car;
+			IScheminType second = args.ListCdr().Car;
 			
 			if (args.Length != 3)
 			{
