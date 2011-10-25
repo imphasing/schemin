@@ -49,15 +49,25 @@ namespace Schemin.AST
 			return Value.ToString();
 		}
 
-		public bool Equals(IScheminType type)
+		public bool Equivalent(IScheminType type)
 		{
-			if (this.GetType() != type.GetType())
+			if ((type as ScheminInteger) == null)
 			{
 				return false;
 			}
 
 			ScheminInteger temp = (ScheminInteger) type;
 			if (this.Value == temp.Value)
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool Equal(IScheminType type)
+		{
+			if (type == this)
 			{
 				return true;
 			}

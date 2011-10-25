@@ -76,9 +76,14 @@ namespace Schemin.AST
 			return "<Port>";
 		}
 
-		public bool Equals(IScheminType type)
+		public bool Equivalent(IScheminType type)
 		{
-			if (this == type)
+			return Equal(type);
+		}
+
+		public bool Equal(IScheminType type)
+		{
+			if (type == this)
 			{
 				return true;
 			}

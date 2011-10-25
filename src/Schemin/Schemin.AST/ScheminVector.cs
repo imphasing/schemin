@@ -79,15 +79,14 @@ namespace Schemin.AST
 			return builder.ToString();
 		}
 
-		public bool Equals(IScheminType type)
+		public bool Equivalent(IScheminType type)
 		{
-			if ((type as ScheminVector) == null)
-			{
-				return false;
-			}
+			return Equal(type);
+		}
 
-			ScheminVector temp = (ScheminVector) type;
-			if (this.List == temp.List)
+		public bool Equal(IScheminType type)
+		{
+			if (type == this)
 			{
 				return true;
 			}

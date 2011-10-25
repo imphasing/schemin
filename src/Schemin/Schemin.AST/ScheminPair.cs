@@ -214,13 +214,30 @@ namespace Schemin.AST
 			return vec;
 		}
 
-		public bool Equals(IScheminType type)
+		public bool Equivalent(IScheminType type)
 		{
-			if ((type as ScheminPair) != null)
+			if ((type as ScheminPair) == null)
+				return false;
+
+			if (this.Empty && ((ScheminPair) type).Empty)
+				return true;
+
+			return Equal(type);
+		}
+
+		public bool Equal(IScheminType type)
+		{
+			if ((type as ScheminPair) == null)
+				return false;
+
+			if (this.Empty && ((ScheminPair) type).Empty)
+				return true;
+
+			if (type == this)
 			{
-				if (type == this)
-					return true;
+				return true;
 			}
+
 			return false;
 		}
 

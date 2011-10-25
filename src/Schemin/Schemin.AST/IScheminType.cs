@@ -29,7 +29,8 @@ namespace Schemin.AST
 {
 	public interface IScheminType
 	{
-		bool Equals(IScheminType type);
+		bool Equal(IScheminType type);
+		bool Equivalent(IScheminType type);
 		ScheminBool BoolValue();
 	}
 }

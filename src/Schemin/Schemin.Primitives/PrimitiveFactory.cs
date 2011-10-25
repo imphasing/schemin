@@ -73,8 +73,10 @@ namespace Schemin.Primitives
 			Primitives.Add("mod", new NumericOperations.Mod());
 
 			Primitives.Add("null?", new BooleanOperations.Null());
-			Primitives.Add("=", new BooleanOperations.Equal());
-			Primitives.Add("eq?", new BooleanOperations.Equal());
+			Primitives.Add("eq?", new BooleanOperations.Eq());
+			Primitives.Add("eqv?", new BooleanOperations.Eqv());
+			Primitives.Add("equal?", new BooleanOperations.Equal());
+			Primitives.Add("=", new BooleanOperations.NumericalEqual());
 
 			Primitives.Add(">", new BooleanOperations.GreaterThan());
 			Primitives.Add(">=", new BooleanOperations.GreaterThanOr());

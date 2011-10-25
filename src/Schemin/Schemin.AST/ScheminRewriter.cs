@@ -61,14 +61,16 @@ namespace Schemin.AST
 			return "<Rewriter>";
 		}
 
-		public bool Equals(IScheminType type)
+		public bool Equivalent(IScheminType type)
 		{
-			if ((type as ScheminRewriter) != null)
+			return Equal(type);
+		}
+
+		public bool Equal(IScheminType type)
+		{
+			if (type == this)
 			{
-				if (type == this)
-				{
-					return true;
-				}
+				return true;
 			}
 
 			return false;

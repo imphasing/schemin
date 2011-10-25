@@ -36,7 +36,7 @@
 
 (define bubblesort (lambda (l)
   (define swap-pass (lambda (l)
-    (if (eq? (length l) 1) 
+    (if (= (length l) 1) 
         l
         (let ((fst (car l))(snd (cadr l))(rest (cddr l)))
           (if (> fst snd) 

@@ -122,14 +122,16 @@ namespace Schemin.AST
 			return "<Lambda>";
 		}
 
-		public bool Equals(IScheminType type)
+		public bool Equivalent(IScheminType type)
 		{
-			if ((type as ScheminLambda) != null)
+			return Equal(type);
+		}
+
+		public bool Equal(IScheminType type)
+		{
+			if (type == this)
 			{
-				if (type == this)
-				{
-					return true;
-				}
+				return true;
 			}
 
 			return false;

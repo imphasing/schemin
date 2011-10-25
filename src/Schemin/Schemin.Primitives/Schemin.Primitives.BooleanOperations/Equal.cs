@@ -34,23 +34,48 @@ namespace Schemin.Primitives.BooleanOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			IScheminType last = args.Car;
+			IScheminType first = args.Car;
+			IScheminType second = args.ElementAt(1);
 
-			bool result = false;
+			return ScheminBool.GetValue(EqualsHelper(first, second));
+		}
 
-			foreach (IScheminType type in args.ListCdr())
+		private bool EqualsHelper(IScheminType first, IScheminType second)
+		{
+			if ((first as ScheminPair) != null && (second as ScheminPair) != null)
 			{
-				if (last.Equals(type))
+				ScheminPair firstPair = (ScheminPair) first;
+				ScheminPair secondPair = (ScheminPair) second;
+
+				if (firstPair.Length != secondPair.Length)
+					return false;
+
+				for (int i = 0; i < firstPair.Length; i++)
 				{
-					result = true;
+					if (!EqualsHelper(firstPair.ElementAt(i), secondPair.ElementAt(i)))
+						return false;
 				}
-				else
+
+				return true;
+			}
+			else if ((first as ScheminVector) != null && (second as ScheminVector) != null)
+			{
+				ScheminVector firstVec = (ScheminVector) first;
+				ScheminVector secondVec = (ScheminVector) second;
+
+				if (firstVec.List.Count != secondVec.List.Count)
+					return false;
+
+				for (int i = 0; i < firstVec.List.Count; i++)
 				{
-					result = false;
+					if (!EqualsHelper(firstVec.List[i], secondVec.List[i]))
+						return false;
 				}
+
+				return true; 
 			}
 
-			return ScheminBool.GetValue(result);
+			return first.Equivalent(second);
 		}
 	}
 }

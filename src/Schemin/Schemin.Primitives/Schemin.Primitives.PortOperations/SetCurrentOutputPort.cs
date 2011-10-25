@@ -36,7 +36,7 @@ namespace Schemin.Primitives.PortOperations
 		{
 			ScheminPort outputPort = (ScheminPort) args.Car;
 			eval.CurrentOutputPort = outputPort;
-			return new ScheminList(false);
+			return new ScheminPair();
 		}
 
 		public override void CheckArguments(ScheminPair args)

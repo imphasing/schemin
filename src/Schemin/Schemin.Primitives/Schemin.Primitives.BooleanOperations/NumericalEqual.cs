@@ -25,63 +25,46 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.AST
+namespace Schemin.Primitives.BooleanOperations
 {
-	using System.Numerics;
+	using Schemin.Evaluate;
+	using Schemin.AST;
 
-	public class ScheminDecimal : IScheminType, IScheminNumeric
+	public class NumericalEqual : Primitive
 	{
-		public decimal Value;
-
-		public ScheminDecimal(decimal value)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			this.Value = value;
-		}
+			IScheminNumeric first = (IScheminNumeric) args.Car;
+			IScheminNumeric second = (IScheminNumeric) args.ElementAt(1);
+			bool dec = false;
 
-		public override string ToString()
-		{
-			return Value.ToString();
-		}
+			if ((first as ScheminDecimal) != null || (second as ScheminDecimal) != null)
+				dec = true;
 
-		public bool Equivalent(IScheminType type)
-		{
-			if ((type as ScheminDecimal) == null)
+			if (!dec)
 			{
-				return false;
+				return ScheminBool.GetValue(first.IntegerValue() == second.IntegerValue());
 			}
 
-			ScheminDecimal temp = (ScheminDecimal) type;
-			if (this.Value == temp.Value)
+			return ScheminBool.GetValue(first.DecimalValue() == second.DecimalValue());
+		}
+
+		public override void CheckArguments(ScheminPair args)
+		{
+			IScheminType first = args.Car;
+			IScheminType second = args.ListCdr().Car;
+
+			if (args.Length != 2)
 			{
-				return true;
+				throw new BadArgumentsException("expected 2 arguments");
 			}
 
-			return false;
-		}
-
-		public bool Equal(IScheminType type)
-		{
-			if (type == this)
+			if ((first as IScheminNumeric) == null || (second as IScheminNumeric) == null)
 			{
-				return true;
+				throw new BadArgumentsException("arguments must be numeric");
 			}
 
-			return false;
-		}
-
-		public decimal DecimalValue()
-		{
-			return this.Value;
-		}
-
-		public BigInteger IntegerValue()
-		{
-			return new BigInteger(this.Value);
-		}
-
-		public ScheminBool BoolValue()
-		{
-			return ScheminBool.True;
+			return;
 		}
 	}
 }

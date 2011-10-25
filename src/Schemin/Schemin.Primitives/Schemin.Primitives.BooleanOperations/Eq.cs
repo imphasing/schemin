@@ -25,63 +25,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.AST
+namespace Schemin.Primitives.BooleanOperations
 {
-	using System.Numerics;
+	using Schemin.Evaluate;
+	using Schemin.AST;
 
-	public class ScheminDecimal : IScheminType, IScheminNumeric
+	public class Eq : Primitive
 	{
-		public decimal Value;
-
-		public ScheminDecimal(decimal value)
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			this.Value = value;
-		}
+			IScheminType first = args.Car;
+			IScheminType second = args.ElementAt(1);
 
-		public override string ToString()
-		{
-			return Value.ToString();
-		}
-
-		public bool Equivalent(IScheminType type)
-		{
-			if ((type as ScheminDecimal) == null)
-			{
-				return false;
-			}
-
-			ScheminDecimal temp = (ScheminDecimal) type;
-			if (this.Value == temp.Value)
-			{
-				return true;
-			}
-
-			return false;
-		}
-
-		public bool Equal(IScheminType type)
-		{
-			if (type == this)
-			{
-				return true;
-			}
-
-			return false;
-		}
-
-		public decimal DecimalValue()
-		{
-			return this.Value;
-		}
-
-		public BigInteger IntegerValue()
-		{
-			return new BigInteger(this.Value);
-		}
-
-		public ScheminBool BoolValue()
-		{
-			return ScheminBool.True;
+			return ScheminBool.GetValue(first.Equal(second));
 		}
 	}
 }

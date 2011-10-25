@@ -36,7 +36,7 @@ namespace Schemin.Primitives.CharOperations
 			ScheminChar first = (ScheminChar) args.Car;
 			ScheminChar second = (ScheminChar) args.ElementAt(1);
 
-			if (first.Equals(second))
+			if (first.Equivalent(second))
 			{
 				return ScheminBool.True;
 			}

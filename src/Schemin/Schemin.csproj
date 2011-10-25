@@ -45,7 +45,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Assembly\AssemblyInfo.cs" />
     <Compile Include="Mono.Options\Options.cs" />
-    <Compile Include="Schemin.AST\ScheminContinuation.cs" />
     <Compile Include="Schemin.Evaluate\Environment.cs" />
     <Compile Include="Schemin.Evaluate\UnboundAtomException.cs" />
     <Compile Include="Schemin.Evaluate\Evaluator.cs" />
@@ -91,7 +90,10 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Boolean.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Char.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\EOFObject.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Eq.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Eqv.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Equal.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\NumericalEqual.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\GreaterThan.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\GreaterThanOr.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\InputPort.cs" />
@@ -156,14 +158,15 @@
     <Compile Include="Schemin.Tokenize\TokenType.cs" />
     <Compile Include="Schemin.Tokenize\Token.cs" />
     <Compile Include="Schemin.Parse\PairParser.cs" />
+
     <Compile Include="Schemin.AST\IScheminType.cs" />
     <Compile Include="Schemin.AST\IScheminNumeric.cs" />
     <Compile Include="Schemin.AST\ScheminAtom.cs" />
     <Compile Include="Schemin.AST\ScheminInteger.cs" />
     <Compile Include="Schemin.AST\ScheminDecimal.cs" />
-    <Compile Include="Schemin.AST\ScheminList.cs" />
     <Compile Include="Schemin.AST\ScheminPair.cs" />
     <Compile Include="Schemin.AST\ScheminLambda.cs" />
+    <Compile Include="Schemin.AST\ScheminContinuation.cs" />
     <Compile Include="Schemin.AST\ScheminRewriter.cs" />
     <Compile Include="Schemin.AST\ScheminPrimitive.cs" />
     <Compile Include="Schemin.AST\ScheminString.cs" />

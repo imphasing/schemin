@@ -92,15 +92,25 @@ namespace Schemin.AST
 			return "#\\" + MapNamedValue(Value);
 		}
 
-		public bool Equals(IScheminType type)
+		public bool Equivalent(IScheminType type)
 		{
-			if (this.GetType() != type.GetType())
+			if ((type as ScheminChar) == null)
 			{
 				return false;
 			}
 
 			ScheminChar temp = (ScheminChar) type;
 			if (this.Value == temp.Value)
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool Equal(IScheminType type)
+		{
+			if (type == this)
 			{
 				return true;
 			}

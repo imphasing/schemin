@@ -45,7 +45,7 @@ namespace Schemin.Primitives.PortOperations
 			writeTo.OutputStream.Write(chr.Value);
 			writeTo.OutputStream.Flush();
 
-			return new ScheminList(false);
+			return new ScheminPair();
 		}
 
 		public override void CheckArguments(ScheminPair args)
