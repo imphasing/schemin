@@ -468,7 +468,7 @@ namespace Schemin.Evaluate
 		{
 			foreach (KeyValuePair<string, Primitive> kvp in PrimitiveFactory.Primitives)
 			{
-				ScheminAtom symbol = new ScheminAtom(kvp.Key);
+				ScheminAtom symbol = AtomFactory.GetAtom(kvp.Key);
 				ScheminPrimitive prim = new ScheminPrimitive(kvp.Key);
 
 				env.AddBinding(symbol, prim);
@@ -501,7 +501,6 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.Product);
 			prebound_schemin.Add(ScheminPrimitives.Max);
 			prebound_schemin.Add(ScheminPrimitives.Min);
-			prebound_schemin.Add(ScheminPrimitives.MemHelper);
 			prebound_schemin.Add(ScheminPrimitives.Memq);
 			prebound_schemin.Add(ScheminPrimitives.Memv);
 			prebound_schemin.Add(ScheminPrimitives.Member);

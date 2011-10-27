@@ -25,42 +25,30 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Primitives.GeneralOperations
+namespace Schemin.AST
 {
-	using Schemin.Evaluate;
+	using System;
+	using System.Text;
+	using System.Collections.Generic;
 	using Schemin.AST;
 
-	public class GenSym : Primitive
+	public static class AtomFactory
 	{
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
+		public static Dictionary<string, ScheminAtom> atoms;
+
+		static AtomFactory()
 		{
-			IScheminType argument = args.Car;
-			if ((argument as ScheminInteger) != null)
-			{
-				ScheminInteger newSeed = (ScheminInteger) argument;
-				eval.GenSymSeed = (int) newSeed.IntegerValue();
-			}
-			else if ((argument as ScheminString) != null)
-			{
-				ScheminString newPrefix = (ScheminString) argument;
-				eval.GenSymPrefix = newPrefix.Value;
-			}
-
-			string symbolName = eval.GenSymPrefix + eval.GenSymSeed.ToString();
-			eval.GenSymSeed++;
-
-			ScheminAtom gen = AtomFactory.GetAtom(symbolName);
-			return gen;
+			atoms = new Dictionary<string, ScheminAtom>();
 		}
-
-		public override void CheckArguments(ScheminPair args)
+		
+		public static ScheminAtom GetAtom(string name)
 		{
-			if (args.Length > 1)
+			if (!atoms.ContainsKey(name))
 			{
-				throw new BadArgumentsException("expected 1 or 0 arguments");
+				atoms.Add(name, new ScheminAtom(name));
 			}
 
-			return;
+			return atoms[name];
 		}
 	}
 }

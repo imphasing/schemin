@@ -90,22 +90,50 @@ namespace Schemin.Primitives
 
 		public static string Min = "(define (min first . num-list) (fold (lambda (old new) (if (< old new) old new)) first num-list))";
 
-		public static string MemHelper = "(define (mem-helper pred op) (lambda (acc next) (if (and (not acc) (pred (op next))) next acc)))";
+		public static string Member = @"(define (member thing lis)
+			(if (null? lis)
+			  #f
+			  (if (equal? (car lis) thing)
+			    lis
+			    (member thing (cdr lis)))))";
 
-		public static string Memq = "(define (memq obj lst) (fold (mem-helper (curry eq? obj) id) #f lst))";
+		public static string Memv = @"(define (memv thing lis)
+			(if (null? lis)
+			  #f
+			  (if (eqv? (car lis) thing)
+			    lis
+			    (member thing (cdr lis)))))";
 
-		public static string Memv = "(define (memv obj lst) (fold (mem-helper (curry eqv? obj) id) #f lst))";
+		public static string Memq = @"(define (memq thing lis)
+			(if (null? lis)
+			  #f
+			  (if (eq? (car lis) thing)
+			    lis
+			    (member thing (cdr lis)))))";
 
-		public static string Member = "(define (member obj lst) (fold (mem-helper (curry equal? obj) id) #f lst))";
+		public static string Assoc = @"(define (assoc thing alist)
+			(if (null? alist)
+			  #f
+			  (if (equal? (car (car alist)) thing)
+			    (car alist)
+			    (assoc thing (cdr alist)))))";
 
-		public static string Assq = "(define (assq obj alist) (fold (mem-helper (curry eq? obj) car) #f alist))";
+		public static string Assq = @"(define (assq thing alist)
+			(if (null? alist)
+			  #f
+			  (if (eq? (car (car alist)) thing)
+			    (car alist)
+			    (assoc thing (cdr alist)))))";
 
-		public static string Assv = "(define (assv obj alist) (fold (mem-helper (curry eqv? obj) car) #f alist))";
-
-		public static string Assoc = "(define (assoc obj alist) (fold (mem-helper (curry equal? obj) car) #f alist))";
+		public static string Assv = @"(define (assv thing alist)
+			(if (null? alist)
+			  #f
+			  (if (eqv? (car (car alist)) thing)
+			    (car alist)
+			    (assoc thing (cdr alist)))))";
 
 		public static string DefineMacro = @"(define-rewriter define-macro
-						      (lambda args
-						        `(define-rewriter ,(car (car args)) (lambda ,(cdr (car args)) ,(car (cdr args))))))";
+						       (lambda args
+						         `(define-rewriter ,(car (car args)) (lambda ,(cdr (car args)) ,(car (cdr args))))))";
 	}
 }

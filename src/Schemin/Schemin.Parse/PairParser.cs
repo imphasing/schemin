@@ -174,7 +174,7 @@ namespace Schemin.Parse
 			switch (token.Type)
 			{
 				case TokenType.Symbol:
-					return ConvertAtom(new ScheminAtom(token.Value), token);
+					return ConvertAtom(AtomFactory.GetAtom(token.Value), token);
 				case TokenType.IntegerLiteral:
 					return new ScheminInteger(BigInteger.Parse(token.Value));
 				case TokenType.DecimalLiteral:

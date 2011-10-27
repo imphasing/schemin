@@ -41,7 +41,7 @@ namespace Schemin.Primitives.GeneralOperations
 
 			foreach (KeyValuePair<string, IScheminType> kvp in env.bindings)
 			{
-				var binding = new ScheminPair(new ScheminAtom(kvp.Key));
+				var binding = new ScheminPair(AtomFactory.GetAtom(kvp.Key));
 				binding = binding.Append(kvp.Value);
 
 				bindings = bindings.Append(binding);

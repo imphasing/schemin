@@ -160,6 +160,7 @@
     <Compile Include="Schemin.Parse\PairParser.cs" />
 
     <Compile Include="Schemin.AST\IScheminType.cs" />
+    <Compile Include="Schemin.AST\AtomFactory.cs" />
     <Compile Include="Schemin.AST\IScheminNumeric.cs" />
     <Compile Include="Schemin.AST\ScheminAtom.cs" />
     <Compile Include="Schemin.AST\ScheminInteger.cs" />
