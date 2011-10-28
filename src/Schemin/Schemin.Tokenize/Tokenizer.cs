@@ -239,11 +239,28 @@ namespace Schemin.Tokenize
 				// char literal!
 				StringBuilder sb = new StringBuilder();
 				int newPosition = position;
-				while (newPosition < input.Length && !Whitespace(input[newPosition]) && SymbolPart(input[newPosition]))
+
+				while (newPosition < input.Length && !Whitespace(input[newPosition]))
 				{
-					sb.Append(input[newPosition]);
-					newPosition++;
+					if (newPosition < position + 3)
+					{
+						sb.Append(input[newPosition]);
+						newPosition++;
+					}
+					else
+					{
+						if (SymbolPart(input[newPosition]))
+						{
+							sb.Append(input[newPosition]);
+							newPosition++;
+						}
+						else
+						{
+							break;
+						}
+					}
 				}
+
 				return MakeTokenPair(TokenType.CharLiteral, new String(input, position, newPosition - position), input, originalPosition, newPosition);
 			}
 			else
