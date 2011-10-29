@@ -136,7 +136,22 @@ namespace Schemin.Primitives
 						       (lambda args
 						         `(define-rewriter ,(car (car args)) (lambda ,(cdr (car args)) ,(car (cdr args))))))";
 
-		public static string Delay = "(define-macro (delay expr) `(lambda () ,expr))";
+		public static string MakePromise = @"
+		(define make-promise
+		(lambda (proc)
+			(let ((result-ready? #f)
+				(result #f))
+			(lambda ()
+				(if result-ready?
+					result
+					(let ((x (proc)))
+					(if result-ready?
+						result
+						(begin (set! result-ready? #t)
+								(set! result x)
+								result))))))))";
+
+		public static string Delay = "(define-macro (delay expr) `(make-promise (lambda () ,expr)))";
 
 		public static string Force = "(define-macro (force expr) `(apply ,expr '()))";
 	}
