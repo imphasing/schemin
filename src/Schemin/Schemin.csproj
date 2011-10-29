@@ -49,8 +49,6 @@
     <Compile Include="Schemin.Evaluate\UnboundAtomException.cs" />
     <Compile Include="Schemin.Evaluate\Evaluator.cs" />
 
-    <Compile Include="Schemin.Primitives\ScheminPrimitives.cs" />
-
     <Compile Include="Schemin.Primitives\Primitive.cs" />
     <Compile Include="Schemin.Primitives\BadArgumentsException.cs" />
     <Compile Include="Schemin.Primitives\PrimitiveFactory.cs" />
@@ -72,6 +70,7 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\QuasiQuote.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\EvalMacro.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\SetBang.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Load.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Append.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Car.cs" />
@@ -182,13 +181,19 @@
     <Compile Include="Schemin.AST\ScheminBool.cs" />
     <Compile Include="Schemin.AST\ScheminPort.cs" />
     <Compile Include="Schemin.AST\ScheminVector.cs" />
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <PropertyGroup>
+    <ScheminLibDirectory>..\ScheminLib</ScheminLibDirectory>
+  </PropertyGroup>
+
   <Target Name="AfterBuild">
+    <CreateItem Include="$(ScheminLibDirectory)\**\*.*">
+      <Output TaskParameter="Include" ItemName="FilesToCopy" />
+    </CreateItem>
+
+    <Message Text="Test" />
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="..\..\build\ScheminLib\%(RecursiveDir)" />
   </Target>
-  -->
 </Project>

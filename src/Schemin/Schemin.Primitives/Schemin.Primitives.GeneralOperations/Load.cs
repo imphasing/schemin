@@ -25,24 +25,40 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Primitives.PortOperations
+namespace Schemin.Primitives.GeneralOperations
 {
 	using System;
-	using Environment = Schemin.Evaluate.Environment;
+	using System.Text;
 	using System.IO;
 	using Schemin.Evaluate;
+	using Schemin.Tokenize;
+	using Schemin.Parse;
 	using Schemin.AST;
+	using Environment = Schemin.Evaluate.Environment;
 
-	public class OpenOutputFile : Primitive
+	public class Load : Primitive
 	{
+		public Load()
+		{
+			base.Rewriter = true;
+		}
+
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminString filename = (ScheminString) args.Car;
 			string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-			FileStream fs = new FileStream(baseDir + Path.DirectorySeparatorChar + filename.Value, FileMode.Append, FileAccess.Write, FileShare.Write);
-			ScheminPort filePort = new ScheminPort(fs, ScheminPort.PortType.OutputPort);
 
-			return filePort;
+			FileStream fs = File.OpenRead(baseDir + Path.DirectorySeparatorChar + filename.Value);
+			StreamReader sr = new StreamReader(fs);
+
+			string file = sr.ReadToEnd();
+			Tokenizer t = new Tokenizer();
+			PairParser p = new PairParser();
+
+			var tokens = t.Tokenize(file);
+			ScheminPair ast = p.Parse(tokens, true).Cons(new ScheminPrimitive("begin"));
+
+			return ast;
 		}
 
 		public override void CheckArguments(ScheminPair args)
@@ -56,7 +72,7 @@ namespace Schemin.Primitives.PortOperations
 
 			if ((first as ScheminString) == null)
 			{
-				throw new BadArgumentsException("argument must be a string");
+				throw new BadArgumentsException("first argument must be a string");
 			}
 
 			return;

@@ -58,6 +58,7 @@ namespace Schemin.Primitives
 			Primitives.Add("let*", new GeneralOperations.LetStar());
 			Primitives.Add("set!", new GeneralOperations.SetBang());
 			Primitives.Add("call/cc", new GeneralOperations.CallCC());
+			Primitives.Add("load", new GeneralOperations.Load());
 
 			Primitives.Add("car", new ListOperations.Car());
 			Primitives.Add("cons", new ListOperations.Cons());

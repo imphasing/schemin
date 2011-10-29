@@ -38,7 +38,8 @@ namespace Schemin.Primitives.PortOperations
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			ScheminString filename = (ScheminString) args.Car;
-			FileStream fs = File.OpenRead(filename.Value);
+			string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+			FileStream fs = File.OpenRead(baseDir + Path.DirectorySeparatorChar + filename.Value);
 			ScheminPort filePort = new ScheminPort(fs, ScheminPort.PortType.InputPort);
 
 			return filePort;

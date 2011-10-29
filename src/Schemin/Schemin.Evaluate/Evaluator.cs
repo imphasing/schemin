@@ -31,8 +31,10 @@ namespace Schemin.Evaluate
 	using System.Text;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.IO;
 	using System.Linq;
 	using Schemin.AST;
+	using Schemin.Parse;
 	using Schemin.Tokenize;
 	using Schemin.Primitives;
 
@@ -466,6 +468,9 @@ namespace Schemin.Evaluate
 
 		private void DefinePrimitives(Environment env)
 		{
+			Tokenizer t = new Tokenizer();
+			PairParser p = new PairParser();
+
 			foreach (KeyValuePair<string, Primitive> kvp in PrimitiveFactory.Primitives)
 			{
 				ScheminAtom symbol = AtomFactory.GetAtom(kvp.Key);
@@ -474,53 +479,10 @@ namespace Schemin.Evaluate
 				env.AddBinding(symbol, prim);
 			}
 
-			var prebound_schemin = new List<string>();
-			prebound_schemin.Add(ScheminPrimitives.Cadr);
-			prebound_schemin.Add(ScheminPrimitives.Cddr);
-			prebound_schemin.Add(ScheminPrimitives.Caddr);
-			prebound_schemin.Add(ScheminPrimitives.Map);
-			prebound_schemin.Add(ScheminPrimitives.Filter);
-			prebound_schemin.Add(ScheminPrimitives.Foldl);
-			prebound_schemin.Add(ScheminPrimitives.Foldr);
-			prebound_schemin.Add(ScheminPrimitives.Not);
-			prebound_schemin.Add(ScheminPrimitives.Id);
-			prebound_schemin.Add(ScheminPrimitives.Flip);
-			prebound_schemin.Add(ScheminPrimitives.Fold);
-			prebound_schemin.Add(ScheminPrimitives.Unfold);
-			prebound_schemin.Add(ScheminPrimitives.Reverse);
-			prebound_schemin.Add(ScheminPrimitives.Curry);
-			prebound_schemin.Add(ScheminPrimitives.Compose);
-			prebound_schemin.Add(ScheminPrimitives.Zero);
-			prebound_schemin.Add(ScheminPrimitives.Positive);
-			prebound_schemin.Add(ScheminPrimitives.Negative);
-			prebound_schemin.Add(ScheminPrimitives.Odd);
-			prebound_schemin.Add(ScheminPrimitives.Even);
-			prebound_schemin.Add(ScheminPrimitives.CallWithCC);
-			prebound_schemin.Add(ScheminPrimitives.Error);
-			prebound_schemin.Add(ScheminPrimitives.Sum);
-			prebound_schemin.Add(ScheminPrimitives.Product);
-			prebound_schemin.Add(ScheminPrimitives.Max);
-			prebound_schemin.Add(ScheminPrimitives.Min);
-			prebound_schemin.Add(ScheminPrimitives.Memq);
-			prebound_schemin.Add(ScheminPrimitives.Memv);
-			prebound_schemin.Add(ScheminPrimitives.Member);
-			prebound_schemin.Add(ScheminPrimitives.Assq);
-			prebound_schemin.Add(ScheminPrimitives.Assv);
-			prebound_schemin.Add(ScheminPrimitives.Assoc);
-			prebound_schemin.Add(ScheminPrimitives.DefineMacro);
-			prebound_schemin.Add(ScheminPrimitives.MakePromise);
-			prebound_schemin.Add(ScheminPrimitives.Force);
-			prebound_schemin.Add(ScheminPrimitives.Delay);
-
-			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
-			Schemin.Parse.PairParser p = new Parse.PairParser();
-
-			foreach (string primitive in prebound_schemin)
-			{
-				var tokens = t.Tokenize(primitive);
-				var ast = p.Parse(tokens, false);
-				Evaluate(ast);
-			}
+			string load = "(load \"ScheminLib\\\\ScheminLib.ss\")";
+			var tokens = t.Tokenize(load);
+			var ast = p.Parse(tokens, true);
+			Evaluate(ast);
 		}
 	}
 }
