@@ -79,6 +79,12 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Cons.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Length.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\List.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\SetCar.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\SetCdr.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Reverse.cs" />
+
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.SymbolOperations\SymbolString.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.SymbolOperations\StringSymbol.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Add.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Divide.cs" />
@@ -100,6 +106,7 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\LessThan.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\LessThanOr.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Null.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\List.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Number.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\Or.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.BooleanOperations\OutputPort.cs" />

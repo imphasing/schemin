@@ -65,6 +65,12 @@ namespace Schemin.Primitives
 			Primitives.Add("length", new ListOperations.Length());
 			Primitives.Add("append", new ListOperations.Append());
 			Primitives.Add("list", new ListOperations.List());
+			Primitives.Add("set-car!", new ListOperations.SetCar());
+			Primitives.Add("set-cdr!", new ListOperations.SetCdr());
+			Primitives.Add("reverse", new ListOperations.Reverse());
+
+			Primitives.Add("symbol->string", new SymbolOperations.SymbolString());
+			Primitives.Add("string->symbol", new SymbolOperations.StringSymbol());
 
 			Primitives.Add("+", new NumericOperations.Add());
 			Primitives.Add("-", new NumericOperations.Subtract());
@@ -73,6 +79,7 @@ namespace Schemin.Primitives
 			Primitives.Add("mod", new NumericOperations.Mod());
 
 			Primitives.Add("null?", new BooleanOperations.Null());
+			Primitives.Add("list?", new BooleanOperations.List());
 			Primitives.Add("eq?", new BooleanOperations.Eq());
 			Primitives.Add("eqv?", new BooleanOperations.Eqv());
 			Primitives.Add("equal?", new BooleanOperations.Equal());
