@@ -135,5 +135,9 @@ namespace Schemin.Primitives
 		public static string DefineMacro = @"(define-rewriter define-macro
 						       (lambda args
 						         `(define-rewriter ,(car (car args)) (lambda ,(cdr (car args)) ,(car (cdr args))))))";
+
+		public static string Delay = "(define-macro (delay expr) `(lambda () ,expr))";
+
+		public static string Force = "(define-macro (force expr) `(apply ,expr '()))";
 	}
 }

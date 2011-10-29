@@ -1,4 +1,5 @@
-;;;; Shamelessly stolen from: https://bitbucket.org/tarballs_are_good/scheme-random/src
+;;;; Shamelessly stolen from: https://bitbucket.org/tarballs_are_good/scheme-random
+
 ;;;; A little sample evaluator
 ;;;; Copyright (c) 2011 Robert Smith
 

@@ -71,6 +71,6 @@ Implemented featues:
 To do:
 ------
 
-+ Possibly implement a parser generator instead of our recursive parser
 + Implement more common primitives
 + Implement hygenic macros
++ Implement proper tail-call optimization

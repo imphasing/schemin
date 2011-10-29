@@ -508,6 +508,8 @@ namespace Schemin.Evaluate
 			prebound_schemin.Add(ScheminPrimitives.Assv);
 			prebound_schemin.Add(ScheminPrimitives.Assoc);
 			prebound_schemin.Add(ScheminPrimitives.DefineMacro);
+			prebound_schemin.Add(ScheminPrimitives.Force);
+			prebound_schemin.Add(ScheminPrimitives.Delay);
 
 			Tokenize.Tokenizer t = new Tokenize.Tokenizer();
 			Schemin.Parse.PairParser p = new Parse.PairParser();
