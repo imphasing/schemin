@@ -124,7 +124,7 @@
 
 (define call-with-current-continuation call/cc)
 
-(define error display)
+(define (error . elements) (display elements)) 
 
 (define (sum . lst) (fold + 0 lst))
 
@@ -155,3 +155,5 @@
 (define-macro (delay expr) `(make-promise (lambda () ,expr)))
 
 (define-macro (force expr) `(apply ,expr '()))
+
+(define-macro (unless expr consequent) `(if (not ,expr) ,consequent))

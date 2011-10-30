@@ -215,6 +215,8 @@ namespace Schemin.Parse
 					return new ScheminPrimitive("and", token);
 				case "cond":
 					return new ScheminPrimitive("cond", token);
+				case "case":
+					return new ScheminPrimitive("case", token);
 				case "let":
 					return new ScheminPrimitive("let", token);
 				case "letrec":

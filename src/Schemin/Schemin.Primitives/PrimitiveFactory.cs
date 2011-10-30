@@ -59,6 +59,7 @@ namespace Schemin.Primitives
 			Primitives.Add("set!", new GeneralOperations.SetBang());
 			Primitives.Add("call/cc", new GeneralOperations.CallCC());
 			Primitives.Add("load", new GeneralOperations.Load());
+			Primitives.Add("case", new GeneralOperations.Case());
 
 			Primitives.Add("car", new ListOperations.Car());
 			Primitives.Add("cons", new ListOperations.Cons());
@@ -125,6 +126,8 @@ namespace Schemin.Primitives
 
 			Primitives.Add("string-ref", new StringOperations.StringRef());
 			Primitives.Add("string-length", new StringOperations.StringLength());
+			Primitives.Add("string->list", new StringOperations.StringList());
+			Primitives.Add("list->string", new StringOperations.ListString());
 
 			Primitives.Add("char=?", new CharOperations.CharEquals());
 			Primitives.Add("char<?", new CharOperations.CharGreaterThan());

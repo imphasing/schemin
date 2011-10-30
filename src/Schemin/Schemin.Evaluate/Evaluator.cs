@@ -446,6 +446,10 @@ namespace Schemin.Evaluate
 						if (currentArg == 1)
 							return false;
 						break;
+					case "case":
+						if (currentArg != 1)
+							return false;
+						break;
 				}
 			}
 

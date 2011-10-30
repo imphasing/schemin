@@ -71,6 +71,7 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\EvalMacro.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\SetBang.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Load.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Case.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Append.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.ListOperations\Car.cs" />
@@ -135,6 +136,8 @@
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\StringLength.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\StringRef.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\StringList.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\ListString.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharEquals.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharLessThan.cs" />
