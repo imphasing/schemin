@@ -79,6 +79,7 @@ namespace Schemin.Primitives
 			Primitives.Add("*", new NumericOperations.Multiply());
 			Primitives.Add("/", new NumericOperations.Divide());
 			Primitives.Add("mod", new NumericOperations.Mod());
+			Primitives.Add("number->string", new NumericOperations.NumberString());
 
 			Primitives.Add("null?", new BooleanOperations.Null());
 			Primitives.Add("list?", new BooleanOperations.List());
@@ -128,6 +129,7 @@ namespace Schemin.Primitives
 			Primitives.Add("string-length", new StringOperations.StringLength());
 			Primitives.Add("string->list", new StringOperations.StringList());
 			Primitives.Add("list->string", new StringOperations.ListString());
+			Primitives.Add("string-append", new StringOperations.StringAppend());
 
 			Primitives.Add("char=?", new CharOperations.CharEquals());
 			Primitives.Add("char<?", new CharOperations.CharGreaterThan());
