@@ -140,6 +140,7 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\StringList.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\ListString.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\StringAppend.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.StringOperations\Substring.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharEquals.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.CharOperations\CharLessThan.cs" />

@@ -130,6 +130,7 @@ namespace Schemin.Primitives
 			Primitives.Add("string->list", new StringOperations.StringList());
 			Primitives.Add("list->string", new StringOperations.ListString());
 			Primitives.Add("string-append", new StringOperations.StringAppend());
+			Primitives.Add("substring", new StringOperations.Substring());
 
 			Primitives.Add("char=?", new CharOperations.CharEquals());
 			Primitives.Add("char<?", new CharOperations.CharGreaterThan());

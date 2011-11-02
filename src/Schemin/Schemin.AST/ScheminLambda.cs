@@ -111,7 +111,7 @@ namespace Schemin.AST
 						vals = (ScheminPair)vals.Cdr;
 				}
 
-				bindings.Add((ScheminAtom)args, vals.Cdr);
+				bindings.Add((ScheminAtom)args, vals.ListCdr());
 
 				return bindings;
 			}

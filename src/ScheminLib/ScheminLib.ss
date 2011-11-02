@@ -157,3 +157,17 @@
 (define-macro (force expr) `(apply ,expr '()))
 
 (define-macro (unless expr consequent) `(if (not ,expr) ,consequent))
+
+(define-macro (when expr consequent) `(if ,expr ,consequent))
+
+(define-macro (do init test . expr)
+  (let ((bindings (map (lambda (x) (cons (car x) (list (cadr x)))) init))
+       (steps (map (lambda (x) (if (< 2 (length x)) (caddr x) (car x))) init))
+       (condition (car test))
+       (endresult (cdr test))
+       (loop-name (gensym)))
+
+    `(let ,loop-name ,bindings
+       (if (not ,condition)
+           (begin ,(car expr) ,(cons loop-name steps))
+	   ,@endresult))))
