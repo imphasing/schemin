@@ -169,15 +169,21 @@ namespace Schemin.Evaluate
 
 					ScheminPrimitive currentPrimitive = null;
 					ScheminRewriter currentRewriter = null;
-					if ((function as ScheminPrimitive) != null)
-					{
-						currentPrimitive = (ScheminPrimitive)function;
-					}
-					else if ((function as ScheminAtom) != null)
+					if ((function as ScheminAtom) != null)
 					{
 						IScheminType evaledFunction = EvalAtom(function, currentEnv);
 						if ((evaledFunction as ScheminRewriter) != null)
 							currentRewriter = (ScheminRewriter) evaledFunction;
+						else if ((evaledFunction as ScheminPrimitive) != null)
+							currentPrimitive = (ScheminPrimitive) evaledFunction;
+					}
+					else if ((function as ScheminPrimitive) != null)
+					{
+						currentPrimitive = (ScheminPrimitive) function;
+					}
+					else if ((function as ScheminRewriter) != null)
+					{
+						currentRewriter = (ScheminRewriter) function;
 					}
 
 					ScheminPair fullArgs = (ScheminPair)current.Evaluated;
@@ -193,7 +199,7 @@ namespace Schemin.Evaluate
 
 						if (currentPrimitive != null || currentRewriter != null)
 						{
-							if (!EvaluateNextArg(currentPrimitive, currentArg, fullArgs.ListCdr()) || (currentRewriter != null && currentArg > 0))
+							if ((!EvaluateNextArg(currentPrimitive, currentArg, fullArgs.ListCdr()) && currentArg > 0) || (currentRewriter != null && currentArg > 0))
 							{
 								evaluated = evaluated.Append(type);
 								unevaluated = unevaluated.ListCdr();

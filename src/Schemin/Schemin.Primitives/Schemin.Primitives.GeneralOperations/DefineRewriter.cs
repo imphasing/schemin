@@ -37,7 +37,7 @@ namespace Schemin.Primitives.GeneralOperations
 			ScheminAtom symbol = (ScheminAtom) args.Car;
 			ScheminLambda definition = (ScheminLambda) args.ElementAt(1);
 
-			ScheminRewriter rewriter = new ScheminRewriter(definition);
+			ScheminRewriter rewriter = new ScheminRewriter(definition, env);
 
 			if (env.bindings.ContainsKey(symbol.Name))
 			{

@@ -36,10 +36,12 @@ namespace Schemin.AST
 	public class ScheminRewriter : IScheminType
 	{
 		public ScheminLambda Rewriter;
+		public Environment DefiningEnv;
 
-		public ScheminRewriter(ScheminLambda rewriter)
+		public ScheminRewriter(ScheminLambda rewriter, Environment definingEnv)
 		{
 			this.Rewriter = rewriter;
+			this.DefiningEnv = definingEnv;
 		}
 
 		public ScheminPair Rewrite(ScheminPair values)

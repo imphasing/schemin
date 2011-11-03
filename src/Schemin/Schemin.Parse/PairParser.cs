@@ -174,7 +174,7 @@ namespace Schemin.Parse
 			switch (token.Type)
 			{
 				case TokenType.Symbol:
-					return ConvertAtom(AtomFactory.GetAtom(token.Value), token);
+					return AtomFactory.GetAtom(token.Value);
 				case TokenType.IntegerLiteral:
 					return new ScheminInteger(BigInteger.Parse(token.Value));
 				case TokenType.DecimalLiteral:
@@ -187,48 +187,6 @@ namespace Schemin.Parse
 					return new ScheminChar(token.Value.Replace("#\\", ""));
 				default:
 					throw new Exception(string.Format("Unable to convert token of type: {0}", token.Type));
-			}
-		}
-
-		private IScheminType ConvertAtom(ScheminAtom atom, Token token)
-		{
-			switch (atom.Name)
-			{
-				// these are special forms that can't be bound to symbols, they're always primitives
-				case "lambda":
-					return new ScheminPrimitive("lambda", token);
-				case "define": 
-					return new ScheminPrimitive("define", token);
-				case "define-rewriter":
-					return new ScheminPrimitive("define-rewriter", token);
-				case "quote":
-					return new ScheminPrimitive("quote", token);
-				case "quasiquote":
-					return new ScheminPrimitive("quasiquote", token);
-				case "begin":
-					return new ScheminPrimitive("begin", token);
-				case "if":
-					return new ScheminPrimitive("if", token);
-				case "or":
-					return new ScheminPrimitive("or", token);
-				case "and":
-					return new ScheminPrimitive("and", token);
-				case "cond":
-					return new ScheminPrimitive("cond", token);
-				case "case":
-					return new ScheminPrimitive("case", token);
-				case "let":
-					return new ScheminPrimitive("let", token);
-				case "letrec":
-					return new ScheminPrimitive("letrec", token);
-				case "let*":
-					return new ScheminPrimitive("let*", token);
-				case "set!":
-					return new ScheminPrimitive("set!", token);
-				case "call/cc":
-					return new ScheminPrimitive("call/cc", token);
-				default:
-					return atom;
 			}
 		}
 
