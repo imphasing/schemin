@@ -58,7 +58,7 @@ namespace Schemin.Primitives.GeneralOperations
 			var tokens = t.Tokenize(file);
 			ScheminPair ast = p.Parse(tokens, true).Cons(new ScheminPrimitive("begin"));
 
-			return ast;
+			return eval.ExpandMacros(ast);
 		}
 
 		public override void CheckArguments(ScheminPair args)

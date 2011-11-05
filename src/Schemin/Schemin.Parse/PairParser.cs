@@ -49,7 +49,7 @@ namespace Schemin.Parse
 				totalParsed = totalParsed.Append(ParseTopLevel(tokens, ref currentPosition));
 			}
 
-			return totalParsed;
+			return totalParsed.Cons(new ScheminPrimitive("begin"));
 		}
 
 		private IScheminType ParseTopLevel(List<Token> tokens, ref int currentPosition)

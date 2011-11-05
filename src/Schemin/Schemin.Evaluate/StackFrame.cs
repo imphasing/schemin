@@ -25,45 +25,27 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.AST
+namespace Schemin.Evaluate
 {
-	using System;
-	using Schemin.Evaluate;
-	using System.Collections.Generic;
-	using Environment = Schemin.Evaluate.Environment;
+	using Schemin.AST;
 
-	public class ScheminContinuation : IScheminType
+	public class StackFrame
 	{
-		public Stack<StackFrame> PreviousStack;
+		public IScheminType Evaluated;
+		public IScheminType Unevaluated;
+		public Environment CurrentEnv;
 
-		public ScheminContinuation(Stack<StackFrame> callStack)
+		public StackFrame(StackFrame original)
 		{
-			PreviousStack = new Stack<StackFrame>(callStack);
+			this.Evaluated = original.Evaluated;
+			this.Unevaluated = original.Unevaluated;
+			this.CurrentEnv = original.CurrentEnv;
 		}
 
-		public override string ToString()
+		public StackFrame()
 		{
-			return "<Continuation>";
-		}
-
-		public bool Equivalent(IScheminType type)
-		{
-			return Equal(type);
-		}
-
-		public bool Equal(IScheminType type)
-		{
-			if (type == this)
-			{
-				return true;
-			}
-
-			return false;
-		}
-
-		public ScheminBool BoolValue()
-		{
-			return ScheminBool.True;
+			this.Evaluated = new ScheminPair();
+			this.Unevaluated = new ScheminPair();
 		}
 	}
 }

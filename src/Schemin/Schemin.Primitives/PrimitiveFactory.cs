@@ -49,7 +49,7 @@ namespace Schemin.Primitives
 			Primitives.Add("gensym", new GeneralOperations.GenSym());
 			Primitives.Add("quote", new GeneralOperations.Quote());
 			Primitives.Add("quasiquote", new GeneralOperations.QuasiQuote());
-			Primitives.Add("eval-macro", new GeneralOperations.EvalMacro());
+			Primitives.Add("eval", new GeneralOperations.Eval());
 			Primitives.Add("begin", new GeneralOperations.Begin());
 			Primitives.Add("if", new GeneralOperations.If());
 			Primitives.Add("cond", new GeneralOperations.Cond());

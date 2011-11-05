@@ -40,26 +40,6 @@ namespace Schemin.Evaluate
 
 	public class Evaluator
 	{
-		public class StackFrame
-		{
-			public IScheminType Evaluated;
-			public IScheminType Unevaluated;
-			public Environment CurrentEnv;
-
-			public StackFrame(StackFrame original)
-			{
-				this.Evaluated = original.Evaluated;
-				this.Unevaluated = original.Unevaluated;
-				this.CurrentEnv = original.CurrentEnv;
-			}
-
-			public StackFrame()
-			{
-				this.Evaluated = new ScheminPair();
-				this.Unevaluated = new ScheminPair();
-			}
-		}
-
 		public Stack<StackFrame> Stack;
 		public Environment GlobalEnv;
 		public ScheminPort ConsoleIOPort;
@@ -83,25 +63,88 @@ namespace Schemin.Evaluate
 
 		public IScheminType Evaluate(ScheminPair ast)
 		{
-			IScheminType last = null;
-
 			try
 			{
-				foreach (IScheminType type in ast)
-				{
-					last = EvaluateInternal(type);
-				}
+				return EvaluateInternal(ExpandMacros(ast));
 			}
 			catch (BadArgumentsException b)
 			{
 				CurrentOutputPort.OutputStream.WriteLine("bad arguments: " + b.Message);
+				return new ScheminPair();
 			}
 			catch (Exception e)
 			{
 				CurrentOutputPort.OutputStream.WriteLine("error: " + e.Message);
+				return new ScheminPair();
+			}
+		}
+
+		public IScheminType ExpandMacros(IScheminType ast)
+		{
+			bool modified = false;
+			IScheminType expanded = Expand(ast, ref modified);
+
+			while (modified == true)
+			{
+				modified = false;
+				expanded = Expand(expanded, ref modified);
 			}
 
-			return last;
+			return expanded;
+		}
+
+		// Change phase, pretty much.
+		public IScheminType EvalAndRestore(IScheminType type)
+		{
+			Stack<StackFrame> oldStack = this.Stack;
+			this.Stack = new Stack<StackFrame>();
+			IScheminType result = this.EvaluateInternal(type);
+			this.Stack = oldStack;
+
+			return result;
+		}
+
+		public IScheminType Expand(IScheminType ast, ref bool modified)
+		{
+			if ((ast as ScheminPair) != null && ((ScheminPair) ast).Proper)
+			{
+				ScheminPair astPair = (ScheminPair) ast;
+				if ((astPair.Car as ScheminAtom) != null)
+				{
+					ScheminAtom functionPosition = (ScheminAtom)astPair.Car;
+					IScheminType bound = this.GlobalEnv.GetValue(functionPosition);
+
+					if ((bound as ScheminRewriter) != null)
+					{
+						ScheminRewriter rewriter = (ScheminRewriter)bound;
+						ScheminPair macroCall = rewriter.Rewrite(astPair.ListCdr());
+						IScheminType expanded = this.EvalAndRestore(macroCall);
+						modified = true;
+						return expanded;
+					}
+					else if ((bound as ScheminPrimitive) != null)
+					{
+						ScheminPrimitive boundPrim = (ScheminPrimitive)bound;
+						if (boundPrim.Definition == PrimitiveFactory.Get("define-rewriter"))
+						{
+							modified = true;
+							return this.EvalAndRestore(astPair);
+						}
+					}
+				}
+
+				ScheminPair rewritten = new ScheminPair();
+				foreach (IScheminType type in astPair)
+				{
+					rewritten = rewritten.Append(Expand(type, ref modified));
+				}
+
+				return rewritten;
+			}
+			else
+			{
+				return ast;
+			}
 		}
 
 		public IScheminType EvaluateInternal(IScheminType ast)
@@ -168,22 +211,15 @@ namespace Schemin.Evaluate
 					}
 
 					ScheminPrimitive currentPrimitive = null;
-					ScheminRewriter currentRewriter = null;
 					if ((function as ScheminAtom) != null)
 					{
 						IScheminType evaledFunction = EvalAtom(function, currentEnv);
-						if ((evaledFunction as ScheminRewriter) != null)
-							currentRewriter = (ScheminRewriter) evaledFunction;
-						else if ((evaledFunction as ScheminPrimitive) != null)
+						if ((evaledFunction as ScheminPrimitive) != null)
 							currentPrimitive = (ScheminPrimitive) evaledFunction;
 					}
 					else if ((function as ScheminPrimitive) != null)
 					{
 						currentPrimitive = (ScheminPrimitive) function;
-					}
-					else if ((function as ScheminRewriter) != null)
-					{
-						currentRewriter = (ScheminRewriter) function;
 					}
 
 					ScheminPair fullArgs = (ScheminPair)current.Evaluated;
@@ -197,9 +233,9 @@ namespace Schemin.Evaluate
 					{
 						IScheminType type = unevaluated.Car;
 
-						if (currentPrimitive != null || currentRewriter != null)
+						if (currentPrimitive != null)
 						{
-							if ((!EvaluateNextArg(currentPrimitive, currentArg, fullArgs.ListCdr()) && currentArg > 0) || (currentRewriter != null && currentArg > 0))
+							if ((!EvaluateNextArg(currentPrimitive, currentArg, fullArgs.ListCdr()) && currentArg > 0))
 							{
 								evaluated = evaluated.Append(type);
 								unevaluated = unevaluated.ListCdr();
@@ -327,17 +363,6 @@ namespace Schemin.Evaluate
 							this.Stack.Push(combinedPrevious);
 							continue;
 						}
-					}
-					else if ((waiting as ScheminRewriter) != null)
-					{
-						ScheminRewriter rewriter = (ScheminRewriter) waiting;
-						ScheminPair macroCall = rewriter.Rewrite(evaluatedList.ListCdr());
-
-						StackFrame macroRewrite = new StackFrame(current);
-						macroRewrite.Unevaluated = macroCall; 
-						macroRewrite.Evaluated = new ScheminPair();
-						this.Stack.Push(macroRewrite);
-						continue;
 					}
 					else
 					{
