@@ -5,7 +5,7 @@
 ;;;; (c) 2010 Robert Smith
 
 ;;; lazy cons... we don't want to evaluate Y!!
-(define-macro (lcons x y) `(cons ,x (delay ,y)))
+(define-rewriter lcons (lambda (form rename) `(,(rename 'cons) ,(cadr form) (,(rename 'delay) ,(car (cddr form))))))
 
 ;;; Head of a lazy list
 (define lhead car)

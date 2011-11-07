@@ -65,7 +65,8 @@ namespace Schemin.Evaluate
 		{
 			try
 			{
-				return EvaluateInternal(ExpandMacros(ast));
+				IScheminType expanded = ExpandMacros(ast);
+				return EvaluateInternal(expanded);
 			}
 			catch (BadArgumentsException b)
 			{
@@ -94,7 +95,7 @@ namespace Schemin.Evaluate
 		}
 
 		// Change phase, pretty much.
-		public IScheminType EvalAndRestore(IScheminType type)
+		private IScheminType EvalAndRestore(IScheminType type)
 		{
 			Stack<StackFrame> oldStack = this.Stack;
 			this.Stack = new Stack<StackFrame>();
@@ -104,20 +105,25 @@ namespace Schemin.Evaluate
 			return result;
 		}
 
-		public IScheminType Expand(IScheminType ast, ref bool modified)
+		private IScheminType Expand(IScheminType ast, ref bool modified)
 		{
 			if ((ast as ScheminPair) != null && ((ScheminPair) ast).Proper)
 			{
 				ScheminPair astPair = (ScheminPair) ast;
 				if ((astPair.Car as ScheminAtom) != null)
 				{
-					ScheminAtom functionPosition = (ScheminAtom)astPair.Car;
-					IScheminType bound = this.GlobalEnv.GetValue(functionPosition);
+					ScheminAtom functionPosition = (ScheminAtom) astPair.Car;
+					IScheminType bound = null;
+
+					if (functionPosition.Closed)
+						bound = functionPosition.Closure.GetValue(functionPosition);
+					else
+						bound = this.GlobalEnv.GetValue(functionPosition);
 
 					if ((bound as ScheminRewriter) != null)
 					{
 						ScheminRewriter rewriter = (ScheminRewriter)bound;
-						ScheminPair macroCall = rewriter.Rewrite(astPair.ListCdr());
+						ScheminPair macroCall = rewriter.Rewrite(astPair);
 						IScheminType expanded = this.EvalAndRestore(macroCall);
 						modified = true;
 						return expanded;
@@ -129,6 +135,10 @@ namespace Schemin.Evaluate
 						{
 							modified = true;
 							return this.EvalAndRestore(astPair);
+						}
+						else if (boundPrim.Name == "quote" || boundPrim.Name == "quasiquote")
+						{
+							return astPair;
 						}
 					}
 				}
@@ -173,7 +183,7 @@ namespace Schemin.Evaluate
 					{
 						StackFrame previous = this.Stack.Pop();
 						StackFrame combinedPrevious = new StackFrame(previous);
-						combinedPrevious.Evaluated = ((ScheminPair) combinedPrevious.Evaluated).Append(EvalAtom(unevaled, currentEnv));
+						combinedPrevious.Evaluated = ((ScheminPair)combinedPrevious.Evaluated).Append(EvalAtom(unevaled, currentEnv));
 						this.Stack.Push(combinedPrevious);
 						continue;
 					}
@@ -219,7 +229,7 @@ namespace Schemin.Evaluate
 					}
 					else if ((function as ScheminPrimitive) != null)
 					{
-						currentPrimitive = (ScheminPrimitive) function;
+						currentPrimitive = (ScheminPrimitive)function;
 					}
 
 					ScheminPair fullArgs = (ScheminPair)current.Evaluated;
@@ -301,7 +311,6 @@ namespace Schemin.Evaluate
 					{
 						waiting = EvalAtom(waiting, currentEnv);
 					}
-
 					if ((waiting as ScheminPrimitive) != null)
 					{
 						ScheminPrimitive prim = (ScheminPrimitive)waiting;
@@ -410,12 +419,15 @@ namespace Schemin.Evaluate
 		private IScheminType EvalAtom(IScheminType ast, Environment env)
 		{
 			ScheminAtom temp = (ScheminAtom) ast;
+			IScheminType bound = null;
 
-			IScheminType bound = env.GetValue(temp);
+			if (temp.Closed)
+				bound = temp.Closure.GetValue(temp);
+			else
+				bound = env.GetValue(temp);
+
 			if (bound == null)
-			{
 				throw new UnboundAtomException(string.Format("Unbound atom: {0}", temp));
-			}
 
 			return bound;
 		}

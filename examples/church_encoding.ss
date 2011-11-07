@@ -22,13 +22,14 @@
 ;; Testing.
 
 ; print-test : a macro for printing tests.
-(define-macro (print-test exp) 
-  `(begin
-   (write (quote ,exp))
-   (display " == ")
-   (write ,exp)
-   (newline)
-   (newline)))
+(define-rewriter print-test 
+  (lambda (form rename)
+    `(,(rename 'begin)
+       (,(rename 'write) (,(rename 'quote) ,(cadr form)))
+       (,(rename 'display) " == ")
+       (,(rename 'write) ,(cadr form))
+       (,(rename 'newline))
+       (,(rename 'newline)))))
 
 
 

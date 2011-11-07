@@ -30,7 +30,6 @@ namespace Schemin.AST
 	using System;
 	using Schemin.Evaluate;
 	using Schemin.Primitives;
-
 	using Environment = Schemin.Evaluate.Environment;
 
 	public class ScheminRewriter : IScheminType
@@ -47,11 +46,8 @@ namespace Schemin.AST
 		public ScheminPair Rewrite(ScheminPair values)
 		{
 			ScheminPair call = new ScheminPair(Rewriter);
-
-			foreach (IScheminType type in values)
-			{
-				call = call.Append(new ScheminPair(new ScheminPrimitive("quote")).Append(type));
-			}
+			call = call.Append(new ScheminPair(new ScheminPrimitive("quote")).Append(values));
+			call = call.Append(new ScheminPrimitive("create-closed-symbol"));
 
 			return call;
 		}

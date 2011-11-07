@@ -86,6 +86,7 @@
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.SymbolOperations\SymbolString.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.SymbolOperations\StringSymbol.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.SymbolOperations\CreateClosedSymbol.cs" />
 
     <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Add.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.NumericOperations\Divide.cs" />

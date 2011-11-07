@@ -57,15 +57,3 @@
   ; Print out the answer:
   (display a)
   (newline))
-
-; test out amb with strings
-(let ((w-1 (amb (list "the" "that" "a")))
-      (w-2 (amb (list "frog" "elephant" "thing")))
-      (w-3 (amb (list "walked" "treaded" "grows")))
-      (w-4 (amb (list "slowly" "quickly"))))
-  (define (joins? left right)
-    (eq? (string-ref left (- (string-length left) 1)) (string-ref right 0)))
-  (if (joins? w-1 w-2) '() (amb))
-  (if (joins? w-2 w-3) '() (amb))
-  (if (joins? w-3 w-4) '() (amb))
-  (list w-1 w-2 w-3 w-4))

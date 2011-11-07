@@ -73,6 +73,7 @@ namespace Schemin.Primitives
 
 			Primitives.Add("symbol->string", new SymbolOperations.SymbolString());
 			Primitives.Add("string->symbol", new SymbolOperations.StringSymbol());
+			Primitives.Add("create-closed-symbol", new SymbolOperations.CreateClosedSymbol());
 
 			Primitives.Add("+", new NumericOperations.Add());
 			Primitives.Add("-", new NumericOperations.Subtract());

@@ -29,8 +29,10 @@
 ;; ScheminLib, parts of Schemin's standard library written in Schemin itself
 ;; List functions:
 
-(define (cadr list) (car (cdr list)))
 (define (cddr list) (cdr (cdr list)))
+(define (cdddr list) (cdr (cdr (cdr list))))
+
+(define (cadr list) (car (cdr list)))
 (define (caddr list) (car (cdr (cdr list))))
 
 (define (foldl func accum lst)
@@ -134,10 +136,6 @@
 
 (define (min first . num-list) (fold (lambda (old new) (if (< old new) old new)) first num-list))
 
-(define-rewriter define-macro
-  (lambda args
-    `(define-rewriter ,(car (car args)) (lambda ,(cdr (car args)) ,(car (cdr args))))))
-
 (define make-promise
   (lambda (proc)
     (let ((result-ready? #f)
@@ -151,23 +149,26 @@
                   (begin (set! result-ready? #t)
                          (set! result x)
                          result))))))))
+(define-rewriter delay 
+  (lambda (form rename) 
+    `(,(rename 'make-promise) (,(rename 'lambda) () ,(cadr form)))))
 
-(define-macro (delay expr) `(make-promise (lambda () ,expr)))
+(define-rewriter force (lambda (form rename) `(,(rename 'apply) ,(cadr form) '())))
 
-(define-macro (force expr) `(apply ,expr '()))
+(define-rewriter unless (lambda (form rename) `(,(rename 'if) (,(rename 'not) ,(cadr form)) ,(caddr form))))
 
-(define-macro (unless expr consequent) `(if (not ,expr) ,consequent))
+(define-rewriter when (lambda (form rename) `(,(rename 'if) ,(cadr form) ,(caddr form))))
 
-(define-macro (when expr consequent) `(if ,expr ,consequent))
+(define-rewriter do 
+  (lambda (form rename)
+    (let ((bindings (map (lambda (x) (cons (car x) (list (cadr x)))) (cadr form)))
+          (steps (map (lambda (x) (if (< 2 (length x)) (caddr x) (car x))) (cadr form)))
+          (condition (car (car (cddr form))))
+          (endresult (cadr (car (cddr form))))
+          (expr (cdddr form))
+          (loop-name (gensym)))
 
-(define-macro (do init test . expr)
-  (let ((bindings (map (lambda (x) (cons (car x) (list (cadr x)))) init))
-       (steps (map (lambda (x) (if (< 2 (length x)) (caddr x) (car x))) init))
-       (condition (car test))
-       (endresult (cdr test))
-       (loop-name (gensym)))
-
-    `(let ,loop-name ,bindings
-       (if (not ,condition)
-           (begin ,(car expr) ,(cons loop-name steps))
-	   ,@endresult))))
+      `(,(rename 'let) ,loop-name ,bindings
+        (,(rename 'if) (,(rename 'not) ,condition)
+            (,(rename 'begin) ,@expr ,(cons loop-name steps))
+	    ,endresult)))))

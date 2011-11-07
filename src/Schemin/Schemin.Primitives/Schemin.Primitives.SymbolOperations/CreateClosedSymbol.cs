@@ -25,62 +25,37 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.AST
+namespace Schemin.Primitives.SymbolOperations
 {
+	using System;
+	using Environment = Schemin.Evaluate.Environment;
 	using Schemin.Evaluate;
+	using Schemin.AST;
 
-	public class ScheminAtom : IScheminType
+	public class CreateClosedSymbol : Primitive
 	{
-		public string Name;
-		public bool Closed = false;
-		public Environment Closure = null;
-
-		public ScheminAtom(string name)
+		// Creates a symbol with a closure to evaluate in, instead of being evaluated in the current env
+		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			this.Name = name;
+			ScheminAtom sym = (ScheminAtom) args.Car;
+			return new ScheminAtom(sym.Name, env);
 		}
 
-		public ScheminAtom(string name, Environment closure)
+		public override void CheckArguments(ScheminPair args)
 		{
-			this.Name = name;
-			this.Closure = closure;
-			this.Closed = true;
-		}
+			IScheminType first = args.Car;
 
-		public override string ToString()
-		{
-			return Name;
-		}
-
-		public bool Equivalent(IScheminType type)
-		{
-			if ((type as ScheminAtom) == null)
+			if (args.Length != 1)
 			{
-				return false;
+				throw new BadArgumentsException("expected 1 argument");
 			}
 
-			ScheminAtom temp = (ScheminAtom) type;
-			if (this.Name == temp.Name)
+			if ((first as ScheminAtom) == null)
 			{
-				return true;
+				throw new BadArgumentsException("argument must be a symbol");
 			}
 
-			return false;
-		}
-
-		public bool Equal(IScheminType type)
-		{
-			if (type == this)
-			{
-				return true;
-			}
-
-			return false;
-		}
-
-		public ScheminBool BoolValue()
-		{
-			return ScheminBool.True;
+			return;
 		}
 	}
 }
