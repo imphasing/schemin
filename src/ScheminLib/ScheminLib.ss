@@ -60,6 +60,15 @@
 
 (define (reverse lst) (fold (flip cons) '() lst))
 
+(define (zip lista listb)
+  ((foldr (lambda (el func)
+     (lambda (a)
+       (if (null? a)
+           '()
+           (cons (list el (car a)) (func (cdr a))))))
+     (lambda (a) '())
+     lista) listb))
+
 (define (member thing lis)
   (if (null? lis)
       #f
@@ -72,14 +81,14 @@
       #f
       (if (eqv? (car lis) thing)
           lis
-          (member thing (cdr lis)))))
+          (memv thing (cdr lis)))))
 
 (define (memq thing lis)
   (if (null? lis)
       #f
       (if (eq? (car lis) thing)
           lis
-          (member thing (cdr lis)))))
+          (memq thing (cdr lis)))))
 
 (define (assoc thing alist)
   (if (null? alist)
@@ -93,14 +102,14 @@
       #f
       (if (eq? (car (car alist)) thing)
           (car alist)
-          (assoc thing (cdr alist)))))
+          (assq thing (cdr alist)))))
 
 (define (assv thing alist)
   (if (null? alist)
       #f
       (if (eqv? (car (car alist)) thing)
           (car alist)
-          (assoc thing (cdr alist)))))
+          (assv thing (cdr alist)))))
 
 ;; General functions:
 
@@ -136,6 +145,8 @@
 
 (define (min first . num-list) (fold (lambda (old new) (if (< old new) old new)) first num-list))
 
+;; Macros and helpers
+
 (define make-promise
   (lambda (proc)
     (let ((result-ready? #f)
@@ -149,6 +160,16 @@
                   (begin (set! result-ready? #t)
                          (set! result x)
                          result))))))))
+
+(define-rewriter destructure
+  (lambda (macro-form rename)
+    (let* ((pattern (cdr (car (caddr macro-form))))
+          (expression (cadr (caddr macro-form)))
+	  (form-name (car (cdr macro-form)))
+	  (kvp (zip pattern (cdr (eval form-name)))))
+
+      `(,(rename 'let) ,kvp ,expression))))
+
 (define-rewriter delay 
   (lambda (form rename) 
     `(,(rename 'make-promise) (,(rename 'lambda) () ,(cadr form)))))

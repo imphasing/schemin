@@ -88,7 +88,7 @@ namespace Schemin.Tokenize
 
 						// only a number literal if the starting char is numerical, or if the starting char is a - or +
 						// AND the next char is part of a number.
-						if(Numerical(input[i + 1]) || input[i + 1] == '.')
+						if(i + 1 < input.Length && (Numerical(input[i + 1]) || input[i + 1] == '.'))
 							return NumberLiteral(input, i);
 						else
 							return Symbol(input, i);
