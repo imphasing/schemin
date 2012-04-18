@@ -25,31 +25,31 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace Schemin.Primitives.GeneralOperations
+namespace Schemin
 {
 	using Schemin.Evaluate;
-	using Schemin.AST;
+	using Schemin.Parse;
+	using Schemin.Tokenize;
 
-	public class Eval : Primitive
+	public class EvaluatorFactory
 	{
-		public Eval()
-		{
-			base.Rewriter = true;
-		}
+		public static Evaluator evaluator;
+		public static Evaluator macroEvaluator;
 
-		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
-		{
-			return EvaluatorFactory.macroExpander.ExpandAll(args.Car);
-		}
+		public static Tokenizer tokenizer;
+		public static PairParser parser;
 
-		public override void CheckArguments(ScheminPair args)
-		{
-			if (args.Length != 1)
-			{
-				throw new BadArgumentsException("expected 1 argument");
-			}
+		public static MacroExpander macroExpander;
 
-			return;
+		static EvaluatorFactory()
+		{
+			tokenizer = new Tokenizer();
+			parser = new PairParser();
+
+			evaluator = new Evaluator();
+			macroEvaluator = new Evaluator();
+
+			macroExpander = new MacroExpander(macroEvaluator);
 		}
 	}
 }

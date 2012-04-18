@@ -52,13 +52,11 @@ namespace Schemin.Primitives.GeneralOperations
 			StreamReader sr = new StreamReader(fs);
 
 			string file = sr.ReadToEnd();
-			Tokenizer t = new Tokenizer();
-			PairParser p = new PairParser();
 
-			var tokens = t.Tokenize(file);
-			ScheminPair ast = p.Parse(tokens, true).Cons(new ScheminPrimitive("begin"));
+			var tokens = EvaluatorFactory.tokenizer.Tokenize(file);
+			ScheminPair ast = EvaluatorFactory.parser.Parse(tokens, true).Cons(new ScheminPrimitive("begin"));
 
-			return eval.ExpandMacros(ast);
+			return EvaluatorFactory.macroExpander.ExpandAll(ast);
 		}
 
 		public override void CheckArguments(ScheminPair args)

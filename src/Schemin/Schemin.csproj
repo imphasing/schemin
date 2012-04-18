@@ -43,11 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="EvaluatorFactory.cs" />
     <Compile Include="Assembly\AssemblyInfo.cs" />
     <Compile Include="Mono.Options\Options.cs" />
     <Compile Include="Schemin.Evaluate\Environment.cs" />
     <Compile Include="Schemin.Evaluate\UnboundAtomException.cs" />
     <Compile Include="Schemin.Evaluate\Evaluator.cs" />
+    <Compile Include="Schemin.Evaluate\MacroExpander.cs" />
     <Compile Include="Schemin.Evaluate\StackFrame.cs" />
 
     <Compile Include="Schemin.Primitives\Primitive.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Quote.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\QuasiQuote.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Eval.cs" />
+    <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Expand.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\SetBang.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Load.cs" />
     <Compile Include="Schemin.Primitives\Schemin.Primitives.GeneralOperations\Case.cs" />
@@ -191,16 +194,13 @@
     <Compile Include="Schemin.AST\ScheminVector.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-
   <PropertyGroup>
     <ScheminLibDirectory>..\ScheminLib</ScheminLibDirectory>
   </PropertyGroup>
-
   <Target Name="AfterBuild">
     <CreateItem Include="$(ScheminLibDirectory)\**\*.*">
       <Output TaskParameter="Include" ItemName="FilesToCopy" />
     </CreateItem>
-
     <Message Text="Test" />
     <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="..\..\build\ScheminLib\%(RecursiveDir)" />
   </Target>

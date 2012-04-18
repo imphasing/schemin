@@ -94,24 +94,17 @@ namespace Schemin
 
 		static void InterpretFile(string filename)
 		{
-			Tokenizer t = new Tokenizer();
-			PairParser p = new PairParser();
-			Evaluator eval = new Evaluator();
-
 			string contents = File.ReadAllText(filename);
-			var tokens = t.Tokenize(contents);
-			var parsed = p.Parse(tokens, false);
+			var tokens = EvaluatorFactory.tokenizer.Tokenize(contents);
+			var parsed = EvaluatorFactory.parser.Parse(tokens, false);
 
-			IScheminType returnType = eval.Evaluate(parsed);
+			var expanded = (ScheminPair) EvaluatorFactory.macroExpander.ExpandAll(parsed);
+			IScheminType returnType = EvaluatorFactory.evaluator.Evaluate(expanded);
 			Console.WriteLine(returnType);
 		}
 
 		static void ReplPrompt()
 		{
-			Tokenizer t = new Tokenizer();
-			PairParser p = new PairParser();
-			Evaluator eval = new Evaluator();
-
 			for (; ;)
 			{
 				bool completeInput = false;
@@ -139,7 +132,7 @@ namespace Schemin
 						return;
 					}
 
-					var lineTokens = t.Tokenize(line);
+					var lineTokens = EvaluatorFactory.tokenizer.Tokenize(line);
 
 					foreach (Token token in lineTokens)
 					{
@@ -166,8 +159,9 @@ namespace Schemin
 					continue;
 				}
 
-				var parsed = p.Parse(partialInput, false);
-				IScheminType returnType = eval.Evaluate(parsed);
+				var parsed = EvaluatorFactory.parser.Parse(partialInput, false);
+				var expanded = (ScheminPair) EvaluatorFactory.macroExpander.ExpandAll(parsed);
+				IScheminType returnType = EvaluatorFactory.evaluator.Evaluate(expanded);
 				Console.WriteLine(returnType);
 			}
 		}

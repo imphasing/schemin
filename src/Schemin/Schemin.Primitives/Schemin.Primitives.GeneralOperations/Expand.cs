@@ -30,13 +30,8 @@ namespace Schemin.Primitives.GeneralOperations
 	using Schemin.Evaluate;
 	using Schemin.AST;
 
-	public class Eval : Primitive
+	public class Expand : Primitive
 	{
-		public Eval()
-		{
-			base.Rewriter = true;
-		}
-
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
 			return EvaluatorFactory.macroExpander.ExpandAll(args.Car);

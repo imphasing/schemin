@@ -42,9 +42,11 @@ namespace Schemin.Evaluate
 	{
 		public Stack<StackFrame> Stack;
 		public Environment GlobalEnv;
+
 		public ScheminPort ConsoleIOPort;
 		public ScheminPort CurrentInputPort;
 		public ScheminPort CurrentOutputPort; 
+
 		public int GenSymSeed = 0;
 		public string GenSymPrefix = "GENERATED_";
 
@@ -65,8 +67,7 @@ namespace Schemin.Evaluate
 		{
 			try
 			{
-				IScheminType expanded = ExpandMacros(ast);
-				return EvaluateInternal(expanded);
+				return EvaluateInternal(ast);
 			}
 			catch (BadArgumentsException b)
 			{
@@ -77,83 +78,6 @@ namespace Schemin.Evaluate
 			{
 				CurrentOutputPort.OutputStream.WriteLine("error: " + e.Message);
 				return new ScheminPair();
-			}
-		}
-
-		public IScheminType ExpandMacros(IScheminType ast)
-		{
-			bool modified = false;
-			IScheminType expanded = Expand(ast, ref modified);
-
-			while (modified == true)
-			{
-				modified = false;
-				expanded = Expand(expanded, ref modified);
-			}
-
-			return expanded;
-		}
-
-		// Change phase, pretty much.
-		private IScheminType EvalAndRestore(IScheminType type)
-		{
-			Stack<StackFrame> oldStack = this.Stack;
-			this.Stack = new Stack<StackFrame>();
-			IScheminType result = this.EvaluateInternal(type);
-			this.Stack = oldStack;
-
-			return result;
-		}
-
-		private IScheminType Expand(IScheminType ast, ref bool modified)
-		{
-			if ((ast as ScheminPair) != null && ((ScheminPair) ast).Proper)
-			{
-				ScheminPair astPair = (ScheminPair) ast;
-				if ((astPair.Car as ScheminAtom) != null)
-				{
-					ScheminAtom functionPosition = (ScheminAtom) astPair.Car;
-					IScheminType bound = null;
-
-					if (functionPosition.Closed)
-						bound = functionPosition.Closure.GetValue(functionPosition);
-					else
-						bound = this.GlobalEnv.GetValue(functionPosition);
-
-					if ((bound as ScheminRewriter) != null)
-					{
-						ScheminRewriter rewriter = (ScheminRewriter)bound;
-						ScheminPair macroCall = rewriter.Rewrite(astPair);
-						IScheminType expanded = this.EvalAndRestore(macroCall);
-						modified = true;
-						return expanded;
-					}
-					else if ((bound as ScheminPrimitive) != null)
-					{
-						ScheminPrimitive boundPrim = (ScheminPrimitive)bound;
-						if (boundPrim.Definition == PrimitiveFactory.Get("define-rewriter"))
-						{
-							modified = true;
-							return this.EvalAndRestore(astPair);
-						}
-						else if (boundPrim.Name == "quote" || boundPrim.Name == "quasiquote")
-						{
-							return astPair;
-						}
-					}
-				}
-
-				ScheminPair rewritten = new ScheminPair();
-				foreach (IScheminType type in astPair)
-				{
-					rewritten = rewritten.Append(Expand(type, ref modified));
-				}
-
-				return rewritten;
-			}
-			else
-			{
-				return ast;
 			}
 		}
 
@@ -398,7 +322,7 @@ namespace Schemin.Evaluate
 			throw new Exception("Control escaped evaluator");
 		}
 
-		private IScheminType EvaluatePrimitive(ScheminPrimitive functionPosition, ScheminPair args, Environment env)
+		public IScheminType EvaluatePrimitive(ScheminPrimitive functionPosition, ScheminPair args, Environment env)
 		{
 			try
 			{
@@ -416,7 +340,7 @@ namespace Schemin.Evaluate
 			}
 		}
 
-		private IScheminType EvalAtom(IScheminType ast, Environment env)
+		public IScheminType EvalAtom(IScheminType ast, Environment env)
 		{
 			ScheminAtom temp = (ScheminAtom) ast;
 			IScheminType bound = null;
@@ -432,7 +356,7 @@ namespace Schemin.Evaluate
 			return bound;
 		}
 
-		private bool EvaluateNextArg(ScheminPrimitive currentPrimitive, int currentArg, ScheminPair args)
+		public bool EvaluateNextArg(ScheminPrimitive currentPrimitive, int currentArg, ScheminPair args)
 		{
 			if (currentPrimitive != null)
 			{
@@ -499,7 +423,7 @@ namespace Schemin.Evaluate
 			return true;
 		}
 
-		private bool IsEmptyList(IScheminType type)
+		public bool IsEmptyList(IScheminType type)
 		{
 			if ((type as ScheminPair) != null)
 			{
@@ -513,11 +437,8 @@ namespace Schemin.Evaluate
 			return false;
 		}
 
-		private void DefinePrimitives(Environment env)
+		public void DefinePrimitives(Environment env)
 		{
-			Tokenizer t = new Tokenizer();
-			PairParser p = new PairParser();
-
 			foreach (KeyValuePair<string, Primitive> kvp in PrimitiveFactory.Primitives)
 			{
 				ScheminAtom symbol = AtomFactory.GetAtom(kvp.Key);
@@ -525,10 +446,16 @@ namespace Schemin.Evaluate
 
 				env.AddBinding(symbol, prim);
 			}
+			
+			string filename = "ScheminLib\\\\ScheminLib.ss";
+			string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+			FileStream fs = File.OpenRead(baseDir + Path.DirectorySeparatorChar + filename);
+			StreamReader sr = new StreamReader(fs);
+			string file = sr.ReadToEnd();
 
-			string load = "(load \"ScheminLib\\\\ScheminLib.ss\")";
-			var tokens = t.Tokenize(load);
-			var ast = p.Parse(tokens, true);
+			var tokens = EvaluatorFactory.tokenizer.Tokenize(file);
+			ScheminPair ast = EvaluatorFactory.parser.Parse(tokens, true).Cons(new ScheminPrimitive("begin"));
+
 			Evaluate(ast);
 		}
 	}
