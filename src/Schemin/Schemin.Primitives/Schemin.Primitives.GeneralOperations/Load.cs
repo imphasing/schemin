@@ -53,10 +53,10 @@ namespace Schemin.Primitives.GeneralOperations
 
 			string file = sr.ReadToEnd();
 
-			var tokens = EvaluatorFactory.tokenizer.Tokenize(file);
-			ScheminPair ast = EvaluatorFactory.parser.Parse(tokens, true).Cons(new ScheminPrimitive("begin"));
+			var tokens = eval.interpreter.tokenizer.Tokenize(file);
+			ScheminPair ast = eval.interpreter.parser.Parse(tokens, true).Cons(new ScheminPrimitive("begin"));
 
-			return EvaluatorFactory.macroExpander.ExpandAll(ast);
+			return eval.interpreter.macroExpander.ExpandAll(ast);
 		}
 
 		public override void CheckArguments(ScheminPair args)

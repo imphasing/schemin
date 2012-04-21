@@ -43,9 +43,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="EvaluatorFactory.cs" />
     <Compile Include="Assembly\AssemblyInfo.cs" />
     <Compile Include="Mono.Options\Options.cs" />
+
+    <Compile Include="Schemin.Interpret\Interpreter.cs" />
+
     <Compile Include="Schemin.Evaluate\Environment.cs" />
     <Compile Include="Schemin.Evaluate\UnboundAtomException.cs" />
     <Compile Include="Schemin.Evaluate\Evaluator.cs" />

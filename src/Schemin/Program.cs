@@ -31,11 +31,8 @@ namespace Schemin
 	using System.Collections.Generic;
 	using System.IO;
 	using Mono.Options;
-	using Schemin.AST;
-	using Schemin.Evaluate;
-	using Schemin.Parse;
+	using Schemin.Interpret;
 	using Schemin.Tokenize;
-	using Environment = Schemin.Evaluate.Environment;
 
 	class Program
 	{
@@ -94,17 +91,14 @@ namespace Schemin
 
 		static void InterpretFile(string filename)
 		{
+			Interpreter i = new Interpreter();
 			string contents = File.ReadAllText(filename);
-			var tokens = EvaluatorFactory.tokenizer.Tokenize(contents);
-			var parsed = EvaluatorFactory.parser.Parse(tokens, false);
-
-			var expanded = (ScheminPair) EvaluatorFactory.macroExpander.ExpandAll(parsed);
-			IScheminType returnType = EvaluatorFactory.evaluator.Evaluate(expanded);
-			Console.WriteLine(returnType);
+			Console.WriteLine(i.Interpret(contents));
 		}
 
 		static void ReplPrompt()
 		{
+			Interpreter i = new Interpreter();
 			for (; ;)
 			{
 				bool completeInput = false;
@@ -132,7 +126,7 @@ namespace Schemin
 						return;
 					}
 
-					var lineTokens = EvaluatorFactory.tokenizer.Tokenize(line);
+					var lineTokens = i.tokenizer.Tokenize(line);
 
 					foreach (Token token in lineTokens)
 					{
@@ -159,10 +153,7 @@ namespace Schemin
 					continue;
 				}
 
-				var parsed = EvaluatorFactory.parser.Parse(partialInput, false);
-				var expanded = (ScheminPair) EvaluatorFactory.macroExpander.ExpandAll(parsed);
-				IScheminType returnType = EvaluatorFactory.evaluator.Evaluate(expanded);
-				Console.WriteLine(returnType);
+				Console.WriteLine(i.Interpret(partialInput));
 			}
 		}
 	}

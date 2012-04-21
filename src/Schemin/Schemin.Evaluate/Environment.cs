@@ -27,9 +27,8 @@
 
 namespace Schemin.Evaluate
 {
-	using System;
-	using System.Text;
 	using System.Collections.Generic;
+	using System.Text;
 	using Schemin.AST;
 
 	public class Environment

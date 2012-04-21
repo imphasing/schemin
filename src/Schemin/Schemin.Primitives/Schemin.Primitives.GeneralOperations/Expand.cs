@@ -34,7 +34,7 @@ namespace Schemin.Primitives.GeneralOperations
 	{
 		public override IScheminType Execute(Environment env, Evaluator eval, ScheminPair args)
 		{
-			return EvaluatorFactory.macroExpander.ExpandAll(args.Car);
+			return eval.interpreter.macroExpander.ExpandAll(args.Car);
 		}
 
 		public override void CheckArguments(ScheminPair args)

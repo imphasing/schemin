@@ -27,15 +27,7 @@
 
 namespace Schemin.Evaluate
 {
-	using System;
-	using System.Text;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.IO;
-	using System.Linq;
 	using Schemin.AST;
-	using Schemin.Parse;
-	using Schemin.Tokenize;
 	using Schemin.Primitives;
 
 	public class MacroExpander

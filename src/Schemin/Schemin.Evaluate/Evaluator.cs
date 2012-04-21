@@ -28,57 +28,37 @@
 namespace Schemin.Evaluate
 {
 	using System;
-	using System.Text;
-	using System.Collections;
 	using System.Collections.Generic;
-	using System.IO;
-	using System.Linq;
 	using Schemin.AST;
-	using Schemin.Parse;
-	using Schemin.Tokenize;
+	using Schemin.Interpret;
 	using Schemin.Primitives;
+	using Schemin.Tokenize;
 
 	public class Evaluator
 	{
 		public Stack<StackFrame> Stack;
 		public Environment GlobalEnv;
 
-		public ScheminPort ConsoleIOPort;
 		public ScheminPort CurrentInputPort;
-		public ScheminPort CurrentOutputPort; 
+		public ScheminPort CurrentOutputPort;
 
 		public int GenSymSeed = 0;
 		public string GenSymPrefix = "GENERATED_";
 
-		public Evaluator()
+		public Interpreter interpreter;
+
+		public Evaluator(Interpreter interpreter)
 		{
+			this.interpreter = interpreter;
+			this.GlobalEnv = interpreter.GlobalEnv;
+
 			Stack = new Stack<StackFrame>();
-			this.GlobalEnv = new Environment();
 
 			var ConsoleInput = new ScheminPort(Console.In);
 			var ConsoleOutput = new ScheminPort(Console.Out);
 
-			CurrentInputPort = ConsoleInput;
-			CurrentOutputPort = ConsoleOutput;
-			DefinePrimitives(this.GlobalEnv);
-		}
-
-		public IScheminType Evaluate(ScheminPair ast)
-		{
-			try
-			{
-				return EvaluateInternal(ast);
-			}
-			catch (BadArgumentsException b)
-			{
-				CurrentOutputPort.OutputStream.WriteLine("bad arguments: " + b.Message);
-				return new ScheminPair();
-			}
-			catch (Exception e)
-			{
-				CurrentOutputPort.OutputStream.WriteLine("error: " + e.Message);
-				return new ScheminPair();
-			}
+			this.CurrentInputPort = ConsoleInput;
+			this.CurrentOutputPort = ConsoleOutput;
 		}
 
 		public IScheminType EvaluateInternal(IScheminType ast)
@@ -435,28 +415,6 @@ namespace Schemin.Evaluate
 			}
 
 			return false;
-		}
-
-		public void DefinePrimitives(Environment env)
-		{
-			foreach (KeyValuePair<string, Primitive> kvp in PrimitiveFactory.Primitives)
-			{
-				ScheminAtom symbol = AtomFactory.GetAtom(kvp.Key);
-				ScheminPrimitive prim = new ScheminPrimitive(kvp.Key);
-
-				env.AddBinding(symbol, prim);
-			}
-			
-			string filename = "ScheminLib\\\\ScheminLib.ss";
-			string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-			FileStream fs = File.OpenRead(baseDir + Path.DirectorySeparatorChar + filename);
-			StreamReader sr = new StreamReader(fs);
-			string file = sr.ReadToEnd();
-
-			var tokens = EvaluatorFactory.tokenizer.Tokenize(file);
-			ScheminPair ast = EvaluatorFactory.parser.Parse(tokens, true).Cons(new ScheminPrimitive("begin"));
-
-			Evaluate(ast);
 		}
 	}
 }
