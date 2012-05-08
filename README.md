@@ -46,17 +46,17 @@ As well as some more complicated things, like this simple example of coroutines 
     (hefty-computation superfluous-computation)
 
 
-Or this basic macro, which adds the arguments given to it, using a quasiquoting template:
+Or this explicit-renaming macro, which implements an "unless" construct:
 
-    (define-macro (testadd . toadd) `(fold (lambda (acc x) (+ acc x)) 0 (list ,@toadd)))
+    (define-rewriter unless (lambda (form rename) `(,(rename 'if) (,(rename 'not) ,(cadr form)) ,(caddr form))))
 
-Check out the examples directory for more examples of what Schemin is capable of.
+Check out the examples directory for more examples of what Schemin is capable of, or the src/ScheminLib directory for portions of Schemin implemented in itself.
 
 
 Implemented featues:
 --------------------
 
-+ Basic unhygenic macros, using define-macro paired with quasiquoting.
++ Lexically scoped macros, that are hopefully not totally broken.
 + All primitive types in r5rs, except the full numerical tower.
 + First-class continuations and call/cc
 + IO Ports (File and console IO)
